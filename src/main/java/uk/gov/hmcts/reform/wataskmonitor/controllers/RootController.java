@@ -1,5 +1,6 @@
-package uk.gov.hmcts.reform.demo.controllers;
+package uk.gov.hmcts.reform.wataskmonitor.controllers;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,8 +22,8 @@ public class RootController {
      *
      * @return Welcome message from the service.
      */
-    @GetMapping("/")
+    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> welcome() {
-        return ok("Welcome to spring-boot-template");
+        return ok("Welcome to wa-task-monitor");
     }
 }

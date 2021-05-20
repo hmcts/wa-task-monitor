@@ -1,0 +1,9 @@
+java:
+  applicationPort: 8077
+  image: 'hmctspublic.azurecr.io/wa/task-monitor:latest'
+  ingressHost: wa-task-monitor-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  aadIdentityName: wa
+  keyVaults:
+    wa:
+      secrets:
+        - AppInsightsInstrumentationKey
