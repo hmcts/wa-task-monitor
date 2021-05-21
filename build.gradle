@@ -7,7 +7,7 @@ plugins {
   id 'org.springframework.boot' version '2.3.4.RELEASE'
   id 'org.owasp.dependencycheck' version '6.1.6'
   id 'com.github.ben-manes.versions' version '0.38.0'
-  id 'org.sonarqube' version '3.2.0'
+  id 'org.sonarqube' version '3.0'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -115,6 +115,8 @@ sonarqube {
     property "sonar.projectName", "Reform :: wa-task-monitor"
     property "sonar.projectKey", "uk.gov.hmcts.reform:wa-task-monitor"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
+    property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/wataskmonitor/config/**," +
+      "src/main/java/uk/gov/hmcts/reform/wataskmonitor/Application.java"
   }
 }
 
