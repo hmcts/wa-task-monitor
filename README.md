@@ -1,6 +1,6 @@
-# wa-monitor-unconfigured-tasks-service
+# wa-task-monitor
 
-[![Build Status](https://travis-ci.org/hmcts/spring-boot-template.svg?branch=master)](https://travis-ci.org/hmcts/spring-boot-template)
+[![Build Status](https://travis-ci.org/hmcts/wa-task-monitor.svg?branch=master)](https://travis-ci.org/hmcts/wa-task-monitor)
 
 ## Purpose
 
@@ -46,7 +46,7 @@ Create docker image:
   docker-compose build
 ```
 
-Run the distribution (created in `build/install/spring-boot-template` directory)
+Run the distribution (created in `build/install/wa-task-monitor` directory)
 by executing the following command:
 
 ```bash
@@ -54,12 +54,12 @@ by executing the following command:
 ```
 
 This will start the API container exposing the application's port
-(set to `4550` in this template app).
+(set to `8077` in this template app).
 
 In order to test if the application is up, you can call its health endpoint:
 
 ```bash
-  curl http://localhost:4550/health
+  curl http://localhost:8077/health
 ```
 
 You should get a response similar to this:
