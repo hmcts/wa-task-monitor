@@ -1,16 +1,27 @@
 package uk.gov.hmcts.reform.wataskmonitor.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @Slf4j
 public class TaskConfiguratorScheduler {
 
-    @Scheduled(fixedRate = 10_000)
+    private final CamundaService camundaService;
+
+    public TaskConfiguratorScheduler(CamundaService camundaService) {
+        this.camundaService = camundaService;
+    }
+
+//    @Scheduled(fixedRate = 10_000)
     public void runTaskConfigurator() {
         log.info("Task configurator starts...");
+
+        List<String> tasks = camundaService.getTasks();
+        System.out.println(tasks);
+
         log.info("Task configurator ends...");
     }
 }

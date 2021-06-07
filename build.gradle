@@ -190,12 +190,13 @@ repositories {
 }
 
 def versions = [
-  junit           : '5.7.2',
-  junitPlatform   : '1.7.2',
-  reformLogging   : '5.1.7',
-  springBoot      : springBoot.class.package.implementationVersion,
-  springfoxSwagger: '3.0.0',
-  serenity        : '2.2.12'
+  junit               : '5.7.2',
+  junitPlatform       : '1.7.2',
+  reformLogging       : '5.1.7',
+  springBoot          : springBoot.class.package.implementationVersion,
+  springfoxSwagger    : '3.0.0',
+  serenity            : '2.2.12',
+  springFrameworkCloud: '2.2.8.RELEASE'
 ]
 
 ext.libraries = [
@@ -214,11 +215,14 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
 
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: versions.springFrameworkCloud
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: versions.springFrameworkCloud
+
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
 
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.8.RELEASE'
+
 
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
@@ -239,6 +243,7 @@ dependencies {
   testImplementation "org.junit.vintage:junit-vintage-engine:${versions.junit}"
   testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.1.0'
 
+  testImplementation "com.github.tomakehurst:wiremock-jre8:2.28.0"
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
@@ -263,5 +268,5 @@ bootJar {
 }
 
 wrapper {
-    distributionType = Wrapper.DistributionType.ALL
+  distributionType = Wrapper.DistributionType.ALL
 }

@@ -11,6 +11,9 @@ management:
       exposure:
         include: health, info, prometheus
 
+camunda:
+  url: ${CAMUNDA_URL:http://camunda-bpm/engine-rest}
+
 spring:
   application:
     name: WA Task monitor
