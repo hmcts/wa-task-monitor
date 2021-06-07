@@ -21,6 +21,10 @@ class TaskConfiguratorSchedulerTest {
 
     @Test
     void runTaskConfigurator() {
+        assertTaskConfiguratorRunsEveryTenSeconds();
+    }
+
+    private void assertTaskConfiguratorRunsEveryTenSeconds() {
         await().atMost(12, TimeUnit.SECONDS)
             .untilAsserted(
                 () -> verify(taskConfiguratorScheduler, times(2)).runTaskConfigurator());

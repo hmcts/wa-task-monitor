@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class TaskConfiguratorScheduler {
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 10_000)
     public void runTaskConfigurator() {
         log.info("Task configurator starts...");
         log.info("Task configurator ends...");
