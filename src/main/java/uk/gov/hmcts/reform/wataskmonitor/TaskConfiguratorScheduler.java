@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.wataskmonitor.models.Task;
+import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.services.CamundaService;
 
 import java.util.List;
@@ -26,8 +26,8 @@ public class TaskConfiguratorScheduler {
     public void runTaskConfigurator() {
         log.info("Task configurator starts...");
 
-        List<Task> tasks = camundaService.getTasks();
-        System.out.println(tasks);
+        List<CamundaTask> camundaTasks = camundaService.getTasks();
+        log.info(camundaTasks.toString());
 
         log.info("Task configurator ends...");
     }

@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.wataskmonitor.clients;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.reform.wataskmonitor.models.Task;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -13,6 +16,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
     name = "camunda",
     url = "${camunda.url}"
 )
+@SuppressWarnings("PMD.UseObjectForClearerAPI")
 public interface CamundaClient {
 
     @PostMapping(value = "/task",
@@ -20,10 +24,12 @@ public interface CamundaClient {
         produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    List<Task> getTasks(@RequestHeader("ServiceAuthorization") String serviceAuthorisation,
-                        @RequestParam(value = "firstResult", required = false, defaultValue = "0") String firstResult,
-                        @RequestParam(value = "maxResults", required = false, defaultValue = "1000") String maxResults,
-                        @RequestBody Map<String, Object> body);
+    List<CamundaTask> getTasks(@RequestHeader("ServiceAuthorization") String serviceAuthorisation,
+                               @RequestParam(value = "firstResult", required = false, defaultValue = "0")
+                                   String firstResult,
+                               @RequestParam(value = "maxResults", required = false, defaultValue = "1000")
+                                   String maxResults,
+                               @RequestBody String body);
 
 }
 

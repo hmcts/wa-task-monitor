@@ -10,9 +10,14 @@ import java.nio.charset.Charset;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static org.springframework.util.StreamUtils.copyToString;
 
-public class CamundaClientMock {
+public final class CamundaClientMock {
 
-    public static void setupPostTaskCamundaResponseMock(WireMockServer mockServer, String expectedResponse) throws IOException {
+    private CamundaClientMock() {
+        // HideUtilityClassConstructor
+    }
+
+    public static void setupPostTaskCamundaResponseMock(WireMockServer mockServer, String expectedResponse)
+        throws IOException {
         mockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/task?firstResult=0&maxResults=1000"))
                                .withHeader("ServiceAuthorization", containing("Bearer"))
                                .willReturn(WireMock.aResponse()
@@ -20,8 +25,8 @@ public class CamundaClientMock {
                                                .withHeader("Content-Type", "application/json")
                                                .withBody(
                                                    copyToString(
-                                                       CamundaClientMock.class.getClassLoader().getResourceAsStream(
-                                                           expectedResponse),
+                                                       Thread.currentThread().getContextClassLoader()
+                                                           .getResourceAsStream(expectedResponse),
                                                        Charset.defaultCharset()
                                                    )
                                                )

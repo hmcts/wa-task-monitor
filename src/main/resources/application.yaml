@@ -12,7 +12,7 @@ management:
         include: health, info, prometheus
 
 camunda:
-  url: ${CAMUNDA_URL:http://camunda-bpm/engine-rest}
+  url: ${CAMUNDA_URL:http://camunda-local-bpm/engine-rest}
 
 spring:
   application:

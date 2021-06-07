@@ -5,19 +5,21 @@ import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode
-public class Task {
+public class CamundaTask {
+
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private String id;
 
-    // to deserialize
-    public Task() {
+    public CamundaTask() {
+        // to deserialize
     }
 
-    public Task(String id) {
+    public CamundaTask(String id) {
         this.id = id;
     }
 
-    // to serialize
     public void setId(String id) {
+        // to serialize
         this.id = id;
     }
 }

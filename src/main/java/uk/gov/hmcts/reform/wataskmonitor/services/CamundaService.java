@@ -1,14 +1,27 @@
 package uk.gov.hmcts.reform.wataskmonitor.services;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.FileCopyUtils;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
-import uk.gov.hmcts.reform.wataskmonitor.models.Task;
+import uk.gov.hmcts.reform.wataskmonitor.exceptions.CamundaRequestFailure;
+import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 @Component
+@Slf4j
 public class CamundaService {
+
+    public static final String QUERY_PARAMETERS_JSON = "camundaquery/camunda-query-parameters.json";
+    public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS+0000";
 
     private final CamundaClient camundaClient;
 
@@ -16,25 +29,25 @@ public class CamundaService {
         this.camundaClient = camundaClient;
     }
 
-    String queryParameters = "{\n" +
-        "    \"orQueries\": [\n" +
-        "        {\n" +
-        "            \"taskVariables\": [\n" +
-        "                {\n" +
-        "                    \"name\": \"taskState\",\n" +
-        "                    \"operator\": \"eq\",\n" +
-        "                    \"value\": \"unconfigured\"\n" +
-        "                }\n" +
-        "            ]\n" +
-        "        }\n" +
-        "    ],\n" +
-        "    \"createdBefore\": \"2021-06-02T16:18:00.808+0000\",\n" +
-        "    \"taskDefinitionKey\": \"processTask\",\n" +
-        "    \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n" +
-        "}";
+    public List<CamundaTask> getTasks() {
+        String serviceToken = "Bearer token";
+        return camundaClient.getTasks(serviceToken, "0", "1000", getQueryParameters());
+    }
 
-    public List<Task> getTasks() {
-        return camundaClient.getTasks("s2s token", null, null, Map.of());
+    private String getQueryParameters() {
+        try (InputStream is = new ClassPathResource(QUERY_PARAMETERS_JSON).getInputStream()) {
+            return FileCopyUtils.copyToString(new InputStreamReader(is, StandardCharsets.UTF_8))
+                .replace("CREATED_BEFORE_PLACEHOLDER", getCreatedBeforeDate());
+        } catch (IOException e) {
+            throw new CamundaRequestFailure(
+                "Error loading the query parameters file: " + QUERY_PARAMETERS_JSON,
+                e
+            );
+        }
+    }
+
+    private String getCreatedBeforeDate() {
+        return ZonedDateTime.now().format(DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN));
     }
 
 }

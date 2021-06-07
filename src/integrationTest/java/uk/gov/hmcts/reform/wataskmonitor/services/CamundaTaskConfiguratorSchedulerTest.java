@@ -12,13 +12,14 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-class TaskConfiguratorSchedulerTest {
+class CamundaTaskConfiguratorSchedulerTest {
 
     @MockBean
     private CamundaClient camundaClient;
@@ -37,7 +38,7 @@ class TaskConfiguratorSchedulerTest {
                 () -> {
                     verify(taskConfiguratorScheduler, times(2)).runTaskConfigurator();
                     verify(camundaClient, times(2))
-                        .getTasks(anyString(), any(), any(), anyMap());
+                        .getTasks(anyString(), any(), any(), anyString());
                 });
     }
 }
