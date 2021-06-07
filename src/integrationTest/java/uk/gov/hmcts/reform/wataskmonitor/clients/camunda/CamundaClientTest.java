@@ -20,7 +20,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(properties = {"camunda.url=http://localhost:9561"})
+@SpringBootTest(properties = {
+    "camunda.url=http://localhost:9561",
+    "task.configurator.scheduling.enable=false"
+})
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(profiles = {"local"})
 @EnableConfigurationProperties
