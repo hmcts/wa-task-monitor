@@ -21,8 +21,8 @@ public interface CamundaClient {
     )
     @ResponseBody
     List<Task> getTasks(@RequestHeader("ServiceAuthorization") String serviceAuthorisation,
-                        @RequestParam(value = "firstResult", defaultValue = "0") Integer firstResult,
-                        @RequestParam(value = "maxResults", defaultValue = "0") Integer maxResults,
+                        @RequestParam(value = "firstResult", required = false, defaultValue = "0") String firstResult,
+                        @RequestParam(value = "maxResults", required = false, defaultValue = "1000") String maxResults,
                         @RequestBody Map<String, Object> body);
 
 }

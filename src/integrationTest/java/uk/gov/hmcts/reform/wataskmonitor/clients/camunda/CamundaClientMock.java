@@ -13,7 +13,7 @@ import static org.springframework.util.StreamUtils.copyToString;
 public class CamundaClientMock {
 
     public static void setupPostTaskCamundaResponseMock(WireMockServer mockServer, String expectedResponse) throws IOException {
-        mockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/task"))
+        mockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/task?firstResult=0&maxResults=1000"))
                                .withHeader("ServiceAuthorization", containing("Bearer"))
                                .willReturn(WireMock.aResponse()
                                                .withStatus(HttpStatus.OK_200)
