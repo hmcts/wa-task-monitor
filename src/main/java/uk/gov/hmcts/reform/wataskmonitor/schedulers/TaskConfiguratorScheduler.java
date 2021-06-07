@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor;
+package uk.gov.hmcts.reform.wataskmonitor.schedulers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

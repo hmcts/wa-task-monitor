@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.wataskmonitor.TaskConfiguratorScheduler;
+import uk.gov.hmcts.reform.wataskmonitor.schedulers.TaskConfiguratorScheduler;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 
 import java.util.concurrent.TimeUnit;
