@@ -47,7 +47,9 @@ public class CamundaService {
     }
 
     private String getCreatedBeforeDate() {
-        return ZonedDateTime.now().format(DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN));
+        return ZonedDateTime.now()
+            .minusMinutes(5)
+            .format(DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN));
     }
 
 }
