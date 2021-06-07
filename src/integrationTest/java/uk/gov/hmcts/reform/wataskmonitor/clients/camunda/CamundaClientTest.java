@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.clients;
+package uk.gov.hmcts.reform.wataskmonitor.clients.camunda;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.jupiter.api.Test;
@@ -9,10 +9,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
+import uk.gov.hmcts.reform.wataskmonitor.clients.WireMockConfig;
+import uk.gov.hmcts.reform.wataskmonitor.models.Task;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(properties = {"camunda.url=http://localhost:9561"})
 @ExtendWith(SpringExtension.class)
@@ -22,18 +28,29 @@ import java.util.Map;
 class CamundaClientTest {
 
     @Autowired
-    private WireMockServer mockCamundaApi;
+    private WireMockServer mockServer;
 
     @Autowired
     private CamundaClient camundaClient;
 
     @Test
     void getTasks() throws IOException {
-        CamundaClientMock.setupPostTaskCamundaResponseMock(mockCamundaApi);
+        CamundaClientMock.setupPostTaskCamundaResponseMock(
+            mockServer,
+            "post-task-camunda-response.json"
+        );
 
-        List<String> tasks = camundaClient.getTasks("s2s token", null, null, Map.of());
+        List<Task> tasks = camundaClient.getTasks(
+            "some service Bearer token",
+            null,
+            null,
+            Collections.emptyMap()
+        );
 
-        System.out.println(tasks);
+        assertThat(tasks).isEqualTo(Arrays.asList(
+            new Task("090e80f0-c3be-11eb-a06f-164a82de09f9"),
+            new Task("21827953-c3c3-11eb-adeb-3a61f2fe2b47")
+        ));
 
     }
 }

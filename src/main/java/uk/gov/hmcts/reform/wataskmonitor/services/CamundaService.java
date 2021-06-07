@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.wataskmonitor.services;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
+import uk.gov.hmcts.reform.wataskmonitor.models.Task;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class CamundaService {
         "    \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n" +
         "}";
 
-    public List<String> getTasks() {
+    public List<Task> getTasks() {
         return camundaClient.getTasks("s2s token", null, null, Map.of());
     }
 
