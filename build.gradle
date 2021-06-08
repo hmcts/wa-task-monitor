@@ -237,15 +237,14 @@ dependencies {
     exclude group: 'junit', module: 'junit'
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
-
   testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
   testImplementation "org.junit.vintage:junit-vintage-engine:${versions.junit}"
   testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.1.0'
-
   testImplementation "com.github.tomakehurst:wiremock-jre8:2.28.0"
+  testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
