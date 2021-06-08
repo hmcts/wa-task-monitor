@@ -13,7 +13,7 @@ import java.util.List;
 @Component
 @Slf4j
 @ConditionalOnProperty(
-    value = "task.configurator.scheduling.enable", havingValue = "true", matchIfMissing = true
+    value = "task.configurator.scheduling.enable", havingValue = "true"
 )
 public class TaskConfiguratorScheduler {
 
@@ -26,7 +26,7 @@ public class TaskConfiguratorScheduler {
         this.taskConfigurationService = taskConfigurationService;
     }
 
-    @Scheduled(fixedRate = 10_000)
+    @Scheduled(fixedRateString = "${task.configurator.scheduling.fixedRate}")
     public void runTaskConfigurator() {
         log.info("Task configurator starts...");
         List<CamundaTask> camundaTasks = camundaService.getUnConfiguredTasks();
