@@ -180,6 +180,8 @@ dependencyManagement {
     }
     // CVE-2021-22112 - Privilege Escalation
     dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.4.6'
+    // CVE-2021-29425
+    dependency group: 'commons-io', name: 'commons-io', version: '2.9.0'
   }
 }
 
