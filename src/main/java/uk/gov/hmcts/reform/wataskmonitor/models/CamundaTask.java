@@ -22,4 +22,8 @@ public class CamundaTask {
         // to serialize
         this.id = id;
     }
+
+    public String getId() {
+        return id;
+    }
 }

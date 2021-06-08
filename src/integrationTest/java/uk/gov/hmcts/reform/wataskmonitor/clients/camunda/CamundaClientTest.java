@@ -10,7 +10,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
-import uk.gov.hmcts.reform.wataskmonitor.clients.WireMockConfig;
 import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
 
 import java.io.IOException;
@@ -26,11 +25,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(profiles = {"local"})
 @EnableConfigurationProperties
-@ContextConfiguration(classes = {WireMockConfig.class})
+@ContextConfiguration(classes = {CamundaWireMockConfig.class})
 class CamundaClientTest {
 
     @Autowired
-    private WireMockServer mockServer;
+    private WireMockServer camundaMockServer;
 
     @Autowired
     private CamundaClient camundaClient;
@@ -38,7 +37,7 @@ class CamundaClientTest {
     @Test
     void givenCamundaClientIsCalledShouldReturnTasks() throws IOException {
         CamundaClientMock.setupPostTaskCamundaResponseMock(
-            mockServer,
+            camundaMockServer,
             "post-task-camunda-response.json"
         );
 

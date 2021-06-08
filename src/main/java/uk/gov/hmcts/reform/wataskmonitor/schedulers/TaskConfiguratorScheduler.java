@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.services.CamundaService;
+import uk.gov.hmcts.reform.wataskmonitor.services.TaskConfigurationService;
 
 import java.util.List;
 
@@ -17,18 +18,19 @@ import java.util.List;
 public class TaskConfiguratorScheduler {
 
     private final CamundaService camundaService;
+    private final TaskConfigurationService taskConfigurationService;
 
-    public TaskConfiguratorScheduler(CamundaService camundaService) {
+    public TaskConfiguratorScheduler(CamundaService camundaService,
+                                     TaskConfigurationService taskConfigurationService) {
         this.camundaService = camundaService;
+        this.taskConfigurationService = taskConfigurationService;
     }
 
     @Scheduled(fixedRate = 10_000)
     public void runTaskConfigurator() {
         log.info("Task configurator starts...");
-
         List<CamundaTask> camundaTasks = camundaService.getUnConfiguredTasks();
-        log.info(camundaTasks.toString());
-
+        taskConfigurationService.configureTasks(camundaTasks);
         log.info("Task configurator ends...");
     }
 }

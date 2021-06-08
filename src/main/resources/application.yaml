@@ -11,12 +11,17 @@ management:
       exposure:
         include: health, info, prometheus
 
-camunda:
-  url: ${CAMUNDA_URL:http://camunda-local-bpm/engine-rest}
-
 spring:
   application:
     name: WA Task monitor
+  main:
+    allow-bean-definition-overriding: true
+
+camunda:
+  url: ${CAMUNDA_URL:http://camunda-local-bpm/engine-rest}
+
+task.configuration.service:
+  url: ${TASK_CONFIGURATION_SERVICE_URL:http://localhost:8091}
 
 idam:
   s2s-auth:

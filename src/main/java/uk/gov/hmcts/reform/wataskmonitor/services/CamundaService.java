@@ -32,12 +32,16 @@ public class CamundaService {
     }
 
     public List<CamundaTask> getUnConfiguredTasks() {
-        return camundaClient.getTasks(
+        log.info("Retrieving unconfigured camunda tasks...");
+        List<CamundaTask> camundaTasks = camundaClient.getTasks(
             authTokenGenerator.generate(),
             "0",
             "1000",
             getQueryParameters()
         );
+        log.info("unconfigured camundaTasks retrieved successfully.");
+        log.debug(camundaTasks.toString());
+        return camundaTasks;
     }
 
     private String getQueryParameters() {
