@@ -6,14 +6,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.schedulers.TaskConfiguratorScheduler;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -22,7 +20,9 @@ import static org.mockito.Mockito.verify;
 class CamundaTaskConfiguratorSchedulerTest {
 
     @MockBean
-    private CamundaClient camundaClient;
+    private CamundaService camundaService;
+    @MockBean
+    private TaskConfigurationService taskConfigurationService;
 
     @SpyBean
     private TaskConfiguratorScheduler taskConfiguratorScheduler;
@@ -37,8 +37,8 @@ class CamundaTaskConfiguratorSchedulerTest {
             .untilAsserted(
                 () -> {
                     verify(taskConfiguratorScheduler, times(2)).runTaskConfigurator();
-                    verify(camundaClient, times(2))
-                        .getTasks(anyString(), any(), any(), anyString());
+                    verify(camundaService, times(2)).getUnConfiguredTasks();
+                    verify(taskConfigurationService, times(2)).configureTasks(anyList());
                 });
     }
 }
