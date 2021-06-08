@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.exceptions.CamundaRequestFailure;
 import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
@@ -23,14 +24,20 @@ public class CamundaService {
     public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS+0000";
 
     private final CamundaClient camundaClient;
+    private final AuthTokenGenerator authTokenGenerator;
 
-    public CamundaService(CamundaClient camundaClient) {
+    public CamundaService(CamundaClient camundaClient, AuthTokenGenerator authTokenGenerator) {
         this.camundaClient = camundaClient;
+        this.authTokenGenerator = authTokenGenerator;
     }
 
     public List<CamundaTask> getUnConfiguredTasks() {
-        var serviceToken = "Bearer token";
-        return camundaClient.getTasks(serviceToken, "0", "1000", getQueryParameters());
+        return camundaClient.getTasks(
+            authTokenGenerator.generate(),
+            "0",
+            "1000",
+            getQueryParameters()
+        );
     }
 
     private String getQueryParameters() {

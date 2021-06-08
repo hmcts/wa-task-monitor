@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.wataskmonitor.services;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -11,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
 
@@ -26,12 +28,19 @@ class CamundaServiceTest {
 
     @Mock
     private CamundaClient camundaClient;
+    @Mock
+    private AuthTokenGenerator authTokenGenerator;
 
     @InjectMocks
     private CamundaService camundaService;
 
     @Captor
     private ArgumentCaptor<String> actualQueryParametersCaptor;
+
+    @BeforeEach
+    void setUp() {
+        when(authTokenGenerator.generate()).thenReturn("some service token");
+    }
 
     @Test
     void givenGetTasksCamundaRequestShouldRetrieveTasks() throws JSONException {
