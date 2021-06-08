@@ -43,7 +43,7 @@ class CamundaServiceTest {
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
-        List<CamundaTask> actualCamundaTasks = camundaService.getTasks();
+        List<CamundaTask> actualCamundaTasks = camundaService.getUnConfiguredTasks();
 
         JSONAssert.assertEquals(
             getExpectedQueryParameters(),

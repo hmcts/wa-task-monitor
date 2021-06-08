@@ -26,7 +26,7 @@ public class TaskConfiguratorScheduler {
     public void runTaskConfigurator() {
         log.info("Task configurator starts...");
 
-        List<CamundaTask> camundaTasks = camundaService.getTasks();
+        List<CamundaTask> camundaTasks = camundaService.getUnConfiguredTasks();
         log.info(camundaTasks.toString());
 
         log.info("Task configurator ends...");

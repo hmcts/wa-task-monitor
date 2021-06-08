@@ -28,7 +28,7 @@ public class CamundaService {
         this.camundaClient = camundaClient;
     }
 
-    public List<CamundaTask> getTasks() {
+    public List<CamundaTask> getUnConfiguredTasks() {
         var serviceToken = "Bearer token";
         return camundaClient.getTasks(serviceToken, "0", "1000", getQueryParameters());
     }
