@@ -1,25 +1,16 @@
 package uk.gov.hmcts.reform.wataskmonitor.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode
-public class CamundaTask {
+public final class CamundaTask {
 
-    @SuppressWarnings("PMD.UnusedPrivateField")
-    private String id;
+    private final String id;
 
-    public CamundaTask() {
-        // to deserialize
-    }
-
-    public CamundaTask(String id) {
-        this.id = id;
-    }
-
-    public void setId(String id) {
-        // to serialize
+    public CamundaTask(@JsonProperty("id") String id) {
         this.id = id;
     }
 
