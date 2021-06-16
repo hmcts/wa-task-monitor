@@ -8,7 +8,7 @@ import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode
-@JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public final class MonitorTaskJobReq {
     private final JobDetails jobDetails;
 
