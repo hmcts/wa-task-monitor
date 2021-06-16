@@ -190,7 +190,7 @@ dependencyManagement {
     }
 
     // CVE-2021-22112 - Privilege Escalation
-    dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.4.6'
+    dependency group: 'org.springframework.security', name: 'spring-security-core', version: '5.4.6'
 
     // CVE-2021-29425
     dependency group: 'commons-io', name: 'commons-io', version: '2.9.0'
@@ -249,9 +249,12 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: versions.springFrameworkCloud
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: versions.springFrameworkCloud
+
+  implementation 'org.springframework.security:spring-security-test'
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
 
