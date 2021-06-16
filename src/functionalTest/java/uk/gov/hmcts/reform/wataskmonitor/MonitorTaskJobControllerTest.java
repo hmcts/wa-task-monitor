@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
+import uk.gov.hmcts.reform.wataskmonitor.models.JobDetailName;
 import uk.gov.hmcts.reform.wataskmonitor.models.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.models.MonitorTaskJobReq;
 
@@ -45,12 +46,12 @@ class MonitorTaskJobControllerTest {
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .header("ServiceAuthorization", serviceToken)
-            .body(TestUtility.asJsonString(new MonitorTaskJobReq(new JobDetails("some name"))))
+            .body(TestUtility.asJsonString(new MonitorTaskJobReq(new JobDetails(JobDetailName.CONFIGURATION))))
             .when()
             .post("/monitor/tasks/jobs")
             .then()
             .statusCode(HttpStatus.OK.value())
-            .body(equalTo("{\"job_details\":{\"name\":\"some name\"}}"));
+            .body(equalTo("{\"job_details\":{\"name\":\"CONFIGURATION\"}}"));
     }
 
     @Test

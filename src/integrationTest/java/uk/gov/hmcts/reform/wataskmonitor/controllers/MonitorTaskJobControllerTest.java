@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
+import uk.gov.hmcts.reform.wataskmonitor.models.JobDetailName;
 import uk.gov.hmcts.reform.wataskmonitor.models.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.models.MonitorTaskJobReq;
 
@@ -25,8 +26,8 @@ class MonitorTaskJobControllerTest {
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     @Test
     public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() throws Exception {
-        MonitorTaskJobReq monitorTaskJobReq = new MonitorTaskJobReq(new JobDetails("some name"));
-        String expectedResponse = "{\"job_details\":{\"name\":\"some name\"}}";
+        MonitorTaskJobReq monitorTaskJobReq = new MonitorTaskJobReq(new JobDetails(JobDetailName.CONFIGURATION));
+        String expectedResponse = "{\"job_details\":{\"name\":\"CONFIGURATION\"}}";
 
         mockMvc.perform(post("/monitor/tasks/jobs")
                             .contentType(MediaType.APPLICATION_JSON)

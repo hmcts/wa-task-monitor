@@ -20,6 +20,7 @@ plugins {
   id 'io.freefair.lombok' version '5.3.0'
 }
 
+
 apply plugin: 'net.serenity-bdd.aggregator'
 apply plugin: 'idea'
 
@@ -189,8 +190,14 @@ dependencyManagement {
       entry 'guava'
     }
 
-    // CVE-2021-22112 - Privilege Escalation
-    dependency group: 'org.springframework.security', name: 'spring-security-core', version: '5.4.6'
+    // CVE-2021-22112
+    dependencySet(group: 'org.springframework.security', version: '5.4.6') {
+      entry 'spring-security-crypto'
+      entry 'spring-security-core'
+      entry 'spring-security-test'
+      entry 'spring-security-config'
+      entry 'spring-security-web'
+    }
 
     // CVE-2021-29425
     dependency group: 'commons-io', name: 'commons-io', version: '2.9.0'
@@ -213,6 +220,7 @@ dependencyManagement {
       entry 'spring-tx'
       entry 'spring-web'
       entry 'spring-webmvc'
+      entry 'spring-test'
     }
   }
 }

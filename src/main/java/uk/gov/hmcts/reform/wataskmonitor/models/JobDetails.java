@@ -10,13 +10,13 @@ import lombok.ToString;
 @EqualsAndHashCode
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public final class JobDetails {
-    private final String name;
+    private final JobDetailName name;
 
-    public JobDetails(@JsonProperty("name") String name) {
+    public JobDetails(@JsonProperty("name") JobDetailName name) {
         this.name = name;
     }
 
-    public String getName() {
+    public JobDetailName getName() {
         return name;
     }
 }
