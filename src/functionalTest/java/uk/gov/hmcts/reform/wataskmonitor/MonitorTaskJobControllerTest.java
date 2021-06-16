@@ -20,6 +20,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @SpringBootTest
 @ActiveProfiles({"local", "functional"})
 @RunWith(SpringIntegrationSerenityRunner.class)
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
 class MonitorTaskJobControllerTest {
 
     @Value("${targets.instance}")
