@@ -38,10 +38,19 @@ lombok {
 }
 
 sourceSets {
-  functionalTest {
+  testUtils {
     java {
       compileClasspath += main.output
       runtimeClasspath += main.output
+      srcDir file('src/testUtils/java')
+    }
+    resources.srcDir file('src/testUtils/resources')
+  }
+
+  functionalTest {
+    java {
+      compileClasspath += testUtils.output
+      runtimeClasspath += testUtils.output
       srcDir file('src/functionalTest/java')
     }
     resources.srcDir file('src/functionalTest/resources')
@@ -49,8 +58,8 @@ sourceSets {
 
   integrationTest {
     java {
-      compileClasspath += main.output
-      runtimeClasspath += main.output
+      compileClasspath += testUtils.output
+      runtimeClasspath += testUtils.output
       srcDir file('src/integrationTest/java')
     }
     resources.srcDir file('src/integrationTest/resources')
@@ -279,6 +288,9 @@ dependencies {
 
   smokeTestImplementation sourceSets.main.runtimeClasspath
   smokeTestImplementation sourceSets.test.runtimeClasspath
+
+  testUtilsImplementation sourceSets.main.runtimeClasspath
+  testUtilsImplementation sourceSets.test.runtimeClasspath
 }
 
 mainClassName = 'uk.gov.hmcts.reform.wataskmonitor.Application'

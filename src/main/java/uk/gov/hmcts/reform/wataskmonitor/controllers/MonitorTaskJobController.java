@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.wataskmonitor.models.MonitorTaskJobReq;
 
 @RestController
 @Slf4j
-public class MonitorTaskJob {
+public class MonitorTaskJobController {
 
     @PostMapping("/monitor/tasks/jobs")
     public MonitorTaskJobReq monitorTaskJob(@RequestBody MonitorTaskJobReq monitorTaskJob) {
