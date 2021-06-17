@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -16,6 +17,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 
 
 @Configuration
+@ConfigurationProperties(prefix = "security")
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
