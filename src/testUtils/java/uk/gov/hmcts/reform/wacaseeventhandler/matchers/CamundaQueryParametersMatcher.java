@@ -34,7 +34,7 @@ public class CamundaQueryParametersMatcher implements ArgumentMatcher<String> {
         return actual.path("orQueries").equals(expected.path("orQueries"))
             && actual.path("taskDefinitionKey").equals(expected.path("taskDefinitionKey"))
             && actual.path("processDefinitionKey").equals(expected.path("processDefinitionKey"))
-            &&isCreatedBeforeValid(String.valueOf(actual.get("createdBefore").asText()));
+            && isCreatedBeforeValid(String.valueOf(actual.get("createdBefore").asText()));
     }
 
     private boolean isCreatedBeforeValid(String actualCreatedBefore) {
