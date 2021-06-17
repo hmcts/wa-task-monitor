@@ -14,3 +14,38 @@ management:
 spring:
   application:
     name: WA Task monitor
+  main:
+    allow-bean-definition-overriding: true
+  freemarker:
+    check-template-location: false
+
+camunda:
+  url: ${CAMUNDA_URL:http://camunda-local-bpm/engine-rest}
+
+task.configuration.service:
+  url: ${TASK_CONFIGURATION_SERVICE_URL:http://localhost:8091}
+
+task.configurator.scheduling:
+  fixedRate: 60000
+
+idam:
+  s2s-auth:
+    url: ${S2S_URL:http://service-auth-provider-api}
+    secret: ${S2S_SECRET_TASK_MONITOR:AAAAAAAAAAAAAAAA}
+    name: wa_task_monitor
+  s2s-authorised:
+    services: ${WA_S2S_AUTHORIZED_SERVICES:wa_task_monitor}
+
+security:
+  anonymousPaths:
+    - "/"
+    - "/health"
+    - "/health/liveness"
+    - "/health/readiness"
+    - "/loggers/**"
+    - "/swagger-resources/**"
+    - "/swagger-ui/**"
+    - "/swagger-ui/index.html"
+    - "/v2/api-docs"
+    - "/webjars/springfox-swagger-ui/**"
+    - "/favicon.ico"
