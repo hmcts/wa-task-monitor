@@ -28,12 +28,6 @@ task.configuration.service:
 task.configurator.scheduling:
   fixedRate: 60000
 
-auth:
-  provider:
-    service:
-      client:
-        baseUrl: ${S2S_URL:http://service-auth-provider-api}
-
 idam:
   s2s-auth:
     url: ${S2S_URL:http://service-auth-provider-api}
