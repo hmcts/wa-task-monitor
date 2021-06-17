@@ -8,7 +8,7 @@ def component = "task-monitor"
 
 def secrets = [
   's2s-${env}': [
-    secret('"microservicekey-wa-task-monitor"', 'S2S_SECRET_TASK_MONITOR'),
+    secret('microservicekey-wa-task-monitor', 'S2S_SECRET_TASK_MONITOR'),
   ]
 ]
 
