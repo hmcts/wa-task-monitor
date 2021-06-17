@@ -31,7 +31,7 @@ task.configurator.scheduling:
 idam:
   s2s-auth:
     url: ${S2S_URL:http://service-auth-provider-api}
-    secret: KNIV46LMP5OGAAAY
+    secret: ${S2S_SECRET_TASK_MONITOR:AAAAAAAAAAAAAAAA}
     name: wa_task_monitor
   s2s-authorised:
     services: ${WA_S2S_AUTHORIZED_SERVICES:wa_task_monitor}
