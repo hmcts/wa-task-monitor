@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
@@ -13,6 +14,7 @@ public class ConfigurationJobService implements JobService {
     private final TaskConfigurationService taskConfigurationService;
     private final AuthTokenGenerator authTokenGenerator;
 
+    @Autowired
     public ConfigurationJobService(CamundaService camundaService,
                                    TaskConfigurationService taskConfigurationService,
                                    AuthTokenGenerator authTokenGenerator) {

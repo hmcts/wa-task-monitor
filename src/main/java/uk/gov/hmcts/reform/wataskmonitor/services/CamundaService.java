@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
@@ -24,6 +25,7 @@ public class CamundaService {
 
     private final CamundaClient camundaClient;
 
+    @Autowired
     public CamundaService(CamundaClient camundaClient) {
         this.camundaClient = camundaClient;
     }

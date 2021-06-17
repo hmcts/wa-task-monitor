@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor;
 
 import io.restassured.RestAssured;
+import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @SpringBootTest
 @ActiveProfiles({"local", "functional"})
 @RunWith(SpringIntegrationSerenityRunner.class)
+@Slf4j
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
 class MonitorTaskJobControllerTest {
 
@@ -39,6 +41,7 @@ class MonitorTaskJobControllerTest {
         RestAssured.useRelaxedHTTPSValidation();
 
         serviceToken = authTokenGenerator.generate();
+        log.debug(serviceToken);
     }
 
     @Test
