@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.services.CamundaService;
 import uk.gov.hmcts.reform.wataskmonitor.services.TaskConfigurationService;
@@ -19,18 +20,22 @@ public class TaskConfiguratorScheduler {
 
     private final CamundaService camundaService;
     private final TaskConfigurationService taskConfigurationService;
+    private final AuthTokenGenerator authTokenGenerator;
 
     public TaskConfiguratorScheduler(CamundaService camundaService,
-                                     TaskConfigurationService taskConfigurationService) {
+                                     TaskConfigurationService taskConfigurationService,
+                                     AuthTokenGenerator authTokenGenerator) {
         this.camundaService = camundaService;
         this.taskConfigurationService = taskConfigurationService;
+        this.authTokenGenerator = authTokenGenerator;
     }
 
     @Scheduled(fixedRateString = "${task.configurator.scheduling.fixedRate}")
     public void runTaskConfigurator() {
         log.info("Task configurator starts...");
-        List<CamundaTask> camundaTasks = camundaService.getUnConfiguredTasks();
-        taskConfigurationService.configureTasks(camundaTasks);
+        String serviceToken = authTokenGenerator.generate();
+        List<CamundaTask> camundaTasks = camundaService.getUnConfiguredTasks(serviceToken);
+        taskConfigurationService.configureTasks(camundaTasks, serviceToken);
         log.info("Task configurator ends...");
     }
 }

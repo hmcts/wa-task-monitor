@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.wataskmonitor.services;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -12,24 +11,21 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CamundaServiceTest {
 
+    public static final String SERVICE_TOKEN = "some service token";
     @Mock
     private CamundaClient camundaClient;
-    @Mock
-    private AuthTokenGenerator authTokenGenerator;
 
     @InjectMocks
     private CamundaService camundaService;
@@ -37,22 +33,17 @@ class CamundaServiceTest {
     @Captor
     private ArgumentCaptor<String> actualQueryParametersCaptor;
 
-    @BeforeEach
-    void setUp() {
-        when(authTokenGenerator.generate()).thenReturn("some service token");
-    }
-
     @Test
     void givenGetTasksCamundaRequestShouldRetrieveTasks() throws JSONException {
         List<CamundaTask> expectedCamundaTasks = List.of(new CamundaTask("1"), new CamundaTask("2"));
         when(camundaClient.getTasks(
-            anyString(),
+            eq(SERVICE_TOKEN),
             eq("0"),
             eq("1000"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
-        List<CamundaTask> actualCamundaTasks = camundaService.getUnConfiguredTasks();
+        List<CamundaTask> actualCamundaTasks = camundaService.getUnConfiguredTasks(SERVICE_TOKEN);
 
         JSONAssert.assertEquals(
             getExpectedQueryParameters(),

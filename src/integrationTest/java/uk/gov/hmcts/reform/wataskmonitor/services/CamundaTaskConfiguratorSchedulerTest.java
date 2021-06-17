@@ -7,11 +7,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.schedulers.TaskConfiguratorScheduler;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,12 +21,15 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("integration")
+@SuppressWarnings("PMD.UnusedPrivateField")
 class CamundaTaskConfiguratorSchedulerTest {
 
     @MockBean
     private CamundaService camundaService;
     @MockBean
     private TaskConfigurationService taskConfigurationService;
+    @MockBean
+    private AuthTokenGenerator authTokenGenerator;
 
     @SpyBean
     private TaskConfiguratorScheduler taskConfiguratorScheduler;
@@ -39,8 +44,8 @@ class CamundaTaskConfiguratorSchedulerTest {
             .untilAsserted(
                 () -> {
                     verify(taskConfiguratorScheduler, times(2)).runTaskConfigurator();
-                    verify(camundaService, times(2)).getUnConfiguredTasks();
-                    verify(taskConfigurationService, times(2)).configureTasks(anyList());
+                    verify(camundaService, times(2)).getUnConfiguredTasks(any());
+                    verify(taskConfigurationService, times(2)).configureTasks(anyList(), any());
                 });
     }
 }

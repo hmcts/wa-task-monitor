@@ -16,4 +16,22 @@ public final class TestUtility {
             throw new RuntimeException(e);
         }
     }
+
+    public static String getExpectedQueryParameters() {
+        return "{\n"
+            + "  \"orQueries\": [\n"
+            + "    {\n"
+            + "      \"taskVariables\": [\n"
+            + "        {\n"
+            + "          \"name\": \"taskState\",\n"
+            + "          \"operator\": \"eq\",\n"
+            + "          \"value\": \"unconfigured\"\n"
+            + "        }\n"
+            + "      ]\n"
+            + "    }\n"
+            + "  ],\n"
+            + "  \"taskDefinitionKey\": \"processTask\",\n"
+            + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n"
+            + "}\n";
+    }
 }

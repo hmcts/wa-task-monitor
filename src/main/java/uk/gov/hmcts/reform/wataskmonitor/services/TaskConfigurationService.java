@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.wataskmonitor.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
 import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
 
@@ -13,17 +12,13 @@ import java.util.List;
 public class TaskConfigurationService {
 
     private final TaskConfigurationClient taskConfigurationClient;
-    private final AuthTokenGenerator authTokenGenerator;
 
-    public TaskConfigurationService(TaskConfigurationClient taskConfigurationClient,
-                                    AuthTokenGenerator authTokenGenerator) {
+    public TaskConfigurationService(TaskConfigurationClient taskConfigurationClient) {
         this.taskConfigurationClient = taskConfigurationClient;
-        this.authTokenGenerator = authTokenGenerator;
     }
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-    public void configureTasks(List<CamundaTask> camundaTasks) {
-        String serviceToken = authTokenGenerator.generate();
+    public void configureTasks(List<CamundaTask> camundaTasks, String serviceToken) {
         camundaTasks.forEach(task -> {
             log.info("Configuring tasks...");
             try {
