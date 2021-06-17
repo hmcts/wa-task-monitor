@@ -17,7 +17,7 @@ public final class TestUtility {
         }
     }
 
-    public static String getExpectedQueryParameters() {
+    public static String getExpectedCamundaQueryParameters() {
         return "{\n"
             + "  \"orQueries\": [\n"
             + "    {\n"

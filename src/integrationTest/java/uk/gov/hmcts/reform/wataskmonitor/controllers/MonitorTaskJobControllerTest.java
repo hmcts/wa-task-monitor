@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
+import uk.gov.hmcts.reform.wacaseeventhandler.matchers.CamundaQueryParametersMatcher;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
 import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.wataskmonitor.models.MonitorTaskJobReq;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,13 +54,14 @@ class MonitorTaskJobControllerTest {
 
     private void mockExternalDependencies() {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
+
         when(camundaClient.getTasks(
             eq(SERVICE_TOKEN),
             eq("0"),
             eq("1000"),
-            eq(TestUtility.getExpectedQueryParameters())
-        ))
-            .thenReturn(List.of(new CamundaTask(CAMUNDA_TASK_ID)));
+            argThat(new CamundaQueryParametersMatcher(TestUtility.getExpectedCamundaQueryParameters()))
+        )).thenReturn(List.of(new CamundaTask(CAMUNDA_TASK_ID)));
+
         when(taskConfigurationClient.configureTask(eq(SERVICE_TOKEN), eq(CAMUNDA_TASK_ID)))
             .thenReturn("OK");
     }
@@ -80,7 +83,7 @@ class MonitorTaskJobControllerTest {
             eq(SERVICE_TOKEN),
             eq("0"),
             eq("1000"),
-            eq(TestUtility.getExpectedQueryParameters())
+            argThat(new CamundaQueryParametersMatcher(TestUtility.getExpectedCamundaQueryParameters()))
         );
         verify(taskConfigurationClient).configureTask(eq(SERVICE_TOKEN), eq(CAMUNDA_TASK_ID));
     }
