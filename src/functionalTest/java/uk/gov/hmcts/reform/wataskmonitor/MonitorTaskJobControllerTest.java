@@ -41,7 +41,6 @@ class MonitorTaskJobControllerTest {
         RestAssured.useRelaxedHTTPSValidation();
 
         serviceToken = authTokenGenerator.generate();
-        log.debug(serviceToken);
     }
 
     @Test
