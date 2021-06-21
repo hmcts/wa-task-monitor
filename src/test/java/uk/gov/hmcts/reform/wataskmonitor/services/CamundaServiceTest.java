@@ -34,7 +34,7 @@ class CamundaServiceTest {
     private ArgumentCaptor<String> actualQueryParametersCaptor;
 
     @Test
-    void givenGetTasksCamundaRequestShouldRetrieveTasks() throws JSONException {
+    void givenGetTasksCamundaRequestShouldRetrieveUserTasksAndNotDelayedTasks() throws JSONException {
         List<CamundaTask> expectedCamundaTasks = List.of(new CamundaTask("1"), new CamundaTask("2"));
         when(camundaClient.getTasks(
             eq(SERVICE_TOKEN),
@@ -45,13 +45,17 @@ class CamundaServiceTest {
 
         List<CamundaTask> actualCamundaTasks = camundaService.getUnConfiguredTasks(SERVICE_TOKEN);
 
+        assertQueryTargetsUserTasksAndNotDelayedTasks("{taskDefinitionKey: processTask}");
+        assertQueryTargetsUserTasksAndNotDelayedTasks(getExpectedQueryParameters());
+        assertThat(actualCamundaTasks).isEqualTo(expectedCamundaTasks);
+    }
+
+    private void assertQueryTargetsUserTasksAndNotDelayedTasks(String expected) throws JSONException {
         JSONAssert.assertEquals(
-            getExpectedQueryParameters(),
+            expected,
             actualQueryParametersCaptor.getValue(),
             JSONCompareMode.LENIENT
         );
-
-        assertThat(actualCamundaTasks).isEqualTo(expectedCamundaTasks);
     }
 
     @NotNull
