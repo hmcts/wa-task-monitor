@@ -21,8 +21,8 @@ public class TaskConfigurationService {
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public void configureTasks(List<CamundaTask> camundaTasks, String serviceToken) {
+        log.info("Configuring tasks...");
         camundaTasks.forEach(task -> {
-            log.info("Configuring tasks...");
             try {
                 taskConfigurationClient.configureTask(serviceToken, task.getId());
                 log.info("Task(taskId={}) configured successfully.", task.getId());
