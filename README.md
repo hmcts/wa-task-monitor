@@ -34,6 +34,19 @@ To build the project execute the following command:
 
 ### Running the application
 
+#### Prerequisite
+* Minikube environment needs to up and running
+
+```shell
+./gradlew bootRun
+```
+
+#### Run Functional tests
+````shell
+./gradlew functional
+````
+
+#### Using docker
 Create the image of the application by executing the following command:
 
 ```bash
@@ -68,7 +81,7 @@ You should get a response similar to this:
   {"status":"UP","diskSpace":{"status":"UP","total":249644974080,"free":137188298752,"threshold":10485760}}
 ```
 
-### Alternative script to run application
+#### Alternative script to run application
 
 To skip all the setting up and building, just execute the following command:
 
