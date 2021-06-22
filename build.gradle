@@ -3,7 +3,7 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath("net.serenity-bdd:serenity-gradle-plugin:2.3.13")
+    classpath("net.serenity-bdd:serenity-gradle-plugin:2.4.24")
   }
 }
 
@@ -19,6 +19,7 @@ plugins {
   id 'org.sonarqube' version '3.0'
   id 'io.freefair.lombok' version '5.3.0'
 }
+
 
 apply plugin: 'net.serenity-bdd.aggregator'
 apply plugin: 'idea'
@@ -38,10 +39,19 @@ lombok {
 }
 
 sourceSets {
-  functionalTest {
+  testUtils {
     java {
       compileClasspath += main.output
       runtimeClasspath += main.output
+      srcDir file('src/testUtils/java')
+    }
+    resources.srcDir file('src/testUtils/resources')
+  }
+
+  functionalTest {
+    java {
+      compileClasspath += testUtils.output
+      runtimeClasspath += testUtils.output
       srcDir file('src/functionalTest/java')
     }
     resources.srcDir file('src/functionalTest/resources')
@@ -49,8 +59,8 @@ sourceSets {
 
   integrationTest {
     java {
-      compileClasspath += main.output
-      runtimeClasspath += main.output
+      compileClasspath += testUtils.output
+      runtimeClasspath += testUtils.output
       srcDir file('src/integrationTest/java')
     }
     resources.srcDir file('src/integrationTest/resources')
@@ -174,12 +184,26 @@ dependencyCheck {
 dependencyManagement {
   dependencies {
     dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.68'
+
     // CVE-2018-10237 - Unbounded memory allocation
     dependencySet(group: 'com.google.guava', version: '30.1.1-jre') {
       entry 'guava'
     }
-    // CVE-2021-22112 - Privilege Escalation
-    dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.4.6'
+
+    // CVE-2021-22112
+    dependencySet(group: 'org.springframework.security', version: '5.4.6') {
+      entry 'spring-security-crypto'
+      entry 'spring-security-core'
+      entry 'spring-security-test'
+      entry 'spring-security-config'
+      entry 'spring-security-web'
+    }
+
+    // CVE-2021-29425
+    dependency group: 'commons-io', name: 'commons-io', version: '2.9.0'
+
+    // CVE-2020-13956 - misinterpret malformed authority component in request URIs - check for update available to com.warrenstrange:googleauth in service-auth-provider-client
+    dependency group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
 
     //CVE-2021-22118
     dependencySet(group: 'org.springframework', version: '5.2.15.RELEASE') {
@@ -204,16 +228,18 @@ dependencyManagement {
 repositories {
   mavenLocal()
   mavenCentral()
+  maven { url 'https://jitpack.io' }
   jcenter()
 }
 
 def versions = [
-  junit           : '5.7.2',
-  junitPlatform   : '1.7.2',
-  reformLogging   : '5.1.7',
-  springBoot      : springBoot.class.package.implementationVersion,
-  springfoxSwagger: '3.0.0',
-  serenity        : '2.2.12'
+  junit               : '5.7.2',
+  junitPlatform       : '1.7.2',
+  reformLogging       : '5.1.7',
+  springBoot          : springBoot.class.package.implementationVersion,
+  springfoxSwagger    : '3.0.0',
+  serenity            : '2.2.12',
+  springFrameworkCloud: '2.2.8.RELEASE'
 ]
 
 ext.libraries = [
@@ -231,30 +257,40 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: versions.springFrameworkCloud
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: versions.springFrameworkCloud
+
+  implementation 'org.springframework.security:spring-security-test'
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
 
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.8.RELEASE'
+  implementation group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
+  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '3.1.2'
 
-  compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
-  compile group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
 
-  compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.43'
-  compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.43'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.43'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.43'
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
     exclude group: 'junit', module: 'junit'
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
-
-  testCompile group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
-  testCompile group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
-  testCompile group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
-  testCompile group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
-  testCompile "org.junit.vintage:junit-vintage-engine:${versions.junit}"
+  testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
+  testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
+  testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
+  testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
+  testImplementation "org.junit.vintage:junit-vintage-engine:${versions.junit}"
+  testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.1.0'
+  testImplementation "com.github.tomakehurst:wiremock-jre8:2.28.0"
+  testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
+  testCompile group: 'pl.pojo', name: 'pojo-tester', version: '0.7.6'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
@@ -264,6 +300,9 @@ dependencies {
 
   smokeTestImplementation sourceSets.main.runtimeClasspath
   smokeTestImplementation sourceSets.test.runtimeClasspath
+
+  testUtilsImplementation sourceSets.main.runtimeClasspath
+  testUtilsImplementation sourceSets.test.runtimeClasspath
 }
 
 mainClassName = 'uk.gov.hmcts.reform.wataskmonitor.Application'
@@ -279,5 +318,5 @@ bootJar {
 }
 
 wrapper {
-    distributionType = Wrapper.DistributionType.ALL
+  distributionType = Wrapper.DistributionType.ALL
 }
