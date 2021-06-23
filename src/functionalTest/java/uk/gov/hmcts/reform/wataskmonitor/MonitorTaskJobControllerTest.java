@@ -58,7 +58,6 @@ class MonitorTaskJobControllerTest {
     }
 
     @Test
-    @Ignore
     void givenMonitorTaskJobRequestWithNoServiceAuthenticationHeaderShouldReturnStatus401Response() {
         given()
             .contentType(APPLICATION_JSON_VALUE)
