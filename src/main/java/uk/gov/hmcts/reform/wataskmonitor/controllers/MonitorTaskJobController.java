@@ -21,7 +21,7 @@ public class MonitorTaskJobController {
 
     @PostMapping("/monitor/tasks/jobs")
     public MonitorTaskJobReq monitorTaskJob(@RequestBody MonitorTaskJobReq monitorTaskJobReq) {
-        log.info(monitorTaskJobReq.toString());
+        log.info("Received request to create a new job of type '{}'", monitorTaskJobReq.getJobDetails().getName());
         monitorTaskJobService.execute(monitorTaskJobReq.getJobDetails().getName());
         return monitorTaskJobReq;
     }

@@ -32,10 +32,12 @@ public class TaskConfiguratorScheduler {
 
     @Scheduled(fixedRateString = "${task.configurator.scheduling.fixedRate}")
     public void runTaskConfigurator() {
-        log.info("Task configurator starts...");
+        log.info("Starting task configurator.");
         String serviceToken = authTokenGenerator.generate();
         List<CamundaTask> camundaTasks = camundaService.getUnConfiguredTasks(serviceToken);
-        taskConfigurationService.configureTasks(camundaTasks, serviceToken);
-        log.info("Task configurator ends...");
+        if (!camundaTasks.isEmpty()) {
+            taskConfigurationService.configureTasks(camundaTasks, serviceToken);
+        }
+        log.info("Task configurator finished successfully.");
     }
 }

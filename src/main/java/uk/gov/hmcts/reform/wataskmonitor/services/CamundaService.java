@@ -31,15 +31,14 @@ public class CamundaService {
     }
 
     public List<CamundaTask> getUnConfiguredTasks(String serviceToken) {
-        log.info("Retrieving unconfigured camunda tasks...");
+        log.info("Retrieving unconfigured tasks from camunda.");
         List<CamundaTask> camundaTasks = camundaClient.getTasks(
             serviceToken,
             "0",
             "1000",
             getQueryParameters()
         );
-        log.info("unconfigured camundaTasks retrieved successfully.");
-        log.debug(camundaTasks.toString());
+        log.info("{} task(s) retrieved successfully.", camundaTasks.size());
         return camundaTasks;
     }
 

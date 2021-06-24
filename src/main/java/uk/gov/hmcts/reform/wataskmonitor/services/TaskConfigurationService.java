@@ -21,13 +21,14 @@ public class TaskConfigurationService {
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public void configureTasks(List<CamundaTask> camundaTasks, String serviceToken) {
-        log.info("Configuring tasks...");
+        log.info("Attempting to configure {} task(s)", camundaTasks.size());
         camundaTasks.forEach(task -> {
             try {
+                log.info("Attempting to configure task with id: '{}'", task.getId());
                 taskConfigurationClient.configureTask(serviceToken, task.getId());
-                log.info("Task(taskId={}) configured successfully.", task.getId());
+                log.info("Task with id: '{}' configured sucessfully.", task.getId());
             } catch (Exception e) {
-                log.info("Error configuring task(taskId={}).", task.getId());
+                log.info("Error while configuring task with id: '{}'", task.getId());
             }
         });
     }
