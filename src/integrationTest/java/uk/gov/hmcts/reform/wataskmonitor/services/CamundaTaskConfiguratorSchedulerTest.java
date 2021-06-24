@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.wataskmonitor.services;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -19,7 +20,6 @@ import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 @ActiveProfiles("integration")
 @SuppressWarnings("PMD.UnusedPrivateField")
 class CamundaTaskConfiguratorSchedulerTest {
@@ -43,25 +44,26 @@ class CamundaTaskConfiguratorSchedulerTest {
 
     @Test
     void assertTaskConfiguratorRunsEveryTenSeconds() {
-        when(camundaService.getUnConfiguredTasks(anyString())).thenReturn(singletonList(new CamundaTask("someId")));
-        await().atMost(12, TimeUnit.SECONDS)
+        when(camundaService.getUnConfiguredTasks(any())).thenReturn(singletonList(new CamundaTask("someId")));
+        await().atMost(20, TimeUnit.SECONDS)
+            .given()
             .untilAsserted(
                 () -> {
                     verify(taskConfiguratorScheduler, times(2)).runTaskConfigurator();
                     verify(camundaService, times(2)).getUnConfiguredTasks(any());
-                    verify(taskConfigurationService, times(2)).configureTasks(anyList(), any());
+                    verify(taskConfigurationService, times(2)).configureTasks(any(), any());
                 });
     }
 
     @Test
     void assertTaskConfiguratorRunsEveryTenSecondsAndNotCallTaskConfigurationIdEmptyList() {
-        when(camundaService.getUnConfiguredTasks(anyString())).thenReturn(emptyList());
+        when(camundaService.getUnConfiguredTasks(any ())).thenReturn(emptyList());
         await().atMost(12, TimeUnit.SECONDS)
             .untilAsserted(
                 () -> {
                     verify(taskConfiguratorScheduler, times(2)).runTaskConfigurator();
                     verify(camundaService, times(2)).getUnConfiguredTasks(any());
-                    verify(taskConfigurationService, never()).configureTasks(anyList(), any());
+                    verify(taskConfigurationService, never()).configureTasks(any(), any());
                 });
     }
 }
