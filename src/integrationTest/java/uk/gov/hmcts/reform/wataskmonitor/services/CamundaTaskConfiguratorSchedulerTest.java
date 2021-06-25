@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("integration")
-@SuppressWarnings("PMD.UnusedPrivateField")
+@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.JUnitTestsShouldIncludeAssert"})
 class CamundaTaskConfiguratorSchedulerTest {
 
     @MockBean
