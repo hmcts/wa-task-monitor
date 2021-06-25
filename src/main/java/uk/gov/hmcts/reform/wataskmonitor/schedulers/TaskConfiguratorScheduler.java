@@ -35,9 +35,7 @@ public class TaskConfiguratorScheduler {
         log.info("Starting task configurator.");
         String serviceToken = authTokenGenerator.generate();
         List<CamundaTask> camundaTasks = camundaService.getUnConfiguredTasks(serviceToken);
-        if (!camundaTasks.isEmpty()) {
-            taskConfigurationService.configureTasks(camundaTasks, serviceToken);
-        }
+        taskConfigurationService.configureTasks(camundaTasks, serviceToken);
         log.info("Task configurator finished successfully.");
     }
 }

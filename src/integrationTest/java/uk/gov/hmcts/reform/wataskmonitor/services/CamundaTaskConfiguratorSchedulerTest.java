@@ -14,11 +14,9 @@ import uk.gov.hmcts.reform.wataskmonitor.schedulers.TaskConfiguratorScheduler;
 
 import java.util.concurrent.TimeUnit;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,18 +48,6 @@ class CamundaTaskConfiguratorSchedulerTest {
                     verify(taskConfiguratorScheduler, times(2)).runTaskConfigurator();
                     verify(camundaService, times(2)).getUnConfiguredTasks(any());
                     verify(taskConfigurationService, times(2)).configureTasks(any(), any());
-                });
-    }
-
-    @Test
-    void assertTaskConfiguratorRunsEveryTenSecondsAndNotCallTaskConfigurationIdEmptyList() {
-        when(camundaService.getUnConfiguredTasks(any())).thenReturn(emptyList());
-        await().atMost(12, TimeUnit.SECONDS)
-            .untilAsserted(
-                () -> {
-                    verify(taskConfiguratorScheduler, times(2)).runTaskConfigurator();
-                    verify(camundaService, times(2)).getUnConfiguredTasks(any());
-                    verify(taskConfigurationService, never()).configureTasks(any(), any());
                 });
     }
 }
