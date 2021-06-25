@@ -37,5 +37,6 @@ public class ConfigurationJobService implements JobService {
         String serviceToken = authTokenGenerator.generate();
         List<CamundaTask> tasks = camundaService.getUnConfiguredTasks(serviceToken);
         taskConfigurationService.configureTasks(tasks, serviceToken);
+        log.info("Task configuration job finished successfully.");
     }
 }
