@@ -21,7 +21,7 @@ public class MonitorTaskJobService {
     public void execute(JobDetailName jobDetailName) {
         jobServices.forEach(job -> {
             if (job.canRun(jobDetailName)) {
-                log.info(jobDetailName.name());
+                log.info("Running job '{}", jobDetailName.name());
                 job.run();
             }
         });
