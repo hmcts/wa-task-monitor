@@ -18,8 +18,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,7 +55,7 @@ class CamundaTaskConfiguratorSchedulerTest {
 
     @Test
     void assertTaskConfiguratorRunsEveryTenSecondsAndNotCallTaskConfigurationIdEmptyList() {
-        when(camundaService.getUnConfiguredTasks(any ())).thenReturn(emptyList());
+        when(camundaService.getUnConfiguredTasks(any())).thenReturn(emptyList());
         await().atMost(12, TimeUnit.SECONDS)
             .untilAsserted(
                 () -> {
