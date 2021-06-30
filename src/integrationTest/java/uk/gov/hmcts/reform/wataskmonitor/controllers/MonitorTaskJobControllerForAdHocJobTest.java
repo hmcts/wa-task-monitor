@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles({"local"})
+@ActiveProfiles({"local", "integration"})
 class MonitorTaskJobControllerForAdHocJobTest {
 
     public static final String SERVICE_TOKEN = "some service token";
@@ -49,8 +49,8 @@ class MonitorTaskJobControllerForAdHocJobTest {
         requestParameter = "{\n"
                            + "  \"deleteReason\": \"clean up running process instances\",\n"
                            + "  \"processInstanceIds\": [\n"
-                           + "    \"4e9f1401-d993-11eb-8fe1-82fee85199b5\",\n"
-                           + "    \"48d26599-d993-11eb-9a97-5a7b203c8d90\"\n"
+                           + "    \"4e9f1401-d993-11eb-8fe1-82fee8519111\",\n"
+                           + "    \"48d26599-d993-11eb-9a97-5a7b203c8112\"\n"
                            + "  ],\n"
                            + "  \"skipCustomListeners\": true,\n"
                            + "  \"skipSubprocesses\": true,\n"
