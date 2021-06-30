@@ -10,7 +10,7 @@ import org.mockito.ArgumentMatcher;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static uk.gov.hmcts.reform.wataskmonitor.services.camunda.CamundaService.CAMUNDA_DATE_REQUEST_PATTERN;
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.configuration.ConfigurationJobService.CAMUNDA_DATE_REQUEST_PATTERN;
 
 @Slf4j
 public class CamundaQueryParametersMatcher implements ArgumentMatcher<String> {

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services;
+package uk.gov.hmcts.reform.wataskmonitor.services.jobs;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -13,7 +13,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
-import uk.gov.hmcts.reform.wataskmonitor.services.camunda.CamundaService;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.configuration.ConfigurationJobService;
 
 import java.util.List;
 
@@ -22,14 +22,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CamundaServiceTest {
+class ConfigurationJobServiceTest {
 
     public static final String SERVICE_TOKEN = "some service token";
     @Mock
     private CamundaClient camundaClient;
 
     @InjectMocks
-    private CamundaService camundaService;
+    private ConfigurationJobService configurationJobService;
 
     @Captor
     private ArgumentCaptor<String> actualQueryParametersCaptor;
@@ -44,7 +44,7 @@ class CamundaServiceTest {
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
-        List<CamundaTask> actualCamundaTasks = camundaService.getUnConfiguredTasks(SERVICE_TOKEN);
+        List<CamundaTask> actualCamundaTasks = configurationJobService.getUnConfiguredTasks(SERVICE_TOKEN);
 
         assertQueryTargetsUserTasksAndNotDelayedTasks("{taskDefinitionKey: processTask}");
         assertQueryTargetsUserTasksAndNotDelayedTasks(getExpectedQueryParameters());
