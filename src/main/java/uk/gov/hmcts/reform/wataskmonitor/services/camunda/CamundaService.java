@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services;
+package uk.gov.hmcts.reform.wataskmonitor.services.camunda;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.exceptions.CamundaRequestFailure;
-import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

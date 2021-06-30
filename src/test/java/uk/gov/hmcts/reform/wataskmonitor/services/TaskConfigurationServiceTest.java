@@ -9,7 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
-import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.services.taskconfiguration.TaskConfigurationService;
 
 import java.util.List;
 

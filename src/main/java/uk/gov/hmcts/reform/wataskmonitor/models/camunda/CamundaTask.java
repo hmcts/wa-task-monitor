@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.models;
+package uk.gov.hmcts.reform.wataskmonitor.models.camunda;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;

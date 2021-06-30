@@ -3,7 +3,8 @@ package uk.gov.hmcts.reform.wataskmonitor.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.wataskmonitor.models.JobDetailName;
+import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
 
 import java.util.List;
 

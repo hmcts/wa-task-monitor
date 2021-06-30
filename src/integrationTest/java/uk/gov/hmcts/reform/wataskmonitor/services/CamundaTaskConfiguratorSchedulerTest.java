@@ -9,8 +9,10 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.schedulers.TaskConfiguratorScheduler;
+import uk.gov.hmcts.reform.wataskmonitor.services.camunda.CamundaService;
+import uk.gov.hmcts.reform.wataskmonitor.services.taskconfiguration.TaskConfigurationService;
 
 import java.util.concurrent.TimeUnit;
 

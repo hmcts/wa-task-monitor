@@ -5,19 +5,20 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetails;
 
 @ToString
 @EqualsAndHashCode
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public final class MonitorTaskJobReq {
-    private final JobDetails jobDetails;
+    private final JobDetails jobDetail;
 
-    public MonitorTaskJobReq(@JsonProperty("job_details") JobDetails jobDetails) {
-        this.jobDetails = jobDetails;
+    public MonitorTaskJobReq(@JsonProperty("job_details") JobDetails jobDetail) {
+        this.jobDetail = jobDetail;
     }
 
-    public JobDetails getJobDetails() {
-        return jobDetails;
+    public JobDetails getJobDetail() {
+        return jobDetail;
     }
 
 }

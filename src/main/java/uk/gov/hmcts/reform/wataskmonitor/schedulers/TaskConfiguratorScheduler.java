@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
-import uk.gov.hmcts.reform.wataskmonitor.services.CamundaService;
-import uk.gov.hmcts.reform.wataskmonitor.services.TaskConfigurationService;
+import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.services.camunda.CamundaService;
+import uk.gov.hmcts.reform.wataskmonitor.services.taskconfiguration.TaskConfigurationService;
 
 import java.util.List;
 

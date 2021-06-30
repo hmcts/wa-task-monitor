@@ -1,11 +1,13 @@
-package uk.gov.hmcts.reform.wataskmonitor.services;
+package uk.gov.hmcts.reform.wataskmonitor.services.jobs;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
-import uk.gov.hmcts.reform.wataskmonitor.models.JobDetailName;
+import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
+import uk.gov.hmcts.reform.wataskmonitor.services.camunda.CamundaService;
+import uk.gov.hmcts.reform.wataskmonitor.services.taskconfiguration.TaskConfigurationService;
 
 import java.util.List;
 

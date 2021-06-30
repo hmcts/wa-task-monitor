@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
 
 import java.util.List;
 

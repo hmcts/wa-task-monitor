@@ -12,7 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
-import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.services.camunda.CamundaService;
 
 import java.util.List;
 
