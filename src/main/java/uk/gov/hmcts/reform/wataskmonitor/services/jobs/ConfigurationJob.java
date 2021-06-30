@@ -13,15 +13,15 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class ConfigurationJobService implements JobService {
+public class ConfigurationJob implements JobService {
     private final CamundaService camundaService;
     private final TaskConfigurationService taskConfigurationService;
     private final AuthTokenGenerator authTokenGenerator;
 
     @Autowired
-    public ConfigurationJobService(CamundaService camundaService,
-                                   TaskConfigurationService taskConfigurationService,
-                                   AuthTokenGenerator authTokenGenerator) {
+    public ConfigurationJob(CamundaService camundaService,
+                            TaskConfigurationService taskConfigurationService,
+                            AuthTokenGenerator authTokenGenerator) {
         this.camundaService = camundaService;
         this.taskConfigurationService = taskConfigurationService;
         this.authTokenGenerator = authTokenGenerator;

@@ -11,14 +11,14 @@ import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetails;
 @EqualsAndHashCode
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public final class MonitorTaskJobReq {
-    private final JobDetails jobDetail;
+    private final JobDetails jobDetails;
 
-    public MonitorTaskJobReq(@JsonProperty("job_details") JobDetails jobDetail) {
-        this.jobDetail = jobDetail;
+    public MonitorTaskJobReq(@JsonProperty("job_details") JobDetails jobDetails) {
+        this.jobDetails = jobDetails;
     }
 
-    public JobDetails getJobDetail() {
-        return jobDetail;
+    public JobDetails getJobDetails() {
+        return jobDetails;
     }
 
 }
