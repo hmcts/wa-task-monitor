@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
@@ -18,7 +17,6 @@ public class ConfigurationJob implements JobService {
     private final TaskConfigurationService taskConfigurationService;
     private final AuthTokenGenerator authTokenGenerator;
 
-    @Autowired
     public ConfigurationJob(CamundaService camundaService,
                             TaskConfigurationService taskConfigurationService,
                             AuthTokenGenerator authTokenGenerator) {

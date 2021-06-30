@@ -1,0 +1,10 @@
+{
+  "deleteReason": "clean up running process instances",
+  "processInstanceIds": [
+    "4e9f1401-d993-11eb-8fe1-82fee85199b5",
+    "48d26599-d993-11eb-9a97-5a7b203c8d90"
+  ],
+  "skipCustomListeners": true,
+  "skipSubprocesses": true,
+  "failIfNotExists": false
+}

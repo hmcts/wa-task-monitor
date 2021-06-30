@@ -20,7 +20,9 @@ import java.util.List;
 @Slf4j
 public class CamundaService {
 
-    public static final String QUERY_PARAMETERS_JSON = "camundaquery/camunda-query-parameters.json";
+    public static final String QUERY_PARAMETERS_JSON = "camunda/camunda-query-parameters.json";
+    public static final String PROCESS_INSTANCES_REQUEST_PARAMETER_JSON =
+        "camunda/camunda-delete-process-instances-request-parameter.json";
     public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS+0000";
 
     private final CamundaClient camundaClient;
@@ -28,6 +30,11 @@ public class CamundaService {
     @Autowired
     public CamundaService(CamundaClient camundaClient) {
         this.camundaClient = camundaClient;
+    }
+
+    public String deleteProcessInstances(String serviceToken) {
+        log.info("Deleting process instances from camunda.");
+        return camundaClient.deleteProcessInstance(serviceToken, getDeleteProcessInstancesRequestParameter());
     }
 
     public List<CamundaTask> getUnConfiguredTasks(String serviceToken) {
@@ -47,8 +54,16 @@ public class CamundaService {
             return FileCopyUtils.copyToString(new InputStreamReader(is, StandardCharsets.UTF_8))
                 .replace("CREATED_BEFORE_PLACEHOLDER", getCreatedBeforeDate());
         } catch (IOException e) {
+            throw new CamundaRequestFailure("Error loading file: " + QUERY_PARAMETERS_JSON, e);
+        }
+    }
+
+    private String getDeleteProcessInstancesRequestParameter() {
+        try (var is = new ClassPathResource(PROCESS_INSTANCES_REQUEST_PARAMETER_JSON).getInputStream()) {
+            return FileCopyUtils.copyToString(new InputStreamReader(is, StandardCharsets.UTF_8));
+        } catch (IOException e) {
             throw new CamundaRequestFailure(
-                "Error loading the query parameters file: " + QUERY_PARAMETERS_JSON,
+                "Error loading file: " + PROCESS_INSTANCES_REQUEST_PARAMETER_JSON,
                 e
             );
         }

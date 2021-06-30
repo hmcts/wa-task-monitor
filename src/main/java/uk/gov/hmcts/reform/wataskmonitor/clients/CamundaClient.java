@@ -31,5 +31,14 @@ public interface CamundaClient {
                                    String maxResults,
                                @RequestBody String body);
 
+
+    @PostMapping(value = "/process-instance/delete",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    String deleteProcessInstance(@RequestHeader("ServiceAuthorization") String serviceAuthorisation,
+                                 @RequestBody String body);
+
 }
 
