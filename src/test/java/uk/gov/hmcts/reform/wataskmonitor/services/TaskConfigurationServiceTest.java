@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
 import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.services.taskconfiguration.TaskConfigurationService;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,5 +59,12 @@ class TaskConfigurationServiceTest {
     void givenUnConfiguredTaskThatCanNotBeConfiguredShouldCatchException() {
         when(taskConfigurationClient.configureTask(any(), any())).thenThrow(new RuntimeException());
         Assertions.assertDoesNotThrow(() -> taskConfigurationService.configureTasks(camundaTasks, SERVICE_TOKEN));
+    }
+
+    @Test
+    void givenThereAreNoTasksToConfigureShouldNotRunConfigureTaskLogic() {
+        taskConfigurationService.configureTasks(Collections.emptyList(), SERVICE_TOKEN);
+
+        verifyNoInteractions(taskConfigurationClient);
     }
 }

@@ -6,12 +6,11 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceUtility;
 
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.RequestParameterEnum.DELETE_PROCESS_INSTANCES_JOB_SERVICE;
+
 @Component
 @Slf4j
 public class DeleteProcessInstancesJobService {
-
-    public static final String PROCESS_INSTANCES_REQUEST_PARAMETER_JSON =
-        "camunda/camunda-delete-process-instances-request-parameter.json";
 
     private final CamundaClient camundaClient;
 
@@ -26,8 +25,7 @@ public class DeleteProcessInstancesJobService {
     }
 
     private String getRequestParameter() {
-        return ResourceUtility.getResource(PROCESS_INSTANCES_REQUEST_PARAMETER_JSON);
+        return ResourceUtility.getResource(DELETE_PROCESS_INSTANCES_JOB_SERVICE.getRequestParameterBody());
     }
-
 
 }

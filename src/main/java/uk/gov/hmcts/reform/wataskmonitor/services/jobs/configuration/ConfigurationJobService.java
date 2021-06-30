@@ -11,11 +11,12 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.RequestParameterEnum.CONFIGURATION_JOB_SERVICE;
+
 @Component
 @Slf4j
 public class ConfigurationJobService {
 
-    public static final String QUERY_PARAMETERS_JSON = "camunda/camunda-query-parameters.json";
     public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS+0000";
 
     private final CamundaClient camundaClient;
@@ -38,7 +39,7 @@ public class ConfigurationJobService {
     }
 
     private String getQueryParameters() {
-        return ResourceUtility.getResource(QUERY_PARAMETERS_JSON)
+        return ResourceUtility.getResource(CONFIGURATION_JOB_SERVICE.getRequestParameterBody())
             .replace("CREATED_BEFORE_PLACEHOLDER", getCreatedBeforeDate());
     }
 
