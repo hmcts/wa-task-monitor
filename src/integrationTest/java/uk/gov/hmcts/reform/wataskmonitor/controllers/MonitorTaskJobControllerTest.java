@@ -14,10 +14,10 @@ import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
 import uk.gov.hmcts.reform.wacaseeventhandler.matchers.CamundaQueryParametersMatcher;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
+import uk.gov.hmcts.reform.wataskmonitor.models.MonitorTaskJobReq;
 import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetail;
-import uk.gov.hmcts.reform.wataskmonitor.models.MonitorTaskJobReq;
+import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetails;
 
 import java.util.List;
 
@@ -69,7 +69,7 @@ class MonitorTaskJobControllerTest {
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     @Test
     public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() throws Exception {
-        MonitorTaskJobReq monitorTaskJobReq = new MonitorTaskJobReq(new JobDetail(JobDetailName.CONFIGURATION));
+        MonitorTaskJobReq monitorTaskJobReq = new MonitorTaskJobReq(new JobDetails(JobDetailName.CONFIGURATION));
         String expectedResponse = "{\"job_details\":{\"name\":\"CONFIGURATION\"}}";
 
         mockMvc.perform(post("/monitor/tasks/jobs")
