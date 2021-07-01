@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.models.MonitorTaskJobReq;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetails;
+import uk.gov.hmcts.reform.wataskmonitor.services.utilities.ResourceUtility;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.eq;
@@ -24,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.RequestParameterEnum.DELETE_PROCESS_INSTANCES_JOB_SERVICE;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -48,16 +50,7 @@ class MonitorTaskJobControllerForAdHocJobTest {
     private void mockExternalDependencies() {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
 
-        requestParameter = "{\n"
-                           + "  \"deleteReason\": \"clean up running process instances\",\n"
-                           + "  \"processInstanceIds\": [\n"
-                           + "    \"4e9f1401-d993-11eb-8fe1-82fee8519111\",\n"
-                           + "    \"48d26599-d993-11eb-9a97-5a7b203c8112\"\n"
-                           + "  ],\n"
-                           + "  \"skipCustomListeners\": true,\n"
-                           + "  \"skipSubprocesses\": true,\n"
-                           + "  \"failIfNotExists\": false\n"
-                           + "}\n";
+        requestParameter = ResourceUtility.getResource(DELETE_PROCESS_INSTANCES_JOB_SERVICE.getRequestParameterBody());
         String someResponse = "{\"id\": \"78e1a849-d9b3-11eb-bb4f-d62f1f620fc5\",\"type\": \"instance-deletion\" }";
         when(camundaClient.deleteProcessInstance(eq(SERVICE_TOKEN), eq(requestParameter)))
             .thenReturn(someResponse);
