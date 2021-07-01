@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -66,17 +67,16 @@ class MonitorTaskJobControllerForConfigurationJobTest {
             .thenReturn("OK");
     }
 
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+    @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
     @Test
     public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() throws Exception {
         MonitorTaskJobReq monitorTaskJobReq = new MonitorTaskJobReq(new JobDetails(JobDetailName.CONFIGURATION));
-        String expectedResponse = "{\"job_details\":{\"name\":\"CONFIGURATION\"}}";
 
         mockMvc.perform(post("/monitor/tasks/jobs")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(TestUtility.asJsonString(monitorTaskJobReq)))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtility.asJsonString(monitorTaskJobReq)))
             .andExpect(status().isOk())
-            .andExpect(content().string(equalTo(expectedResponse)));
+            .andExpect(content().string(equalTo(expectedResponse.apply(JobDetailName.CONFIGURATION.name()))));
 
         verify(authTokenGenerator).generate();
         verify(camundaClient).getTasks(

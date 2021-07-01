@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.jobs;
+package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,8 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.DeleteProcessInstancesJob;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.DeleteProcessInstancesJobService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;

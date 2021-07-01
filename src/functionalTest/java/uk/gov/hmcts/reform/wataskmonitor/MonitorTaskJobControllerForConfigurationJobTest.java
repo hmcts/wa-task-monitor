@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetails;
 import static net.serenitybdd.rest.SerenityRest.given;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.wataskmonitor.MonitorTaskJobControllerUtility.expectedResponse;
+import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
 @SpringBootTest
 @ActiveProfiles({"local", "functional"})

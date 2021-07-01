@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -46,6 +47,7 @@ class MonitorTaskJobControllerForAdHocJobTest {
 
     private void mockExternalDependencies() {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
+
         requestParameter = "{\n"
                            + "  \"deleteReason\": \"clean up running process instances\",\n"
                            + "  \"processInstanceIds\": [\n"
@@ -56,20 +58,22 @@ class MonitorTaskJobControllerForAdHocJobTest {
                            + "  \"skipSubprocesses\": true,\n"
                            + "  \"failIfNotExists\": false\n"
                            + "}\n";
-        when(camundaClient.deleteProcessInstance(eq(SERVICE_TOKEN), eq(requestParameter))).thenReturn("some response");
+        String someResponse = "{\"id\": \"78e1a849-d9b3-11eb-bb4f-d62f1f620fc5\",\"type\": \"instance-deletion\" }";
+        when(camundaClient.deleteProcessInstance(eq(SERVICE_TOKEN), eq(requestParameter)))
+            .thenReturn(someResponse);
     }
 
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+    @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
     @Test
     public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() throws Exception {
         MonitorTaskJobReq monitorTaskJobReq = new MonitorTaskJobReq(new JobDetails(JobDetailName.AD_HOC));
-        String expectedResponse = "{\"job_details\":{\"name\":\"AD_HOC\"}}";
+
 
         mockMvc.perform(post("/monitor/tasks/jobs")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtility.asJsonString(monitorTaskJobReq)))
             .andExpect(status().isOk())
-            .andExpect(content().string(equalTo(expectedResponse)));
+            .andExpect(content().string(equalTo(expectedResponse.apply(JobDetailName.AD_HOC.name()))));
 
         verify(authTokenGenerator).generate();
         verify(camundaClient).deleteProcessInstance(eq(SERVICE_TOKEN), eq(requestParameter));
