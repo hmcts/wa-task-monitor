@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
 
-import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.utilities.LoggingUtility.logPrettyPrint;
+import static uk.gov.hmcts.reform.wataskmonitor.services.utilities.LoggingUtility.logPrettyPrint;
 
 @Slf4j
 @Component

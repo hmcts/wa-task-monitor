@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.jobs.utilities;
+package uk.gov.hmcts.reform.wataskmonitor.services.utilities;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.jobs.utilities;
+package uk.gov.hmcts.reform.wataskmonitor.services.utilities;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,6 +12,7 @@ class LoggingUtilityTest {
     void logPrettyPrint() {
         String input = "{\"job_details\" : {\"name\" : \"CONFIGURATION\"}}";
 
+        @SuppressWarnings("PMD.LawOfDemeter")
         String output = LoggingUtility.logPrettyPrint.apply(input);
 
         String expectedOutput = "{\n"
@@ -20,8 +21,8 @@ class LoggingUtilityTest {
                                 + "  }\n"
                                 + "}";
 
-        assertEquals(expectedOutput, output);
-        assertNotEquals(output, input);
+        assertEquals(expectedOutput, output, "output does not match expected output");
+        assertNotEquals(output, input, "output can't be equal to input");
     }
 
 }

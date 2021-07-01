@@ -43,6 +43,10 @@ class DeleteProcessInstancesJobTest {
     void run() {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
 
+        String someResponse = "{\"id\": \"78e1a849-d9b3-11eb-bb4f-d62f1f620fc5\",\"type\": \"instance-deletion\" }";
+        when(deleteProcessInstancesJobService.deleteProcessInstances(eq(SERVICE_TOKEN)))
+            .thenReturn(someResponse);
+
         deleteProcessInstancesJob.run();
 
         verify(authTokenGenerator).generate();
