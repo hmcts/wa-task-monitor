@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetails;
 import static net.serenitybdd.rest.SerenityRest.given;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.wataskmonitor.MonitorTaskJobControllerUtility.expectedResponse;
 
 @SpringBootTest
 @ActiveProfiles({"local", "functional"})
@@ -45,11 +46,6 @@ class MonitorTaskJobControllerForConfigurationJobTest {
 
     @Test
     void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() {
-        String expectedResponse = "{\n"
-                       + "  \"job_details\" : {\n"
-                       + "    \"name\" : \"CONFIGURATION\"\n"
-                       + "  }\n"
-                       + "}";
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .header("ServiceAuthorization", serviceToken)
@@ -58,7 +54,7 @@ class MonitorTaskJobControllerForConfigurationJobTest {
             .post("/monitor/tasks/jobs")
             .then()
             .statusCode(HttpStatus.OK.value())
-            .body(is(expectedResponse));
+            .body(is(expectedResponse.apply(JobDetailName.CONFIGURATION.name())));
     }
 
     @Test

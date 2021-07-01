@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
 
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.utilities.LoggingUtility.logPrettyPrint;
+
 @Slf4j
 @Component
 public class DeleteProcessInstancesJob implements JobService {
@@ -31,6 +33,7 @@ public class DeleteProcessInstancesJob implements JobService {
         log.info("Starting '" + DELETE_PROCESS_INSTANCE_JOB);
         String serviceToken = authTokenGenerator.generate();
         String response = deleteProcessInstancesJobService.deleteProcessInstances(serviceToken);
-        log.info("{} finished successfully: {}", DELETE_PROCESS_INSTANCE_JOB, response);
+        log.info("{} finished successfully: {}", DELETE_PROCESS_INSTANCE_JOB, logPrettyPrint.apply(response));
     }
+
 }
