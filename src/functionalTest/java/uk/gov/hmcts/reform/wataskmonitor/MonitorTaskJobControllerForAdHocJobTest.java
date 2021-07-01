@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetails;
 
 import static net.serenitybdd.rest.SerenityRest.given;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @SpringBootTest
@@ -26,7 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RunWith(SpringIntegrationSerenityRunner.class)
 @Slf4j
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
-class MonitorTaskJobControllerTest {
+class MonitorTaskJobControllerForAdHocJobTest {
 
     @Value("${targets.instance}")
     protected String testUrl;
@@ -45,15 +45,20 @@ class MonitorTaskJobControllerTest {
 
     @Test
     void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() {
+        String expectedResponse = "{\n"
+                       + "  \"job_details\" : {\n"
+                       + "    \"name\" : \"AD_HOC\"\n"
+                       + "  }\n"
+                       + "}";
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .header("ServiceAuthorization", serviceToken)
-            .body(TestUtility.asJsonString(new MonitorTaskJobReq(new JobDetails(JobDetailName.CONFIGURATION))))
+            .body(TestUtility.asJsonString(new MonitorTaskJobReq(new JobDetails(JobDetailName.AD_HOC))))
             .when()
             .post("/monitor/tasks/jobs")
             .then()
             .statusCode(HttpStatus.OK.value())
-            .body(equalTo("{\"job_details\":{\"name\":\"CONFIGURATION\"}}"));
+            .body(is(expectedResponse));
     }
 
     @Test
