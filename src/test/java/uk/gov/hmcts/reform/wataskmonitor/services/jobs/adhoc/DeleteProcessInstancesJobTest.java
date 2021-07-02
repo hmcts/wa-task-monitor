@@ -31,7 +31,7 @@ class DeleteProcessInstancesJobTest {
         "TERMINATION, false",
         "INITIATION, false",
         "CONFIGURATION, false",
-        "AD_HOC, true"
+        "AD_HOC_DELETE_PROCESS_INSTANCES, true"
     })
     void canRun(JobDetailName jobDetailName, boolean expectedResult) {
         assertThat(deleteProcessInstancesJob.canRun(jobDetailName)).isEqualTo(expectedResult);

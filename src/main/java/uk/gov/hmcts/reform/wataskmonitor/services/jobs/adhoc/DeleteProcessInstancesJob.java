@@ -6,13 +6,13 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
 
+import static uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName.AD_HOC_DELETE_PROCESS_INSTANCES;
 import static uk.gov.hmcts.reform.wataskmonitor.services.utilities.LoggingUtility.logPrettyPrint;
 
 @Slf4j
 @Component
 public class DeleteProcessInstancesJob implements JobService {
 
-    public static final String DELETE_PROCESS_INSTANCE_JOB = "Delete process instance job";
     private final AuthTokenGenerator authTokenGenerator;
     private final DeleteProcessInstancesJobService deleteProcessInstancesJobService;
 
@@ -25,15 +25,15 @@ public class DeleteProcessInstancesJob implements JobService {
     @Override
     @SuppressWarnings("PMD.LawOfDemeter")
     public boolean canRun(JobDetailName jobDetailName) {
-        return JobDetailName.AD_HOC.equals(jobDetailName);
+        return AD_HOC_DELETE_PROCESS_INSTANCES.equals(jobDetailName);
     }
 
     @Override
     public void run() {
-        log.info("Starting '" + DELETE_PROCESS_INSTANCE_JOB);
+        log.info("Starting '" + AD_HOC_DELETE_PROCESS_INSTANCES);
         String serviceToken = authTokenGenerator.generate();
         String response = deleteProcessInstancesJobService.deleteProcessInstances(serviceToken);
-        log.info("{} finished successfully: {}", DELETE_PROCESS_INSTANCE_JOB, logPrettyPrint.apply(response));
+        log.info("{} finished successfully: {}", AD_HOC_DELETE_PROCESS_INSTANCES, logPrettyPrint.apply(response));
     }
 
 }

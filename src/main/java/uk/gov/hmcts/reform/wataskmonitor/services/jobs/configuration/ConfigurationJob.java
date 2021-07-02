@@ -13,7 +13,6 @@ import java.util.List;
 @Slf4j
 @Component
 public class ConfigurationJob implements JobService {
-    public static final String TASK_CONFIGURATION_JOB = "task configuration job";
     private final ConfigurationJobService configurationJobService;
     private final TaskConfigurationService taskConfigurationService;
     private final AuthTokenGenerator authTokenGenerator;
@@ -34,10 +33,10 @@ public class ConfigurationJob implements JobService {
 
     @Override
     public void run() {
-        log.info("Starting " + TASK_CONFIGURATION_JOB + ".");
+        log.info("Starting " + JobDetailName.CONFIGURATION + ".");
         String serviceToken = authTokenGenerator.generate();
         List<CamundaTask> tasks = configurationJobService.getUnConfiguredTasks(serviceToken);
         taskConfigurationService.configureTasks(tasks, serviceToken);
-        log.info(TASK_CONFIGURATION_JOB + " finished successfully.");
+        log.info(JobDetailName.CONFIGURATION + " finished successfully.");
     }
 }

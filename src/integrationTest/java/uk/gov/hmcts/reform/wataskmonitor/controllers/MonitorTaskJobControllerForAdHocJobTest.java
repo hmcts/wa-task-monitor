@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.models.MonitorTaskJobReq;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.services.utilities.ResourceUtility;
 
@@ -25,6 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
+import static uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName.AD_HOC_DELETE_PROCESS_INSTANCES;
 import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.RequestParameterEnum.DELETE_PROCESS_INSTANCES_JOB_SERVICE;
 
 @SpringBootTest
@@ -59,14 +59,14 @@ class MonitorTaskJobControllerForAdHocJobTest {
     @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
     @Test
     public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() throws Exception {
-        MonitorTaskJobReq monitorTaskJobReq = new MonitorTaskJobReq(new JobDetails(JobDetailName.AD_HOC));
+        MonitorTaskJobReq monitorTaskJobReq = new MonitorTaskJobReq(new JobDetails(AD_HOC_DELETE_PROCESS_INSTANCES));
 
 
         mockMvc.perform(post("/monitor/tasks/jobs")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtility.asJsonString(monitorTaskJobReq)))
             .andExpect(status().isOk())
-            .andExpect(content().string(equalTo(expectedResponse.apply(JobDetailName.AD_HOC.name()))));
+            .andExpect(content().string(equalTo(expectedResponse.apply(AD_HOC_DELETE_PROCESS_INSTANCES.name()))));
 
         verify(authTokenGenerator).generate();
         verify(camundaClient).deleteProcessInstance(eq(SERVICE_TOKEN), eq(requestParameter));
