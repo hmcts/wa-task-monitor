@@ -30,7 +30,7 @@ public class DeleteProcessInstancesJob implements JobService {
 
     @Override
     public void run() {
-        log.info("Starting '" + AD_HOC_DELETE_PROCESS_INSTANCES);
+        log.info("Starting '{}'", AD_HOC_DELETE_PROCESS_INSTANCES);
         String serviceToken = authTokenGenerator.generate();
         String response = deleteProcessInstancesJobService.deleteProcessInstances(serviceToken);
         log.info("{} finished successfully: {}", AD_HOC_DELETE_PROCESS_INSTANCES, logPrettyPrint.apply(response));
