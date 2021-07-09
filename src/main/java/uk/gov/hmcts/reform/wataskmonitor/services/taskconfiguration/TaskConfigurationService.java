@@ -1,10 +1,10 @@
-package uk.gov.hmcts.reform.wataskmonitor.services;
+package uk.gov.hmcts.reform.wataskmonitor.services.taskconfiguration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
-import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
 
 import java.util.List;
 

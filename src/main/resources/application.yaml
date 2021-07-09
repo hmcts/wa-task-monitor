@@ -12,6 +12,7 @@ management:
         include: health, info, prometheus
 
 spring:
+  jackson.serialization.INDENT_OUTPUT: true
   application:
     name: WA Task monitor
   main:
@@ -24,9 +25,6 @@ camunda:
 
 task.configuration.service:
   url: ${TASK_CONFIGURATION_SERVICE_URL:http://localhost:8091}
-
-task.configurator.scheduling:
-  fixedRate: 60000
 
 idam:
   s2s-auth:

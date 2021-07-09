@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
 
 import java.util.List;
 
@@ -30,6 +30,15 @@ public interface CamundaClient {
                                @RequestParam(value = "maxResults", required = false, defaultValue = "1000")
                                    String maxResults,
                                @RequestBody String body);
+
+
+    @PostMapping(value = "/process-instance/delete",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    String deleteProcessInstance(@RequestHeader("ServiceAuthorization") String serviceAuthorisation,
+                                 @RequestBody String body);
 
 }
 
