@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
 
@@ -13,12 +12,9 @@ import static uk.gov.hmcts.reform.wataskmonitor.services.utilities.LoggingUtilit
 @Component
 public class DeleteProcessInstancesJob implements JobService {
 
-    private final AuthTokenGenerator authTokenGenerator;
     private final DeleteProcessInstancesJobService deleteProcessInstancesJobService;
 
-    public DeleteProcessInstancesJob(AuthTokenGenerator authTokenGenerator,
-                                     DeleteProcessInstancesJobService deleteProcessInstancesJobService) {
-        this.authTokenGenerator = authTokenGenerator;
+    public DeleteProcessInstancesJob(DeleteProcessInstancesJobService deleteProcessInstancesJobService) {
         this.deleteProcessInstancesJobService = deleteProcessInstancesJobService;
     }
 
@@ -29,9 +25,8 @@ public class DeleteProcessInstancesJob implements JobService {
     }
 
     @Override
-    public void run() {
+    public void run(String serviceToken) {
         log.info("Starting '{}'", AD_HOC_DELETE_PROCESS_INSTANCES);
-        String serviceToken = authTokenGenerator.generate();
         String response = deleteProcessInstancesJobService.deleteProcessInstances(serviceToken);
         log.info("{} finished successfully: {}", AD_HOC_DELETE_PROCESS_INSTANCES, logPrettyPrint.apply(response));
     }

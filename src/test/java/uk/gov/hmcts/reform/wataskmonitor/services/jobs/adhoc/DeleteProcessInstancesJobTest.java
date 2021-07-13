@@ -7,7 +7,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,8 +18,6 @@ import static org.mockito.Mockito.when;
 class DeleteProcessInstancesJobTest {
 
     public static final String SERVICE_TOKEN = "some s2s token";
-    @Mock
-    private AuthTokenGenerator authTokenGenerator;
     @Mock
     private DeleteProcessInstancesJobService deleteProcessInstancesJobService;
     @InjectMocks
@@ -39,15 +36,12 @@ class DeleteProcessInstancesJobTest {
 
     @Test
     void run() {
-        when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
-
         String someResponse = "{\"id\": \"78e1a849-d9b3-11eb-bb4f-d62f1f620fc5\",\"type\": \"instance-deletion\" }";
         when(deleteProcessInstancesJobService.deleteProcessInstances(eq(SERVICE_TOKEN)))
             .thenReturn(someResponse);
 
-        deleteProcessInstancesJob.run();
+        deleteProcessInstancesJob.run(SERVICE_TOKEN);
 
-        verify(authTokenGenerator).generate();
         verify(deleteProcessInstancesJobService).deleteProcessInstances(eq(SERVICE_TOKEN));
     }
 }
