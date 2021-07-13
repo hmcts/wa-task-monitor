@@ -1,32 +1,28 @@
-package uk.gov.hmcts.reform.wataskmonitor.services;
+package uk.gov.hmcts.reform.wataskmonitor.services.jobs.configuration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.FileCopyUtils;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
-import uk.gov.hmcts.reform.wataskmonitor.exceptions.CamundaRequestFailure;
-import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.services.utilities.ResourceUtility;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.RequestParameterEnum.CONFIGURATION_JOB_SERVICE;
+
 @Component
 @Slf4j
-public class CamundaService {
+public class ConfigurationJobService {
 
-    public static final String QUERY_PARAMETERS_JSON = "camundaquery/camunda-query-parameters.json";
     public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS+0000";
 
     private final CamundaClient camundaClient;
 
     @Autowired
-    public CamundaService(CamundaClient camundaClient) {
+    public ConfigurationJobService(CamundaClient camundaClient) {
         this.camundaClient = camundaClient;
     }
 
@@ -43,18 +39,11 @@ public class CamundaService {
     }
 
     private String getQueryParameters() {
-        try (var is = new ClassPathResource(QUERY_PARAMETERS_JSON).getInputStream()) {
-            return FileCopyUtils.copyToString(new InputStreamReader(is, StandardCharsets.UTF_8))
-                .replace("CREATED_BEFORE_PLACEHOLDER", getCreatedBeforeDate());
-        } catch (IOException e) {
-            throw new CamundaRequestFailure(
-                "Error loading the query parameters file: " + QUERY_PARAMETERS_JSON,
-                e
-            );
-        }
+        return ResourceUtility.getResource(CONFIGURATION_JOB_SERVICE.getRequestParameterBody())
+            .replace("CREATED_BEFORE_PLACEHOLDER", getCreatedBeforeDate());
     }
 
-    private String getCreatedBeforeDate() {
+    private static String getCreatedBeforeDate() {
         return ZonedDateTime.now()
             .minusMinutes(5)
             .format(DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN));

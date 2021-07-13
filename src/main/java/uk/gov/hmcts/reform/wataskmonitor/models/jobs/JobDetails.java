@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.models;
+package uk.gov.hmcts.reform.wataskmonitor.models.jobs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;

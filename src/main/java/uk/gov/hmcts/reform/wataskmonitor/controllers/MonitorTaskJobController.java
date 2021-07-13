@@ -23,6 +23,8 @@ public class MonitorTaskJobController {
     public MonitorTaskJobReq monitorTaskJob(@RequestBody MonitorTaskJobReq monitorTaskJobReq) {
         log.info("Received request to create a new job of type '{}'", monitorTaskJobReq.getJobDetails().getName());
         monitorTaskJobService.execute(monitorTaskJobReq.getJobDetails().getName());
+        log.info("Job({}) processed in the background", monitorTaskJobReq.getJobDetails().getName());
         return monitorTaskJobReq;
     }
+
 }

@@ -11,32 +11,28 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
-import uk.gov.hmcts.reform.wacaseeventhandler.matchers.CamundaQueryParametersMatcher;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
-import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
-import uk.gov.hmcts.reform.wataskmonitor.models.CamundaTask;
-import uk.gov.hmcts.reform.wataskmonitor.models.JobDetailName;
-import uk.gov.hmcts.reform.wataskmonitor.models.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.models.MonitorTaskJobReq;
-
-import java.util.List;
+import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetails;
+import uk.gov.hmcts.reform.wataskmonitor.services.utilities.ResourceUtility;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
+import static uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName.AD_HOC_DELETE_PROCESS_INSTANCES;
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.RequestParameterEnum.DELETE_PROCESS_INSTANCES_JOB_SERVICE;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles({"local"})
-class MonitorTaskJobControllerTest {
+@ActiveProfiles({"local", "integration"})
+class MonitorTaskJobControllerForAdHocJobTest {
 
     public static final String SERVICE_TOKEN = "some service token";
-    public static final String CAMUNDA_TASK_ID = "some camunda task id";
     @Autowired
     private MockMvc mockMvc;
 
@@ -44,8 +40,7 @@ class MonitorTaskJobControllerTest {
     private CamundaClient camundaClient;
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
-    private TaskConfigurationClient taskConfigurationClient;
+    private String requestParameter;
 
     @BeforeEach
     void setUp() {
@@ -55,37 +50,26 @@ class MonitorTaskJobControllerTest {
     private void mockExternalDependencies() {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
 
-        when(camundaClient.getTasks(
-            eq(SERVICE_TOKEN),
-            eq("0"),
-            eq("1000"),
-            argThat(new CamundaQueryParametersMatcher(TestUtility.getExpectedCamundaQueryParameters()))
-        )).thenReturn(List.of(new CamundaTask(CAMUNDA_TASK_ID)));
-
-        when(taskConfigurationClient.configureTask(eq(SERVICE_TOKEN), eq(CAMUNDA_TASK_ID)))
-            .thenReturn("OK");
+        requestParameter = ResourceUtility.getResource(DELETE_PROCESS_INSTANCES_JOB_SERVICE.getRequestParameterBody());
+        String someResponse = "{\"id\": \"78e1a849-d9b3-11eb-bb4f-d62f1f620fc5\",\"type\": \"instance-deletion\" }";
+        when(camundaClient.deleteProcessInstance(eq(SERVICE_TOKEN), eq(requestParameter)))
+            .thenReturn(someResponse);
     }
 
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+    @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
     @Test
     public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() throws Exception {
-        MonitorTaskJobReq monitorTaskJobReq = new MonitorTaskJobReq(new JobDetails(JobDetailName.CONFIGURATION));
-        String expectedResponse = "{\"job_details\":{\"name\":\"CONFIGURATION\"}}";
+        MonitorTaskJobReq monitorTaskJobReq = new MonitorTaskJobReq(new JobDetails(AD_HOC_DELETE_PROCESS_INSTANCES));
+
 
         mockMvc.perform(post("/monitor/tasks/jobs")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(TestUtility.asJsonString(monitorTaskJobReq)))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtility.asJsonString(monitorTaskJobReq)))
             .andExpect(status().isOk())
-            .andExpect(content().string(equalTo(expectedResponse)));
+            .andExpect(content().string(equalTo(expectedResponse.apply(AD_HOC_DELETE_PROCESS_INSTANCES.name()))));
 
         verify(authTokenGenerator).generate();
-        verify(camundaClient).getTasks(
-            eq(SERVICE_TOKEN),
-            eq("0"),
-            eq("1000"),
-            argThat(new CamundaQueryParametersMatcher(TestUtility.getExpectedCamundaQueryParameters()))
-        );
-        verify(taskConfigurationClient).configureTask(eq(SERVICE_TOKEN), eq(CAMUNDA_TASK_ID));
+        verify(camundaClient).deleteProcessInstance(eq(SERVICE_TOKEN), eq(requestParameter));
     }
 
 }
