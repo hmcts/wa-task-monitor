@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc;
+package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.deleteprocessinstances;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
