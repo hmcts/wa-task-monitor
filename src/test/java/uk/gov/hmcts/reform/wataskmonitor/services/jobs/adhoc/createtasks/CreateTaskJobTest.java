@@ -1,16 +1,34 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.createtasks;
 
+import org.apache.commons.lang.StringUtils;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient;
+import uk.gov.hmcts.reform.wataskmonitor.models.caseeventhandler.EventInformation;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
+import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CreateTaskJobOutcome;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CreateTaskJobTest {
+
+    public static final String SOME_SERVICE_TOKEN = "some service token";
+    @Mock
+    private CaseEventHandlerClient caseEventHandlerClient;
+    @Mock
+    private JobOutcomeService createTaskJobOutcomeService;
 
     @InjectMocks
     private CreateTaskJob createTaskJob;
@@ -25,5 +43,30 @@ class CreateTaskJobTest {
     })
     void canRun(JobDetailName jobDetailName, boolean expectedResult) {
         assertThat(createTaskJob.canRun(jobDetailName)).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void run() {
+        when(createTaskJobOutcomeService.getJobOutcome(eq(SOME_SERVICE_TOKEN), anyString()))
+            .thenReturn(CreateTaskJobOutcome.builder().build());
+
+        createTaskJob.run(SOME_SERVICE_TOKEN);
+
+        verify(caseEventHandlerClient).sendMessage(
+            eq(SOME_SERVICE_TOKEN),
+            argThat(this::eventInformationMatcher)
+        );
+
+        verify(createTaskJobOutcomeService).getJobOutcome(eq(SOME_SERVICE_TOKEN), anyString());
+    }
+
+    private boolean eventInformationMatcher(EventInformation eventInformation) {
+        return eventInformation.getEventId().equals("buildCase") && eventInformation.getJurisdictionId().equals("ia")
+               && eventInformation.getCaseTypeId().equals("asylum")
+               && eventInformation.getNewStateId().equals("caseUnderReview")
+               && StringUtils.isNotBlank(eventInformation.getEventInstanceId())
+               && eventInformation.getEventTimeStamp() != null
+               && StringUtils.isNotBlank(eventInformation.getCaseId())
+               && StringUtils.isNotBlank(eventInformation.getUserId());
     }
 }

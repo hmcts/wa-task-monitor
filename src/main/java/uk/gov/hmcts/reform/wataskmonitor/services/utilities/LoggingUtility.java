@@ -6,12 +6,12 @@ import uk.gov.hmcts.reform.wataskmonitor.exceptions.PrettyPrintFailure;
 
 public final class LoggingUtility {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public static String logPrettyPrint(String str) {
         try {
-            Object json = mapper.readValue(str, Object.class);
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
+            Object json = MAPPER.readValue(str, Object.class);
+            return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(json);
         } catch (JsonProcessingException e) {
             throw new PrettyPrintFailure("Error logging pretty print: " + str, e);
         }
@@ -19,7 +19,7 @@ public final class LoggingUtility {
 
     public static String logPrettyPrint(Object obj) {
         try {
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+            return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             throw new PrettyPrintFailure("Error logging pretty print: " + obj, e);
         }
