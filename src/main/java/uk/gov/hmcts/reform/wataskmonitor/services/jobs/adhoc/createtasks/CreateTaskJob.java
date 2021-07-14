@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.wataskmonitor.models.caseeventhandler.EventInformatio
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CreateTaskJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
+import uk.gov.hmcts.reform.wataskmonitor.services.utilities.LoggingUtility;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,7 +48,7 @@ public class CreateTaskJob implements JobService {
         sendMessageToInitiateTask(serviceToken, caseId);
         CreateTaskJobOutcome createTaskJobOutcome = waitForJobOutcome(serviceToken, caseId);
 
-        log.info("{} finished successfully: {}", AD_HOC_CREATE_TASKS, List.of(createTaskJobOutcome));
+        log.info("{} finished successfully: {}", AD_HOC_CREATE_TASKS, LoggingUtility.logPrettyPrint(List.of(createTaskJobOutcome)));
     }
 
     private CreateTaskJobOutcome waitForJobOutcome(String serviceToken, String caseId) {

@@ -13,7 +13,7 @@ class LoggingUtilityTest {
         String input = "{\"job_details\" : {\"name\" : \"CONFIGURATION\"}}";
 
         @SuppressWarnings("PMD.LawOfDemeter")
-        String output = LoggingUtility.logPrettyPrint.apply(input);
+        String output = LoggingUtility.logPrettyPrint(input);
 
         String expectedOutput = "{\n"
                                 + "  \"job_details\" : {\n"

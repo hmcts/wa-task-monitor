@@ -28,7 +28,7 @@ public class DeleteProcessInstancesJob implements JobService {
     public void run(String serviceToken) {
         log.info("Starting '{}'", AD_HOC_DELETE_PROCESS_INSTANCES);
         String response = deleteProcessInstancesJobService.deleteProcessInstances(serviceToken);
-        log.info("{} finished successfully: {}", AD_HOC_DELETE_PROCESS_INSTANCES, logPrettyPrint.apply(response));
+        log.info("{} finished successfully: {}", AD_HOC_DELETE_PROCESS_INSTANCES, logPrettyPrint(response));
     }
 
 }
