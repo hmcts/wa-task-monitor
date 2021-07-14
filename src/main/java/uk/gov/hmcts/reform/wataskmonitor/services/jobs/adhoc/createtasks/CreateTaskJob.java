@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.equalTo;
 import static uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName.AD_HOC_CREATE_TASKS;
 
 @Slf4j
@@ -40,11 +43,23 @@ public class CreateTaskJob implements JobService {
     @Override
     public void run(String serviceToken) {
         log.info("Starting '{}'", AD_HOC_CREATE_TASKS);
-
         //todo: read case Ids
-
-        // send message call
         String caseId = "1626216741759512";
+
+        sendMessageToInitiateTask(serviceToken, caseId);
+        waitForOperationOutcome(serviceToken, caseId);
+
+    }
+
+    private void waitForOperationOutcome(String serviceToken, String caseId) {
+        await()
+            .pollInterval(5, SECONDS)
+            .atMost(15, SECONDS)
+            .until(
+                () -> checkTaskWasCreatedSuccessfully(serviceToken, caseId), equalTo(true));
+    }
+
+    private void sendMessageToInitiateTask(String serviceToken, String caseId) {
         caseEventHandlerClient.sendMessage(serviceToken,
             EventInformation.builder()
                 .eventInstanceId(UUID.randomUUID().toString())
@@ -56,9 +71,10 @@ public class CreateTaskJob implements JobService {
                 .newStateId("caseUnderReview")
                 .userId("some user Id")
                 .build());
+    }
 
-        //check task is created successfully
-        Thread.sleep(10000);
+    private boolean checkTaskWasCreatedSuccessfully(String serviceToken, String caseId) {
+        boolean result;
         CamundaTask camundaTask = camundaClient.getTasksByTaskVariables(serviceToken,
             "caseId_eq_" + caseId + ",taskType_eq_reviewAppealSkeletonArgument",
             "created",
@@ -68,10 +84,13 @@ public class CreateTaskJob implements JobService {
         List<String> taskNotCreated = new ArrayList<>();
         if (camundaTask != null && camundaTask.getName().equals("Review Appeal Skeleton Argument")) {
             taskCreated.add(camundaTask);
+            result = true;
         } else {
             taskNotCreated.add(caseId);
+            result = false;
         }
 
+        // print report
         log.info("{} finished successfully: "
                  + "\n number of tasks created: {} "
                  + "\n tasks created list: {} "
@@ -82,6 +101,7 @@ public class CreateTaskJob implements JobService {
             taskCreated,
             taskNotCreated.size(),
             taskNotCreated);
+        return result;
     }
 
 }
