@@ -61,7 +61,9 @@ class MonitorTaskJobControllerForConfigurationJobTest {
             eq("0"),
             eq("1000"),
             argThat(new CamundaQueryParametersMatcher(TestUtility.getExpectedCamundaQueryParameters()))
-        )).thenReturn(List.of(new CamundaTask(CAMUNDA_TASK_ID)));
+        )).thenReturn(List.of(new CamundaTask(CAMUNDA_TASK_ID,
+            "task name",
+            "2151a580-c3c3-11eb-8b76-d26a7287fec2")));
 
         when(taskConfigurationClient.configureTask(eq(SERVICE_TOKEN), eq(CAMUNDA_TASK_ID)))
             .thenReturn("OK");

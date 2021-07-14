@@ -36,8 +36,15 @@ class TaskConfigurationServiceTest {
 
     @Captor
     private ArgumentCaptor<String> taskIdCaptor;
-    private final CamundaTask task1 = new CamundaTask("some id");
-    private final CamundaTask task2 = new CamundaTask("some other id");
+
+    private final CamundaTask task1 = new CamundaTask("some id",
+        "task name 1",
+        "2151a580-c3c3-11eb-8b76-d26a7287fec2");
+
+    private final CamundaTask task2 = new CamundaTask("some other id",
+        "task name 2",
+        "2151a580-c3c3-11eb-8b76-d26a7287f000");
+
     private final List<CamundaTask> camundaTasks = List.of(task1, task2);
 
     @Test

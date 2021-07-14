@@ -36,7 +36,10 @@ class ConfigurationJobServiceTest {
 
     @Test
     void givenGetTasksCamundaRequestShouldRetrieveUserTasksAndNotDelayedTasks() throws JSONException {
-        List<CamundaTask> expectedCamundaTasks = List.of(new CamundaTask("1"), new CamundaTask("2"));
+        List<CamundaTask> expectedCamundaTasks = List.of(
+            new CamundaTask("1", "task name", "2151a580-c3c3-11eb-8b76-d26a7287fec2"),
+            new CamundaTask("2", "task name", "2151a580-c3c3-11eb-8b76-d26a7287f000")
+        );
         when(camundaClient.getTasks(
             eq(SERVICE_TOKEN),
             eq("0"),
@@ -62,20 +65,20 @@ class ConfigurationJobServiceTest {
     @NotNull
     private String getExpectedQueryParameters() {
         return "{\n"
-            + "  \"orQueries\": [\n"
-            + "    {\n"
-            + "      \"taskVariables\": [\n"
-            + "        {\n"
-            + "          \"name\": \"taskState\",\n"
-            + "          \"operator\": \"eq\",\n"
-            + "          \"value\": \"unconfigured\"\n"
-            + "        }\n"
-            + "      ]\n"
-            + "    }\n"
-            + "  ],\n"
-            + "  \"taskDefinitionKey\": \"processTask\",\n"
-            + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n"
-            + "}\n";
+               + "  \"orQueries\": [\n"
+               + "    {\n"
+               + "      \"taskVariables\": [\n"
+               + "        {\n"
+               + "          \"name\": \"taskState\",\n"
+               + "          \"operator\": \"eq\",\n"
+               + "          \"value\": \"unconfigured\"\n"
+               + "        }\n"
+               + "      ]\n"
+               + "    }\n"
+               + "  ],\n"
+               + "  \"taskDefinitionKey\": \"processTask\",\n"
+               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n"
+               + "}\n";
     }
 
 }
