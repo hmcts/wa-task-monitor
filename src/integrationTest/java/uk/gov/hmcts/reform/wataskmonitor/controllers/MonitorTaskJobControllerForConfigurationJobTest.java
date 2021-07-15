@@ -68,7 +68,7 @@ class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootIntegrat
 
         mockMvc.perform(post("/monitor/tasks/jobs")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(monitorTaskJobReq)))
+                            .content(TestUtility.asJsonString(monitorTaskJobReq)))
             .andExpect(status().isOk())
             .andExpect(content().string(equalTo(expectedResponse.apply(JobName.CONFIGURATION.name()))));
 
