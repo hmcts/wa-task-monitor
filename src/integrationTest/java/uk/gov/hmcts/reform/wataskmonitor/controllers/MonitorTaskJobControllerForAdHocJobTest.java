@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.controllers.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.controllers.request.MonitorTaskJobRequest;
@@ -49,7 +50,7 @@ class MonitorTaskJobControllerForAdHocJobTest extends SpringBootIntegrationBaseT
         mockMvc.perform(
             post("/monitor/tasks/jobs")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(monitorTaskJobReq)))
+                .content(TestUtility.asJsonString(monitorTaskJobReq)))
             .andExpect(status().isOk())
             .andExpect(content().string(equalTo(expectedResponse.apply(AD_HOC_DELETE_PROCESS_INSTANCES.name()))));
 
