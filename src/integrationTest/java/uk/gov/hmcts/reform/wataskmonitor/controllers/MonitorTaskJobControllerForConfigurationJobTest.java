@@ -2,13 +2,8 @@ package uk.gov.hmcts.reform.wataskmonitor.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
 import uk.gov.hmcts.reform.wacaseeventhandler.matchers.CamundaQueryParametersMatcher;
@@ -31,15 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
-@SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles({"integration"})
-class MonitorTaskJobControllerForConfigurationJobTest {
+class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootIntegrationBaseTest {
 
     public static final String SERVICE_TOKEN = "some service token";
     public static final String CAMUNDA_TASK_ID = "some camunda task id";
-    @Autowired
-    private MockMvc mockMvc;
 
     @MockBean
     private CamundaClient camundaClient;
@@ -60,7 +50,7 @@ class MonitorTaskJobControllerForConfigurationJobTest {
 
         mockMvc.perform(post("/monitor/tasks/jobs")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(TestUtility.asJsonString(monitorTaskJobReq)))
+                            .content(asJsonString(monitorTaskJobReq)))
             .andExpect(status().isOk())
             .andExpect(content().string(equalTo(expectedResponse.apply(JobName.CONFIGURATION.name()))));
 

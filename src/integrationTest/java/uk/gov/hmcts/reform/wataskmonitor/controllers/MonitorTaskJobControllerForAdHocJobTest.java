@@ -2,15 +2,11 @@ package uk.gov.hmcts.reform.wataskmonitor.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.controllers.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.controllers.request.MonitorTaskJobRequest;
@@ -27,14 +23,10 @@ import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobC
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_DELETE_PROCESS_INSTANCES;
 import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.RequestsEnum.DELETE_PROCESS_INSTANCES_JOB_SERVICE;
 
-@SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles({"integration"})
-class MonitorTaskJobControllerForAdHocJobTest {
+@ExtendWith(MockitoExtension.class)
+class MonitorTaskJobControllerForAdHocJobTest extends SpringBootIntegrationBaseTest {
 
     public static final String SERVICE_TOKEN = "some service token";
-    @Autowired
-    private MockMvc mockMvc;
 
     @MockBean
     private CamundaClient camundaClient;
@@ -54,9 +46,10 @@ class MonitorTaskJobControllerForAdHocJobTest {
             AD_HOC_DELETE_PROCESS_INSTANCES));
 
 
-        mockMvc.perform(post("/monitor/tasks/jobs")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(TestUtility.asJsonString(monitorTaskJobReq)))
+        mockMvc.perform(
+            post("/monitor/tasks/jobs")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(monitorTaskJobReq)))
             .andExpect(status().isOk())
             .andExpect(content().string(equalTo(expectedResponse.apply(AD_HOC_DELETE_PROCESS_INSTANCES.name()))));
 
