@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.wataskmonitor.services.utilities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import uk.gov.hmcts.reform.wataskmonitor.exceptions.PrettyPrintFailure;
+import uk.gov.hmcts.reform.wataskmonitor.exceptions.LoggingUtilityFailure;
 
 public final class LoggingUtility {
 
@@ -13,7 +13,7 @@ public final class LoggingUtility {
             Object json = MAPPER.readValue(str, Object.class);
             return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(json);
         } catch (JsonProcessingException e) {
-            throw new PrettyPrintFailure("Error logging pretty print: " + str, e);
+            throw new LoggingUtilityFailure("Error logging pretty print: " + str, e);
         }
     }
 
@@ -21,7 +21,7 @@ public final class LoggingUtility {
         try {
             return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            throw new PrettyPrintFailure("Error logging pretty print: " + obj, e);
+            throw new LoggingUtilityFailure("Error logging pretty print: " + obj, e);
         }
     }
 

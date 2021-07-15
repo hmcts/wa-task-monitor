@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.createtasks;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient;
@@ -12,9 +10,11 @@ import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CreateTas
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
+import uk.gov.hmcts.reform.wataskmonitor.services.utilities.ObjectMapperUtility;
 import uk.gov.hmcts.reform.wataskmonitor.services.utilities.ResourceUtility;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,21 +44,21 @@ public class CreateTaskJob implements JobService {
     public void run(String serviceToken) {
         log.info("Starting '{}'", AD_HOC_CREATE_TASKS);
 
-        CaseIdList caseIdList = getCaseIdList();
-        String caseId = caseIdList.getCaseIds().get(0);
+        List<CreateTaskJobOutcome> report = new ArrayList<>();
+        getCaseIdList().getCaseIds().forEach(caseId -> {
+            sendMessageToInitiateTask(serviceToken, caseId);
+            CreateTaskJobOutcome createTaskJobOutcome = (CreateTaskJobOutcome) createTaskJobOutcomeService
+                .getJobOutcome(serviceToken, caseId);
+            report.add(createTaskJobOutcome);
 
-        sendMessageToInitiateTask(serviceToken, caseId);
-        CreateTaskJobOutcome createTaskJobOutcome = (CreateTaskJobOutcome) createTaskJobOutcomeService
-            .getJobOutcome(serviceToken, caseId);
+        });
 
-        log.info("{} finished successfully: {}", AD_HOC_CREATE_TASKS, logPrettyPrint(List.of(createTaskJobOutcome)));
+        log.info("{} finished successfully: {}", AD_HOC_CREATE_TASKS, logPrettyPrint(report));
     }
 
-    @SneakyThrows
     private CaseIdList getCaseIdList() {
-        String resource = ResourceUtility.getResource(ResourceEnum.AD_HOC_CREATE_TASKS);
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(resource, CaseIdList.class);
+        return ObjectMapperUtility
+            .stringToObject(ResourceUtility.getResource(ResourceEnum.AD_HOC_CREATE_TASKS), CaseIdList.class);
     }
 
     private void sendMessageToInitiateTask(String serviceToken, String caseId) {

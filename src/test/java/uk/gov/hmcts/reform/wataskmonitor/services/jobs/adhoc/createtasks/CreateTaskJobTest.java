@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,12 +53,13 @@ class CreateTaskJobTest {
 
         createTaskJob.run(SOME_SERVICE_TOKEN);
 
-        verify(caseEventHandlerClient).sendMessage(
+        verify(caseEventHandlerClient, times(4)).sendMessage(
             eq(SOME_SERVICE_TOKEN),
             argThat(this::eventInformationMatcher)
         );
 
-        verify(createTaskJobOutcomeService).getJobOutcome(eq(SOME_SERVICE_TOKEN), anyString());
+        verify(createTaskJobOutcomeService, times(4))
+            .getJobOutcome(eq(SOME_SERVICE_TOKEN), anyString());
     }
 
     private boolean eventInformationMatcher(EventInformation eventInformation) {
