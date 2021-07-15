@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.reform.wataskmonitor.exceptions.ObjectMapperUtilityFailure;
 
-public class ObjectMapperUtility {
+public final class ObjectMapperUtility {
 
     private ObjectMapperUtility() {
         // utility class should not have a public or default constructor

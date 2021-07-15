@@ -40,7 +40,9 @@ public class CreateTaskJob implements JobService {
         return AD_HOC_CREATE_TASKS.equals(jobDetailName);
     }
 
+
     @Override
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public void run(String serviceToken) {
         log.info("Starting '{}'", AD_HOC_CREATE_TASKS);
 

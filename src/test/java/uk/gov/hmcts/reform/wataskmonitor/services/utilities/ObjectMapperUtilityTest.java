@@ -8,11 +8,12 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static uk.gov.hmcts.reform.wataskmonitor.services.utilities.ObjectMapperUtility.stringToObject;
 
 class ObjectMapperUtilityTest {
 
     @Test
-    void stringToObject() {
+    void stringToObjectTest() {
         String source = "{\n"
                         + "  \"caseIds\": [\n"
                         + "    \"1626272789070361\",\n"
@@ -20,14 +21,14 @@ class ObjectMapperUtilityTest {
                         + "  ]\n"
                         + "}\n";
 
-        CaseIdList actual = ObjectMapperUtility.stringToObject(source, CaseIdList.class);
+        CaseIdList actual = stringToObject(source, CaseIdList.class);
         assertThat(actual).isEqualTo(new CaseIdList(List.of("1626272789070361", "1626272789070362")));
     }
 
     @Test
     void stringToObjectThrowException() {
         assertThatThrownBy(() ->
-            ObjectMapperUtility.stringToObject("invalid source", CaseIdList.class))
+            stringToObject("invalid source", CaseIdList.class))
             .hasMessage("Error deserializing "
                         + "object[class uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CaseIdList] "
                         + "from string[invalid source]")
