@@ -13,9 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
-import uk.gov.hmcts.reform.wataskmonitor.models.MonitorTaskJobReq;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetails;
+import uk.gov.hmcts.reform.wataskmonitor.controllers.request.JobDetails;
+import uk.gov.hmcts.reform.wataskmonitor.controllers.request.MonitorTaskJobRequest;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 
 import static net.serenitybdd.rest.SerenityRest.given;
 import static org.hamcrest.Matchers.is;
@@ -23,7 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
 @SpringBootTest
-@ActiveProfiles({"local", "functional"})
+@ActiveProfiles({"functional"})
 @RunWith(SpringIntegrationSerenityRunner.class)
 @Slf4j
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
@@ -49,12 +49,12 @@ class MonitorTaskJobControllerForConfigurationJobTest {
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .header("ServiceAuthorization", serviceToken)
-            .body(TestUtility.asJsonString(new MonitorTaskJobReq(new JobDetails(JobDetailName.CONFIGURATION))))
+            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(JobName.CONFIGURATION))))
             .when()
             .post("/monitor/tasks/jobs")
             .then()
             .statusCode(HttpStatus.OK.value())
-            .body(is(expectedResponse.apply(JobDetailName.CONFIGURATION.name())));
+            .body(is(expectedResponse.apply(JobName.CONFIGURATION.name())));
     }
 
     @Test

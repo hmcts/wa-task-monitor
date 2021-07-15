@@ -13,17 +13,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
-import uk.gov.hmcts.reform.wataskmonitor.models.MonitorTaskJobReq;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetails;
+import uk.gov.hmcts.reform.wataskmonitor.controllers.request.JobDetails;
+import uk.gov.hmcts.reform.wataskmonitor.controllers.request.MonitorTaskJobRequest;
 
 import static net.serenitybdd.rest.SerenityRest.given;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
-import static uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName.AD_HOC_DELETE_PROCESS_INSTANCES;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_DELETE_PROCESS_INSTANCES;
 
 @SpringBootTest
-@ActiveProfiles({"local", "functional"})
+@ActiveProfiles({"functional"})
 @RunWith(SpringIntegrationSerenityRunner.class)
 @Slf4j
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
@@ -49,7 +49,7 @@ class MonitorTaskJobControllerForAdHocJobTest {
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .header("ServiceAuthorization", serviceToken)
-            .body(TestUtility.asJsonString(new MonitorTaskJobReq(new JobDetails(AD_HOC_DELETE_PROCESS_INSTANCES))))
+            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(AD_HOC_DELETE_PROCESS_INSTANCES))))
             .when()
             .post("/monitor/tasks/jobs")
             .then()

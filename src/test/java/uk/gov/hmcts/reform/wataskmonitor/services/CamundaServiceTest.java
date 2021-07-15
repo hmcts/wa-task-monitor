@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.jobs;
+package uk.gov.hmcts.reform.wataskmonitor.services;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -12,24 +12,25 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
-import uk.gov.hmcts.reform.wataskmonitor.models.camunda.CamundaTask;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.configuration.ConfigurationJobService;
+import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ConfigurationJobServiceTest {
+class CamundaServiceTest {
 
     public static final String SERVICE_TOKEN = "some service token";
     @Mock
     private CamundaClient camundaClient;
 
     @InjectMocks
-    private ConfigurationJobService configurationJobService;
+    private CamundaService camundaService;
 
     @Captor
     private ArgumentCaptor<String> actualQueryParametersCaptor;
@@ -44,11 +45,22 @@ class ConfigurationJobServiceTest {
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
-        List<CamundaTask> actualCamundaTasks = configurationJobService.getUnConfiguredTasks(SERVICE_TOKEN);
+        List<CamundaTask> actualCamundaTasks = camundaService.getUnConfiguredTasks(SERVICE_TOKEN);
 
         assertQueryTargetsUserTasksAndNotDelayedTasks("{taskDefinitionKey: processTask}");
         assertQueryTargetsUserTasksAndNotDelayedTasks(getExpectedQueryParameters());
         assertThat(actualCamundaTasks).isEqualTo(expectedCamundaTasks);
+    }
+
+
+    @Test
+    void deleteProcessInstances() {
+        when(camundaClient.deleteProcessInstance(eq("some s2s token"), anyString()))
+            .thenReturn("some response");
+
+        camundaService.deleteProcessInstances("some s2s token");
+
+        verify(camundaClient).deleteProcessInstance(eq("some s2s token"), anyString());
     }
 
     private void assertQueryTargetsUserTasksAndNotDelayedTasks(String expected) throws JSONException {
@@ -62,20 +74,20 @@ class ConfigurationJobServiceTest {
     @NotNull
     private String getExpectedQueryParameters() {
         return "{\n"
-            + "  \"orQueries\": [\n"
-            + "    {\n"
-            + "      \"taskVariables\": [\n"
-            + "        {\n"
-            + "          \"name\": \"taskState\",\n"
-            + "          \"operator\": \"eq\",\n"
-            + "          \"value\": \"unconfigured\"\n"
-            + "        }\n"
-            + "      ]\n"
-            + "    }\n"
-            + "  ],\n"
-            + "  \"taskDefinitionKey\": \"processTask\",\n"
-            + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n"
-            + "}\n";
+               + "  \"orQueries\": [\n"
+               + "    {\n"
+               + "      \"taskVariables\": [\n"
+               + "        {\n"
+               + "          \"name\": \"taskState\",\n"
+               + "          \"operator\": \"eq\",\n"
+               + "          \"value\": \"unconfigured\"\n"
+               + "        }\n"
+               + "      ]\n"
+               + "    }\n"
+               + "  ],\n"
+               + "  \"taskDefinitionKey\": \"processTask\",\n"
+               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n"
+               + "}\n";
     }
 
 }

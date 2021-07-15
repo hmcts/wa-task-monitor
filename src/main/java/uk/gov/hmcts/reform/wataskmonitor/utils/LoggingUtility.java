@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.utilities;
+package uk.gov.hmcts.reform.wataskmonitor.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 public final class LoggingUtility {
 
-    public static Function<String, String> logPrettyPrint = (str) -> {
+    public static Function<String, String> logPrettyPrint = str -> {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             Object json = objectMapper.readValue(str, Object.class);
