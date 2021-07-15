@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.wataskmonitor.Application;
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles({"integration"})
+@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class SpringBootIntegrationBaseTest {
 
     @Autowired
