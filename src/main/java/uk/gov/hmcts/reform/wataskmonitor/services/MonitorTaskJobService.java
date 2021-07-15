@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.wataskmonitor.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.handlers.JobHandler;
@@ -19,6 +20,7 @@ public class MonitorTaskJobService {
     }
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    @Async
     public void execute(JobName jobName) {
         jobHandlers.forEach(handler -> {
             if (handler.canHandle(jobName)) {
