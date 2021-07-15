@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName.AD_HOC
 @RunWith(SpringIntegrationSerenityRunner.class)
 @Slf4j
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
-class MonitorTaskJobControllerForAdHocJobTest {
+class MonitorTaskJobControllerForAdHocDeleteProcessInstanceTest {
 
     @Value("${targets.instance}")
     protected String testUrl;
