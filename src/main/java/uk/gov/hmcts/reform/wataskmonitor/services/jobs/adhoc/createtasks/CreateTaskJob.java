@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.wataskmonitor.models.caseeventhandler.EventInformatio
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CaseIdList;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CreateTaskJobOutcome;
+import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CreateTaskJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
@@ -42,20 +43,25 @@ public class CreateTaskJob implements JobService {
 
 
     @Override
-    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public void run(String serviceToken) {
         log.info("Starting '{}'", AD_HOC_CREATE_TASKS);
+        List<CreateTaskJobOutcome> outcomeList = createTasks(serviceToken);
+        log.info("{} finished successfully: {}",
+            AD_HOC_CREATE_TASKS,
+            logPrettyPrint(new CreateTaskJobReport(outcomeList)));
+    }
 
-        List<CreateTaskJobOutcome> report = new ArrayList<>();
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    private List<CreateTaskJobOutcome> createTasks(String serviceToken) {
+        List<CreateTaskJobOutcome> outcomeList = new ArrayList<>();
         getCaseIdList().getCaseIds().forEach(caseId -> {
             sendMessageToInitiateTask(serviceToken, caseId);
             CreateTaskJobOutcome createTaskJobOutcome = (CreateTaskJobOutcome) createTaskJobOutcomeService
                 .getJobOutcome(serviceToken, caseId);
-            report.add(createTaskJobOutcome);
+            outcomeList.add(createTaskJobOutcome);
 
         });
-
-        log.info("{} finished successfully: {}", AD_HOC_CREATE_TASKS, logPrettyPrint(report));
+        return outcomeList;
     }
 
     private CaseIdList getCaseIdList() {
