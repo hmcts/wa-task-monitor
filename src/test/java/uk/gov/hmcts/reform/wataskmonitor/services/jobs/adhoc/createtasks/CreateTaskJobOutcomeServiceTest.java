@@ -30,7 +30,7 @@ class CreateTaskJobOutcomeServiceTest {
 
     @ParameterizedTest
     @MethodSource("scenarioProvider")
-    void getJobOutcome(List<CamundaTask> camundaTaskList, CreateTaskJobOutcome expectedOutcome) {
+    void shouldGetJobOutcome(List<CamundaTask> camundaTaskList, CreateTaskJobOutcome expectedOutcome) {
         when(camundaClient.getTasksByTaskVariables(
             eq("some service token"),
             eq("caseId_eq_someCaseId,taskType_eq_reviewAppealSkeletonArgument"),
@@ -46,6 +46,7 @@ class CreateTaskJobOutcomeServiceTest {
         assertThat(actual).isEqualTo(expectedOutcome);
     }
 
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static Stream<Arguments> scenarioProvider() {
         Arguments taskIsCreatedScenario = Arguments.of(
             List.of(new CamundaTask(
