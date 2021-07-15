@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 import static uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName.AD_HOC_DELETE_PROCESS_INSTANCES;
-import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.RequestParameterEnum.DELETE_PROCESS_INSTANCES_JOB_SERVICE;
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum.DELETE_PROCESS_INSTANCES_JOB_SERVICE;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -50,7 +50,7 @@ class MonitorTaskJobControllerForAdHocJobTest {
     private void mockExternalDependencies() {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
 
-        requestParameter = ResourceUtility.getResource(DELETE_PROCESS_INSTANCES_JOB_SERVICE.getRequestParameterBody());
+        requestParameter = ResourceUtility.getResource(DELETE_PROCESS_INSTANCES_JOB_SERVICE);
         String someResponse = "{\"id\": \"78e1a849-d9b3-11eb-bb4f-d62f1f620fc5\",\"type\": \"instance-deletion\" }";
         when(camundaClient.deleteProcessInstance(eq(SERVICE_TOKEN), eq(requestParameter)))
             .thenReturn(someResponse);

@@ -10,9 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class ResourceUtilityTest {
 
     @ParameterizedTest(name = "{0}")
-    @EnumSource(RequestParameterEnum.class)
-    void testGetResource(RequestParameterEnum requestParameterEnum) {
+    @EnumSource(ResourceEnum.class)
+    void testGetResource(ResourceEnum resourceEnum) {
         assertDoesNotThrow(() ->
-            assertNotNull(ResourceUtility.getResource(requestParameterEnum.getRequestParameterBody())));
+            assertNotNull(ResourceUtility.getResource(resourceEnum)));
     }
 }

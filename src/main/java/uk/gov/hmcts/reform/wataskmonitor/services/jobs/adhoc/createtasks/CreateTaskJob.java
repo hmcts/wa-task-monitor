@@ -1,13 +1,18 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.createtasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient;
 import uk.gov.hmcts.reform.wataskmonitor.models.caseeventhandler.EventInformation;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
+import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CaseIdList;
 import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CreateTaskJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
+import uk.gov.hmcts.reform.wataskmonitor.services.utilities.ResourceUtility;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,14 +43,22 @@ public class CreateTaskJob implements JobService {
     @Override
     public void run(String serviceToken) {
         log.info("Starting '{}'", AD_HOC_CREATE_TASKS);
-        //todo: read case Ids
-        String caseId = "1626277296363571";
+
+        CaseIdList caseIdList = getCaseIdList();
+        String caseId = caseIdList.getCaseIds().get(0);
 
         sendMessageToInitiateTask(serviceToken, caseId);
         CreateTaskJobOutcome createTaskJobOutcome = (CreateTaskJobOutcome) createTaskJobOutcomeService
             .getJobOutcome(serviceToken, caseId);
 
         log.info("{} finished successfully: {}", AD_HOC_CREATE_TASKS, logPrettyPrint(List.of(createTaskJobOutcome)));
+    }
+
+    @SneakyThrows
+    private CaseIdList getCaseIdList() {
+        String resource = ResourceUtility.getResource(ResourceEnum.AD_HOC_CREATE_TASKS);
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(resource, CaseIdList.class);
     }
 
     private void sendMessageToInitiateTask(String serviceToken, String caseId) {
