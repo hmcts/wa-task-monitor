@@ -4,15 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
-import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.TerminateReason;
 import uk.gov.hmcts.reform.wataskmonitor.services.CamundaService;
-import uk.gov.hmcts.reform.wataskmonitor.services.TaskConfigurationService;
+import uk.gov.hmcts.reform.wataskmonitor.services.TaskManagementService;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TERMINATION;
 
@@ -20,15 +18,15 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TERMI
 @Component
 public class TerminationJobHandler implements JobHandler {
     private final CamundaService camundaService;
-    private final TaskConfigurationService taskConfigurationService;
+    private final TaskManagementService taskManagementService;
     private final AuthTokenGenerator authTokenGenerator;
 
     @Autowired
     public TerminationJobHandler(CamundaService camundaService,
-                                 TaskConfigurationService taskConfigurationService,
+                                 TaskManagementService taskManagementService,
                                  AuthTokenGenerator authTokenGenerator) {
         this.camundaService = camundaService;
-        this.taskConfigurationService = taskConfigurationService;
+        this.taskManagementService = taskManagementService;
         this.authTokenGenerator = authTokenGenerator;
     }
 
@@ -40,20 +38,18 @@ public class TerminationJobHandler implements JobHandler {
     @Override
     public void run() {
         log.info("Starting task termination job.");
-        //Fetch tasks with state cftTaskstate = pendingTermination
-        //For Each call history to find deleteReason
-        // If completed:
-        // Call task management /terminate with termination Reason Completed
-        //If cancelled:
-        // Call task management /terminate with termination Reason Cancelled
         String serviceToken = authTokenGenerator.generate();
-        List<CamundaTask> tasks = camundaService.getTasksPendingTermination(serviceToken);
-        Map<TerminateReason, List<CamundaTask>> tasksByTerminateReason = new ConcurrentHashMap<>();
+        List<HistoricCamundaTask> tasks = camundaService.getTasksPendingTermination(serviceToken);
 
-        tasks.forEach( task -> {
-            task.
-        });
-        taskConfigurationService.configureTasks(tasks, serviceToken);
+        List<HistoricCamundaTask> completedTasks = tasks.stream()
+            .filter(t -> t.getDeleteReason().equals("completed"))
+            .collect(Collectors.toList());
+
+        List<HistoricCamundaTask> cancelledTasks = tasks.stream()
+            .filter(t -> t.getDeleteReason().equals("cancelled"))
+            .collect(Collectors.toList());
+
+        taskManagementService.terminateTasks(authTokenGenerator.generate(), completedTasks, cancelledTasks);
         log.info("Task termination job completed successfully.");
     }
 }
