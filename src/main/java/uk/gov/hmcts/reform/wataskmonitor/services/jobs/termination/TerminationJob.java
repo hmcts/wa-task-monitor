@@ -27,7 +27,7 @@ public class TerminationJob implements JobService {
     }
 
     @Override
-    public boolean canHandle(JobName jobName) {
+    public boolean canRun(JobName jobName) {
         return TERMINATION.equals(jobName);
     }
 
