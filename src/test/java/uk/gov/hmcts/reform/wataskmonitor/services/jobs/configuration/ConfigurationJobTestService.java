@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.jobs;
+package uk.gov.hmcts.reform.wataskmonitor.services.jobs.configuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ConfigurationJobServiceTest {
+class ConfigurationJobTestService {
 
     public static final String SERVICE_TOKEN = "some service token";
     @Mock

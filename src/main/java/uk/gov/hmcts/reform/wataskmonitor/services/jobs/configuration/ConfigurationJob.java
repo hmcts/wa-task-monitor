@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.handlers;
+package uk.gov.hmcts.reform.wataskmonitor.services.jobs.configuration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ConfigurationJobService;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
 
 import java.util.List;
 
@@ -14,13 +14,13 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.CONFI
 
 @Slf4j
 @Component
-public class ConfigurationJobHandler implements JobHandler {
+public class ConfigurationJob implements JobService {
     private final ConfigurationJobService configurationJobService;
     private final AuthTokenGenerator authTokenGenerator;
 
     @Autowired
-    public ConfigurationJobHandler(ConfigurationJobService configurationJobService,
-                                   AuthTokenGenerator authTokenGenerator) {
+    public ConfigurationJob(ConfigurationJobService configurationJobService,
+                            AuthTokenGenerator authTokenGenerator) {
         this.configurationJobService = configurationJobService;
         this.authTokenGenerator = authTokenGenerator;
     }

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.handlers;
+package uk.gov.hmcts.reform.wataskmonitor.services.jobs.configuration;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ConfigurationJobService;
 
 import java.util.List;
 
@@ -21,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ConfigurationJobHandlerTest {
+class ConfigurationJobTest {
 
     public static final String SERVICE_TOKEN = "some s2s token";
     @Mock
@@ -29,7 +28,7 @@ class ConfigurationJobHandlerTest {
     @Mock
     private ConfigurationJobService configurationJobService;
     @InjectMocks
-    private ConfigurationJobHandler configurationJobHandler;
+    private ConfigurationJob configurationJob;
 
     @ParameterizedTest(name = "jobName: {0} expected: {1}")
     @CsvSource({
@@ -39,7 +38,7 @@ class ConfigurationJobHandlerTest {
         "AD_HOC_DELETE_PROCESS_INSTANCES, false"
     })
     void canRun(JobName jobName, boolean expectedResult) {
-        assertThat(configurationJobHandler.canHandle(jobName)).isEqualTo(expectedResult);
+        assertThat(configurationJob.canHandle(jobName)).isEqualTo(expectedResult);
     }
 
     @Test
@@ -49,7 +48,7 @@ class ConfigurationJobHandlerTest {
         List<CamundaTask> taskList = singletonList(camundaTask);
         when(configurationJobService.getUnConfiguredTasks(SERVICE_TOKEN))
             .thenReturn(taskList);
-        configurationJobHandler.run();
+        configurationJob.run();
         verify(authTokenGenerator).generate();
         verify(configurationJobService).getUnConfiguredTasks(SERVICE_TOKEN);
         verify(configurationJobService).configureTasks(taskList, SERVICE_TOKEN);

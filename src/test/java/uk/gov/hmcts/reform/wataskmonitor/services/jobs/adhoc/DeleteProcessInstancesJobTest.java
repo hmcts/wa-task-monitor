@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.handlers;
+package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,14 +9,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.DeleteProcessInstancesJobService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class DeleteProcessInstancesJobHandlerTest {
+class DeleteProcessInstancesJobTest {
 
     public static final String SERVICE_TOKEN = "some s2s token";
     @Mock
@@ -24,7 +23,7 @@ class DeleteProcessInstancesJobHandlerTest {
     @Mock
     private DeleteProcessInstancesJobService deleteProcessInstancesJobService;
     @InjectMocks
-    private DeleteProcessInstancesJobHandler deleteProcessInstancesJobHandler;
+    private DeleteProcessInstancesJob deleteProcessInstancesJob;
 
     @ParameterizedTest(name = "jobName: {0} expected: {1}")
     @CsvSource({
@@ -34,7 +33,7 @@ class DeleteProcessInstancesJobHandlerTest {
         "AD_HOC_DELETE_PROCESS_INSTANCES, true"
     })
     void canRun(JobName jobName, boolean expectedResult) {
-        assertThat(deleteProcessInstancesJobHandler.canHandle(jobName)).isEqualTo(expectedResult);
+        assertThat(deleteProcessInstancesJob.canHandle(jobName)).isEqualTo(expectedResult);
     }
 
     @Test
@@ -45,7 +44,7 @@ class DeleteProcessInstancesJobHandlerTest {
         when(deleteProcessInstancesJobService.deleteProcessInstances(SERVICE_TOKEN))
             .thenReturn(someResponse);
 
-        deleteProcessInstancesJobHandler.run();
+        deleteProcessInstancesJob.run();
 
         verify(authTokenGenerator).generate();
         verify(deleteProcessInstancesJobService).deleteProcessInstances(SERVICE_TOKEN);
