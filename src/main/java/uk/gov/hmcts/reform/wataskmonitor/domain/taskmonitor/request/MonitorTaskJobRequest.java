@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.controllers.request;
+package uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.EqualsAndHashCode;
@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode
-public final class MonitorTaskJobRequest {
+public class MonitorTaskJobRequest {
     private final JobDetails jobDetails;
 
     @JsonCreator
