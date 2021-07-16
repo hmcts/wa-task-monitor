@@ -6,8 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
-import uk.gov.hmcts.reform.wataskmonitor.services.CamundaService;
-import uk.gov.hmcts.reform.wataskmonitor.services.TaskConfigurationService;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ConfigurationJobService;
 
 import java.util.List;
 
@@ -16,16 +15,13 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.CONFI
 @Slf4j
 @Component
 public class ConfigurationJobHandler implements JobHandler {
-    private final CamundaService camundaService;
-    private final TaskConfigurationService taskConfigurationService;
+    private final ConfigurationJobService configurationJobService;
     private final AuthTokenGenerator authTokenGenerator;
 
     @Autowired
-    public ConfigurationJobHandler(CamundaService camundaService,
-                                   TaskConfigurationService taskConfigurationService,
+    public ConfigurationJobHandler(ConfigurationJobService configurationJobService,
                                    AuthTokenGenerator authTokenGenerator) {
-        this.camundaService = camundaService;
-        this.taskConfigurationService = taskConfigurationService;
+        this.configurationJobService = configurationJobService;
         this.authTokenGenerator = authTokenGenerator;
     }
 
@@ -38,8 +34,8 @@ public class ConfigurationJobHandler implements JobHandler {
     public void run() {
         log.info("Starting task configuration job.");
         String serviceToken = authTokenGenerator.generate();
-        List<CamundaTask> tasks = camundaService.getUnConfiguredTasks(serviceToken);
-        taskConfigurationService.configureTasks(tasks, serviceToken);
+        List<CamundaTask> tasks = configurationJobService.getUnConfiguredTasks(serviceToken);
+        configurationJobService.configureTasks(tasks, serviceToken);
         log.info("Task configuration job finished successfully.");
     }
 }

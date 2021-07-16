@@ -10,8 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
-import uk.gov.hmcts.reform.wataskmonitor.services.CamundaService;
-import uk.gov.hmcts.reform.wataskmonitor.services.TaskConfigurationService;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ConfigurationJobService;
 
 import java.util.List;
 
@@ -28,9 +27,7 @@ class ConfigurationJobHandlerTest {
     @Mock
     private AuthTokenGenerator authTokenGenerator;
     @Mock
-    private CamundaService camundaService;
-    @Mock
-    private TaskConfigurationService taskConfigurationService;
+    private ConfigurationJobService configurationJobService;
     @InjectMocks
     private ConfigurationJobHandler configurationJobHandler;
 
@@ -50,11 +47,11 @@ class ConfigurationJobHandlerTest {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
         CamundaTask camundaTask = mock(CamundaTask.class);
         List<CamundaTask> taskList = singletonList(camundaTask);
-        when(camundaService.getUnConfiguredTasks(SERVICE_TOKEN))
+        when(configurationJobService.getUnConfiguredTasks(SERVICE_TOKEN))
             .thenReturn(taskList);
         configurationJobHandler.run();
         verify(authTokenGenerator).generate();
-        verify(camundaService).getUnConfiguredTasks(SERVICE_TOKEN);
-        verify(taskConfigurationService).configureTasks(taskList, SERVICE_TOKEN);
+        verify(configurationJobService).getUnConfiguredTasks(SERVICE_TOKEN);
+        verify(configurationJobService).configureTasks(taskList, SERVICE_TOKEN);
     }
 }

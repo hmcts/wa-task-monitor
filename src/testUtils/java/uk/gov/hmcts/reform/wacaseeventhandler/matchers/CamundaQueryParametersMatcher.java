@@ -10,7 +10,7 @@ import org.mockito.ArgumentMatcher;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static uk.gov.hmcts.reform.wataskmonitor.services.CamundaService.CAMUNDA_DATE_REQUEST_PATTERN;
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.ConfigurationJobService.CAMUNDA_DATE_REQUEST_PATTERN;
 
 @Slf4j
 public class CamundaQueryParametersMatcher implements ArgumentMatcher<String> {
@@ -32,9 +32,9 @@ public class CamundaQueryParametersMatcher implements ArgumentMatcher<String> {
         log.debug(actual.toPrettyString());
 
         return actual.path("orQueries").equals(expected.path("orQueries"))
-            && actual.path("taskDefinitionKey").equals(expected.path("taskDefinitionKey"))
-            && actual.path("processDefinitionKey").equals(expected.path("processDefinitionKey"))
-            && isCreatedBeforeValid(String.valueOf(actual.get("createdBefore").asText()));
+               && actual.path("taskDefinitionKey").equals(expected.path("taskDefinitionKey"))
+               && actual.path("processDefinitionKey").equals(expected.path("processDefinitionKey"))
+               && isCreatedBeforeValid(String.valueOf(actual.get("createdBefore").asText()));
     }
 
     private boolean isCreatedBeforeValid(String actualCreatedBefore) {

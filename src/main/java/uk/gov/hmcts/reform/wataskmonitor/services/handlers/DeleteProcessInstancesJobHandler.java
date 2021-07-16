@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
-import uk.gov.hmcts.reform.wataskmonitor.services.CamundaService;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.DeleteProcessInstancesJobService;
 
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_DELETE_PROCESS_INSTANCES;
 import static uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility.logPrettyPrint;
@@ -14,12 +14,12 @@ import static uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility.logPrettyPr
 public class DeleteProcessInstancesJobHandler implements JobHandler {
 
     private final AuthTokenGenerator authTokenGenerator;
-    private final CamundaService camundaService;
+    private final DeleteProcessInstancesJobService deleteProcessInstancesJobService;
 
     public DeleteProcessInstancesJobHandler(AuthTokenGenerator authTokenGenerator,
-                                            CamundaService camundaService) {
+                                            DeleteProcessInstancesJobService deleteProcessInstancesJobService) {
         this.authTokenGenerator = authTokenGenerator;
-        this.camundaService = camundaService;
+        this.deleteProcessInstancesJobService = deleteProcessInstancesJobService;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class DeleteProcessInstancesJobHandler implements JobHandler {
     public void run() {
         log.info("Starting '{}'", AD_HOC_DELETE_PROCESS_INSTANCES);
         String serviceToken = authTokenGenerator.generate();
-        String response = camundaService.deleteProcessInstances(serviceToken);
+        String response = deleteProcessInstancesJobService.deleteProcessInstances(serviceToken);
         log.info("{} finished successfully: {}", AD_HOC_DELETE_PROCESS_INSTANCES, logPrettyPrint.apply(response));
     }
 

@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
-import uk.gov.hmcts.reform.wataskmonitor.services.CamundaService;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.DeleteProcessInstancesJobService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -22,7 +22,7 @@ class DeleteProcessInstancesJobHandlerTest {
     @Mock
     private AuthTokenGenerator authTokenGenerator;
     @Mock
-    private CamundaService camundaService;
+    private DeleteProcessInstancesJobService deleteProcessInstancesJobService;
     @InjectMocks
     private DeleteProcessInstancesJobHandler deleteProcessInstancesJobHandler;
 
@@ -42,12 +42,12 @@ class DeleteProcessInstancesJobHandlerTest {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
 
         String someResponse = "{\"id\": \"78e1a849-d9b3-11eb-bb4f-d62f1f620fc5\",\"type\": \"instance-deletion\" }";
-        when(camundaService.deleteProcessInstances(SERVICE_TOKEN))
+        when(deleteProcessInstancesJobService.deleteProcessInstances(SERVICE_TOKEN))
             .thenReturn(someResponse);
 
         deleteProcessInstancesJobHandler.run();
 
         verify(authTokenGenerator).generate();
-        verify(camundaService).deleteProcessInstances(SERVICE_TOKEN);
+        verify(deleteProcessInstancesJobService).deleteProcessInstances(SERVICE_TOKEN);
     }
 }
