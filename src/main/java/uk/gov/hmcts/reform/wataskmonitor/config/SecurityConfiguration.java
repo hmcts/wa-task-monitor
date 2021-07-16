@@ -45,14 +45,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .csrf().disable();
     }
 
-    public List<String> getAnonymousPaths() {
-        return anonymousPaths;
-    }
-
     @Override
     public void configure(WebSecurity web) {
         web.ignoring().mvcMatchers(
             anonymousPaths.toArray(String[]::new)
         );
+    }
+
+    public List<String> getAnonymousPaths() {
+        return anonymousPaths;
     }
 }
