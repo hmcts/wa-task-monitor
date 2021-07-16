@@ -44,7 +44,7 @@ class TerminationJobServiceTest {
     private ArgumentCaptor<String> actualQueryParametersCaptor;
 
     @Test
-    void should_fetch_tasks_and_terminate_them() throws JSONException {
+    void shouldFetchTasksAndTerminateThem() throws JSONException {
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "cancelled"),
             new HistoricCamundaTask("2", "completed")
@@ -66,7 +66,7 @@ class TerminationJobServiceTest {
 
 
     @Test
-    void should_fetch_tasks_and_call_terminate_for_cancelled_task_only() throws JSONException {
+    void shouldFetchTasksAndCallTerminateForCancelledTaskOnly() throws JSONException {
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "cancelled")
         );
@@ -86,7 +86,7 @@ class TerminationJobServiceTest {
     }
 
     @Test
-    void should_fetch_tasks_and_call_terminate_for_completed_task_only() throws JSONException {
+    void shouldFetchTasksAndCallTerminateForCompletedTaskOnly() throws JSONException {
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "completed")
         );
