@@ -34,18 +34,7 @@ public class TerminationJob implements JobService {
     @Override
     public void run() {
         log.info("Starting task termination job.");
-        String serviceToken = authTokenGenerator.generate();
-        List<HistoricCamundaTask> tasks = terminationJobService.getTasksPendingTermination(serviceToken);
-
-        List<HistoricCamundaTask> completedTasks = tasks.stream()
-            .filter(t -> t.getDeleteReason().equals("completed"))
-            .collect(Collectors.toList());
-
-        List<HistoricCamundaTask> cancelledTasks = tasks.stream()
-            .filter(t -> t.getDeleteReason().equals("cancelled"))
-            .collect(Collectors.toList());
-
-        terminationJobService.terminateTasks(authTokenGenerator.generate(), completedTasks, cancelledTasks);
+        terminationJobService.terminateTasks(authTokenGenerator.generate());
         log.info("Task termination job completed successfully.");
     }
 }

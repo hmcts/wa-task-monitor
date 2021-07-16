@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options.T
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.CANCELLED;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.COMPLETED;
@@ -31,7 +32,22 @@ public class TerminationJobService {
         this.taskManagementClient = taskManagementClient;
     }
 
-    public List<HistoricCamundaTask> getTasksPendingTermination(String serviceToken) {
+    public void terminateTasks(String serviceAuthorizationToken) {
+        List<HistoricCamundaTask> tasks = getTasksPendingTermination(serviceAuthorizationToken);
+
+        List<HistoricCamundaTask> completedTasks = tasks.stream()
+            .filter(t -> t.getDeleteReason().equals("completed"))
+            .collect(Collectors.toList());
+
+        List<HistoricCamundaTask> cancelledTasks = tasks.stream()
+            .filter(t -> t.getDeleteReason().equals("cancelled"))
+            .collect(Collectors.toList());
+
+        terminateAllTasksWithReason(serviceAuthorizationToken, completedTasks, COMPLETED);
+        terminateAllTasksWithReason(serviceAuthorizationToken, cancelledTasks, CANCELLED);
+    }
+
+    private List<HistoricCamundaTask> getTasksPendingTermination(String serviceToken) {
         log.info("Retrieving historic tasks pending termination from camunda.");
         List<HistoricCamundaTask> camundaTasks = camundaClient.getTasksFromHistory(
             serviceToken,
@@ -41,13 +57,6 @@ public class TerminationJobService {
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());
         return camundaTasks;
-    }
-
-    public void terminateTasks(String serviceAuthorizationToken,
-                               List<HistoricCamundaTask> completedTasks,
-                               List<HistoricCamundaTask> cancelledTasks) {
-        terminateAllTasksWithReason(serviceAuthorizationToken, completedTasks, COMPLETED);
-        terminateAllTasksWithReason(serviceAuthorizationToken, cancelledTasks, CANCELLED);
     }
 
     private void terminateAllTasksWithReason(String serviceAuthorizationToken,
