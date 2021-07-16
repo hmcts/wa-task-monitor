@@ -1,14 +1,14 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.utilities;
+package uk.gov.hmcts.reform.wataskmonitor.utils;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CaseIdList;
 import uk.gov.hmcts.reform.wataskmonitor.exceptions.ObjectMapperUtilityFailure;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CaseIdList;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static uk.gov.hmcts.reform.wataskmonitor.services.utilities.ObjectMapperUtility.stringToObject;
+import static uk.gov.hmcts.reform.wataskmonitor.utils.ObjectMapperUtility.stringToObject;
 
 class ObjectMapperUtilityTest {
 
@@ -28,9 +28,9 @@ class ObjectMapperUtilityTest {
     @Test
     void stringToObjectThrowException() {
         assertThatThrownBy(() ->
-            stringToObject("invalid source", CaseIdList.class))
+                               stringToObject("invalid source", CaseIdList.class))
             .hasMessage("Error deserializing "
-                        + "object[class uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CaseIdList] "
+                        + "object[class uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CaseIdList] "
                         + "from string[invalid source]")
             .isInstanceOf(ObjectMapperUtilityFailure.class);
     }

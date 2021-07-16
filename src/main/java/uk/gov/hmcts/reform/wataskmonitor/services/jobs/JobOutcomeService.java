@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs;
 
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobOutcome;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.JobOutcome;
 
 public interface JobOutcomeService {
 

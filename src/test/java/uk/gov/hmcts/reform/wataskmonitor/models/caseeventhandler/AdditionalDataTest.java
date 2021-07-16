@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.wataskmonitor.models.caseeventhandler;
 
 import org.junit.jupiter.api.Test;
 import pl.pojo.tester.api.assertion.Method;
+import uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler.AdditionalData;
 
 import static pl.pojo.tester.api.assertion.Assertions.assertPojoMethodsFor;
 

@@ -3,24 +3,24 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.createtasks;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient;
-import uk.gov.hmcts.reform.wataskmonitor.models.caseeventhandler.EventInformation;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CaseIdList;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CreateTaskJobOutcome;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CreateTaskJobReport;
+import uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler.EventInformation;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CaseIdList;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
-import uk.gov.hmcts.reform.wataskmonitor.services.utilities.ObjectMapperUtility;
-import uk.gov.hmcts.reform.wataskmonitor.services.utilities.ResourceUtility;
+import uk.gov.hmcts.reform.wataskmonitor.utils.ObjectMapperUtility;
+import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName.AD_HOC_CREATE_TASKS;
-import static uk.gov.hmcts.reform.wataskmonitor.services.utilities.LoggingUtility.logPrettyPrint;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_CREATE_TASKS;
+import static uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility.logPrettyPrint;
 
 @Slf4j
 @Component
@@ -37,8 +37,8 @@ public class CreateTaskJob implements JobService {
 
     @Override
     @SuppressWarnings("PMD.LawOfDemeter")
-    public boolean canRun(JobDetailName jobDetailName) {
-        return AD_HOC_CREATE_TASKS.equals(jobDetailName);
+    public boolean canRun(JobName jobName) {
+        return AD_HOC_CREATE_TASKS.equals(jobName);
     }
 
 
@@ -46,9 +46,11 @@ public class CreateTaskJob implements JobService {
     public void run(String serviceToken) {
         log.info("Starting '{}'", AD_HOC_CREATE_TASKS);
         List<CreateTaskJobOutcome> outcomeList = createTasks(serviceToken);
-        log.info("{} finished successfully: {}",
+        log.info(
+            "{} finished successfully: {}",
             AD_HOC_CREATE_TASKS,
-            logPrettyPrint(new CreateTaskJobReport(outcomeList)));
+            logPrettyPrint(new CreateTaskJobReport(outcomeList))
+        );
     }
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
@@ -70,7 +72,8 @@ public class CreateTaskJob implements JobService {
     }
 
     private void sendMessageToInitiateTask(String serviceToken, String caseId) {
-        caseEventHandlerClient.sendMessage(serviceToken,
+        caseEventHandlerClient.sendMessage(
+            serviceToken,
             EventInformation.builder()
                 .eventInstanceId(UUID.randomUUID().toString())
                 .eventTimeStamp(LocalDateTime.now())
@@ -80,7 +83,8 @@ public class CreateTaskJob implements JobService {
                 .eventId("buildCase")
                 .newStateId("caseUnderReview")
                 .userId("some user Id")
-                .build());
+                .build()
+        );
     }
 
 }

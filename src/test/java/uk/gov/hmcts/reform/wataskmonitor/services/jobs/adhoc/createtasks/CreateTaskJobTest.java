@@ -9,9 +9,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient;
-import uk.gov.hmcts.reform.wataskmonitor.models.caseeventhandler.EventInformation;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CreateTaskJobOutcome;
+import uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler.EventInformation;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +34,7 @@ class CreateTaskJobTest {
     @InjectMocks
     private CreateTaskJob createTaskJob;
 
-    @ParameterizedTest(name = "jobDetailName: {0} expected: {1}")
+    @ParameterizedTest(name = "jobName: {0} expected: {1}")
     @CsvSource({
         "TERMINATION, false",
         "INITIATION, false",
@@ -42,8 +42,8 @@ class CreateTaskJobTest {
         "AD_HOC_DELETE_PROCESS_INSTANCES, false",
         "AD_HOC_CREATE_TASKS, true"
     })
-    void canRun(JobDetailName jobDetailName, boolean expectedResult) {
-        assertThat(createTaskJob.canRun(jobDetailName)).isEqualTo(expectedResult);
+    void canRun(JobName jobName, boolean expectedResult) {
+        assertThat(createTaskJob.canRun(jobName)).isEqualTo(expectedResult);
     }
 
     @Test

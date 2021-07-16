@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.deleteprocessinstances.DeleteProcessInstancesJob;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.deleteprocessinstances.DeleteProcessInstancesJobService;
 
@@ -25,21 +25,21 @@ class DeleteProcessInstancesJobTest {
     @InjectMocks
     private DeleteProcessInstancesJob deleteProcessInstancesJob;
 
-    @ParameterizedTest(name = "jobDetailName: {0} expected: {1}")
+    @ParameterizedTest(name = "jobName: {0} expected: {1}")
     @CsvSource({
         "TERMINATION, false",
         "INITIATION, false",
         "CONFIGURATION, false",
         "AD_HOC_DELETE_PROCESS_INSTANCES, true"
     })
-    void canRun(JobDetailName jobDetailName, boolean expectedResult) {
-        assertThat(deleteProcessInstancesJob.canRun(jobDetailName)).isEqualTo(expectedResult);
+    void canRun(JobName jobName, boolean expectedResult) {
+        assertThat(deleteProcessInstancesJob.canRun(jobName)).isEqualTo(expectedResult);
     }
 
     @Test
     void run() {
         String someResponse = "{\"id\": \"78e1a849-d9b3-11eb-bb4f-d62f1f620fc5\",\"type\": \"instance-deletion\" }";
-        when(deleteProcessInstancesJobService.deleteProcessInstances(eq(SERVICE_TOKEN)))
+        when(deleteProcessInstancesJobService.deleteProcessInstances(SERVICE_TOKEN))
             .thenReturn(someResponse);
 
         deleteProcessInstancesJob.run(SERVICE_TOKEN);

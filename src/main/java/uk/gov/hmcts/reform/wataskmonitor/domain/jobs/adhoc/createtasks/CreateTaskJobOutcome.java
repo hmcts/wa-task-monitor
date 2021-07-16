@@ -1,10 +1,10 @@
-package uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks;
+package uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobOutcome;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.JobOutcome;
 
 @ToString
 @EqualsAndHashCode(callSuper = false)

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks;
+package uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,9 +1,9 @@
-package uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks;
+package uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobReport;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.JobReport;
 
 import java.util.List;
 

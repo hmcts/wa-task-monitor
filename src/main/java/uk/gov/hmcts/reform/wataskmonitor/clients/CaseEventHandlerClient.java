@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
-import uk.gov.hmcts.reform.wataskmonitor.models.caseeventhandler.EventInformation;
+import uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler.EventInformation;
 
 import javax.validation.Valid;
 

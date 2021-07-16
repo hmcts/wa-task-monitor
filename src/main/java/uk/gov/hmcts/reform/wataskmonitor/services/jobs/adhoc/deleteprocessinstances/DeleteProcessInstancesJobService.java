@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
-import uk.gov.hmcts.reform.wataskmonitor.services.utilities.ResourceUtility;
+import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
 import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum.DELETE_PROCESS_INSTANCES_JOB_SERVICE;
 

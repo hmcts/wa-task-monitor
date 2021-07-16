@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.utilities;
+package uk.gov.hmcts.reform.wataskmonitor.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

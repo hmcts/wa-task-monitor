@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.models.caseeventhandler;
+package uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

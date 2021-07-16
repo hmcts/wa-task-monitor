@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.utilities;
+package uk.gov.hmcts.reform.wataskmonitor.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +17,8 @@ public final class ObjectMapperUtility {
         } catch (JsonProcessingException e) {
             throw new ObjectMapperUtilityFailure(
                 String.format("Error deserializing object[%s] from string[%s]", valueType.toString(), string),
-                e);
+                e
+            );
         }
 
     }

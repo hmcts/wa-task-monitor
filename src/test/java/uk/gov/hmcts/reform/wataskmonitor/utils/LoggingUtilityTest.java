@@ -1,7 +1,7 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.utilities;
+package uk.gov.hmcts.reform.wataskmonitor.utils;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks.CreateTaskJobOutcome;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
