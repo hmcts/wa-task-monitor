@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs;
 import lombok.Getter;
 
 @Getter
-public enum RequestParameterEnum {
+public enum RequestsEnum {
     CONFIGURATION_JOB_SERVICE("camunda/camunda-query-parameters.json"),
 
     DELETE_PROCESS_INSTANCES_JOB_SERVICE(
@@ -11,7 +11,7 @@ public enum RequestParameterEnum {
 
     private final String requestParameterBody;
 
-    RequestParameterEnum(String requestParameterBody) {
+    RequestsEnum(String requestParameterBody) {
         this.requestParameterBody = requestParameterBody;
     }
 }

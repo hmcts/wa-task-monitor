@@ -3,11 +3,11 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
 
-import static uk.gov.hmcts.reform.wataskmonitor.models.jobs.JobDetailName.AD_HOC_DELETE_PROCESS_INSTANCES;
-import static uk.gov.hmcts.reform.wataskmonitor.services.utilities.LoggingUtility.logPrettyPrint;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_DELETE_PROCESS_INSTANCES;
+import static uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility.logPrettyPrint;
 
 @Slf4j
 @Component
@@ -24,8 +24,8 @@ public class DeleteProcessInstancesJob implements JobService {
 
     @Override
     @SuppressWarnings("PMD.LawOfDemeter")
-    public boolean canRun(JobDetailName jobDetailName) {
-        return AD_HOC_DELETE_PROCESS_INSTANCES.equals(jobDetailName);
+    public boolean canHandle(JobName jobName) {
+        return AD_HOC_DELETE_PROCESS_INSTANCES.equals(jobName);
     }
 
     @Override
