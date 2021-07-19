@@ -10,9 +10,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler.EventInformation;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobCaseIdList;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -30,6 +33,8 @@ class CreateTaskJobTest {
     private CaseEventHandlerClient caseEventHandlerClient;
     @Mock
     private JobOutcomeService createTaskJobOutcomeService;
+    @Mock
+    private CreateTaskJobRetrieveCaseIdListService createTaskJobRetrieveCaseIdListService;
 
     @InjectMocks
     private CreateTaskJob createTaskJob;
@@ -50,15 +55,17 @@ class CreateTaskJobTest {
     void run() {
         when(createTaskJobOutcomeService.getJobOutcome(eq(SOME_SERVICE_TOKEN), anyString()))
             .thenReturn(CreateTaskJobOutcome.builder().build());
+        when(createTaskJobRetrieveCaseIdListService.getCaseIdList())
+            .thenReturn(new CreateTaskJobCaseIdList(List.of("1626272789070362", "1626272789070361")));
 
         createTaskJob.run(SOME_SERVICE_TOKEN);
 
-        verify(caseEventHandlerClient, times(4)).sendMessage(
+        verify(caseEventHandlerClient, times(2)).sendMessage(
             eq(SOME_SERVICE_TOKEN),
             argThat(this::eventInformationMatcher)
         );
 
-        verify(createTaskJobOutcomeService, times(4))
+        verify(createTaskJobOutcomeService, times(2))
             .getJobOutcome(eq(SOME_SERVICE_TOKEN), anyString());
     }
 

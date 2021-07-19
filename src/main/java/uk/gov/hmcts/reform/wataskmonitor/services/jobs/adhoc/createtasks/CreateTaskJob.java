@@ -4,15 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler.EventInformation;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CaseIdList;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
-import uk.gov.hmcts.reform.wataskmonitor.utils.ObjectMapperUtility;
-import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,11 +24,14 @@ public class CreateTaskJob implements JobService {
 
     private final CaseEventHandlerClient caseEventHandlerClient;
     private final JobOutcomeService createTaskJobOutcomeService;
+    private final CreateTaskJobRetrieveCaseIdListService createTaskJobRetrieveCaseIdListService;
 
     public CreateTaskJob(CaseEventHandlerClient caseEventHandlerClient,
-                         JobOutcomeService createTaskJobOutcomeService) {
+                         JobOutcomeService createTaskJobOutcomeService,
+                         CreateTaskJobRetrieveCaseIdListService createTaskJobRetrieveCaseIdListService) {
         this.caseEventHandlerClient = caseEventHandlerClient;
         this.createTaskJobOutcomeService = createTaskJobOutcomeService;
+        this.createTaskJobRetrieveCaseIdListService = createTaskJobRetrieveCaseIdListService;
     }
 
     @Override
@@ -56,7 +55,7 @@ public class CreateTaskJob implements JobService {
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     private List<CreateTaskJobOutcome> createTasks(String serviceToken) {
         List<CreateTaskJobOutcome> outcomeList = new ArrayList<>();
-        getCaseIdList().getCaseIds().forEach(caseId -> {
+        createTaskJobRetrieveCaseIdListService.getCaseIdList().getCaseIds().forEach(caseId -> {
             sendMessageToInitiateTask(serviceToken, caseId);
             CreateTaskJobOutcome createTaskJobOutcome = (CreateTaskJobOutcome) createTaskJobOutcomeService
                 .getJobOutcome(serviceToken, caseId);
@@ -64,11 +63,6 @@ public class CreateTaskJob implements JobService {
 
         });
         return outcomeList;
-    }
-
-    private CaseIdList getCaseIdList() {
-        return ObjectMapperUtility
-            .stringToObject(ResourceUtility.getResource(ResourceEnum.AD_HOC_CREATE_TASKS), CaseIdList.class);
     }
 
     private void sendMessageToInitiateTask(String serviceToken, String caseId) {

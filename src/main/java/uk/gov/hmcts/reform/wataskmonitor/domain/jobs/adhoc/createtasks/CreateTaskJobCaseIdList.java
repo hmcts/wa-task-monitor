@@ -5,17 +5,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.CaseIdList;
 
 import java.util.List;
 
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @Getter
-public class CaseIdList {
+public class CreateTaskJobCaseIdList extends CaseIdList {
+
     List<String> caseIds;
 
     @JsonCreator
-    public CaseIdList(@JsonProperty("caseIds") List<String> caseIds) {
+    public CreateTaskJobCaseIdList(@JsonProperty("caseIds") List<String> caseIds) {
+        super();
         this.caseIds = caseIds;
     }
 
