@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.createtasks;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CcdClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCaseList;
@@ -19,6 +20,9 @@ public class ElasticSearchCaseRetrieverService implements RetrieveCaseListServic
 
     @Override
     public ElasticSearchCaseList retrieveCaseList(ElasticSearchRetrieverParameter param) {
+        if (StringUtils.isBlank(param.getServiceAuthentication())) {
+            throw new IllegalArgumentException("service token is missing");
+        }
         return ccdClient.searchCases(
             "some Bearer token",
             param.getServiceAuthentication(),

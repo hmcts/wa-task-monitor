@@ -27,15 +27,15 @@ public class CreateTaskJob implements JobService {
 
     private final CaseEventHandlerClient caseEventHandlerClient;
     private final JobOutcomeService createTaskJobOutcomeService;
-    private final ElasticSearchCaseRetrieverService elasticSearchCaseRetrieverService;
+    private final ElasticSearchCaseRetrieverService retrieverService;
 
     public CreateTaskJob(CaseEventHandlerClient caseEventHandlerClient,
                          JobOutcomeService createTaskJobOutcomeService,
                          ElasticSearchCaseRetrieverService
-                             elasticSearchCaseRetrieverService) {
+                             retrieverService) {
         this.caseEventHandlerClient = caseEventHandlerClient;
         this.createTaskJobOutcomeService = createTaskJobOutcomeService;
-        this.elasticSearchCaseRetrieverService = elasticSearchCaseRetrieverService;
+        this.retrieverService = retrieverService;
     }
 
     @Override
@@ -52,22 +52,25 @@ public class CreateTaskJob implements JobService {
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     private CreateTaskJobReport createTasks(String serviceToken) {
-        ElasticSearchCaseList searchCaseList = retrieveCasesFromCcd(serviceToken);
+        ElasticSearchCaseList searchCaseList =
+            retrieverService.retrieveCaseList(new ElasticSearchRetrieverParameter(serviceToken));
+        return new CreateTaskJobReport(
+            searchCaseList.getTotal(),
+            sendMessagesAndReturnOutcomes(serviceToken, searchCaseList)
+        );
+    }
+
+    private List<CreateTaskJobOutcome> sendMessagesAndReturnOutcomes(String serviceToken,
+                                                                     ElasticSearchCaseList searchCaseList) {
         List<CreateTaskJobOutcome> partialOutcomeList = new ArrayList<>();
-        searchCaseList.getCases().forEach(ccdCase ->
-                                        partialOutcomeList.add(sendMessageAndReturnOutcome(serviceToken, ccdCase)));
-        return new CreateTaskJobReport(searchCaseList.getTotal(), partialOutcomeList);
+        searchCaseList.getCases()
+            .forEach(ccdCase -> partialOutcomeList.add(sendMessageAndReturnOutcome(serviceToken, ccdCase)));
+        return partialOutcomeList;
     }
 
     private CreateTaskJobOutcome sendMessageAndReturnOutcome(String serviceToken, ElasticSearchCase ccdCase) {
         sendMessageToInitiateTask(serviceToken, ccdCase.getId());
         return (CreateTaskJobOutcome) createTaskJobOutcomeService.getJobOutcome(serviceToken, ccdCase.getId());
-    }
-
-    private ElasticSearchCaseList retrieveCasesFromCcd(String serviceToken) {
-        return elasticSearchCaseRetrieverService.retrieveCaseList(ElasticSearchRetrieverParameter.builder()
-                                                                      .serviceAuthentication(serviceToken)
-                                                                      .build());
     }
 
     private void sendMessageToInitiateTask(String serviceToken, String caseId) {
