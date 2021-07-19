@@ -1,8 +1,7 @@
-package uk.gov.hmcts.reform.wataskmonitor.models.jobs.adhoc.createtasks;
+package uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks;
 
 import org.junit.jupiter.api.Test;
 import pl.pojo.tester.api.assertion.Method;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
 
 import static pl.pojo.tester.api.assertion.Assertions.assertPojoMethodsFor;
 

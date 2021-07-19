@@ -24,7 +24,7 @@ class ElasticSearchCaseRetrieverServiceTest {
     @Test
     void retrieveCaseList() {
         elasticSearchCaseRetrieverService.retrieveCaseList(
-            new ElasticSearchRetrieverParameter(null));
+            new ElasticSearchRetrieverParameter("some service token"));
 
         String expected = "{\n"
                           + "  \"query\": {\n"
