@@ -10,8 +10,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler.EventInformation;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobCaseIdList;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCase;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCaseList;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchRetrieverParameter;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
 
@@ -34,7 +36,7 @@ class CreateTaskJobTest {
     @Mock
     private JobOutcomeService createTaskJobOutcomeService;
     @Mock
-    private CreateTaskJobRetrieveCaseIdListService createTaskJobRetrieveCaseIdListService;
+    private ElasticSearchCaseRetrieverService elasticSearchCaseRetrieverService;
 
     @InjectMocks
     private CreateTaskJob createTaskJob;
@@ -55,8 +57,14 @@ class CreateTaskJobTest {
     void run() {
         when(createTaskJobOutcomeService.getJobOutcome(eq(SOME_SERVICE_TOKEN), anyString()))
             .thenReturn(CreateTaskJobOutcome.builder().build());
-        when(createTaskJobRetrieveCaseIdListService.getCaseIdList())
-            .thenReturn(new CreateTaskJobCaseIdList(List.of("1626272789070362", "1626272789070361")));
+        when(elasticSearchCaseRetrieverService.getCaseIdList(ElasticSearchRetrieverParameter.builder()
+                                                                 .authentication("some user token")
+                                                                 .serviceAuthentication(SOME_SERVICE_TOKEN)
+                                                                 .build()
+        )).thenReturn(new ElasticSearchCaseList(List.of(
+            new ElasticSearchCase("1626272789070362"),
+            new ElasticSearchCase("1626272789070361")
+        )));
 
         createTaskJob.run(SOME_SERVICE_TOKEN);
 

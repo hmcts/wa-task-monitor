@@ -6,7 +6,7 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.ObjectContent;
 import pl.pojo.tester.api.assertion.Method;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobCaseIdList;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.JsonResourceCaseList;
 
 import java.io.IOException;
 import java.util.List;
@@ -15,24 +15,24 @@ import static pl.pojo.tester.api.assertion.Assertions.assertPojoMethodsFor;
 
 @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
 @JsonTest
-class CreateTaskJobCaseIdListTest {
+class JsonResourceCaseListTest {
 
     @Autowired
-    private JacksonTester<CreateTaskJobCaseIdList> jacksonTester;
+    private JacksonTester<JsonResourceCaseList> jacksonTester;
 
     @Test
     void deserializeAsExpected() throws IOException {
-        ObjectContent<CreateTaskJobCaseIdList> caseIdListObjectContent =
+        ObjectContent<JsonResourceCaseList> caseIdListObjectContent =
             jacksonTester.read("ad-hoc-create-tasks.json");
 
         caseIdListObjectContent.assertThat().isEqualToComparingFieldByField(
-            new CreateTaskJobCaseIdList(List.of("1626272789070361", "1626272789070362")));
+            new JsonResourceCaseList(List.of("1626272789070361", "1626272789070362")));
     }
 
     @Test
     void isWellImplemented() {
 
-        final Class<?> classUnderTest = CreateTaskJobCaseIdList.class;
+        final Class<?> classUnderTest = JsonResourceCaseList.class;
 
         assertPojoMethodsFor(classUnderTest)
             .testing(Method.GETTER)

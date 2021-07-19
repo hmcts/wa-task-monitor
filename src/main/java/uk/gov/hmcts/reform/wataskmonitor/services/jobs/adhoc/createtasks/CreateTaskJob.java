@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler.EventInformation;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchRetrieverParameter;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
@@ -24,14 +25,15 @@ public class CreateTaskJob implements JobService {
 
     private final CaseEventHandlerClient caseEventHandlerClient;
     private final JobOutcomeService createTaskJobOutcomeService;
-    private final CreateTaskJobRetrieveCaseIdListService createTaskJobRetrieveCaseIdListService;
+    private final ElasticSearchCaseRetrieverService elasticSearchCaseRetrieverService;
 
     public CreateTaskJob(CaseEventHandlerClient caseEventHandlerClient,
                          JobOutcomeService createTaskJobOutcomeService,
-                         CreateTaskJobRetrieveCaseIdListService createTaskJobRetrieveCaseIdListService) {
+                         ElasticSearchCaseRetrieverService
+                             elasticSearchCaseRetrieverService) {
         this.caseEventHandlerClient = caseEventHandlerClient;
         this.createTaskJobOutcomeService = createTaskJobOutcomeService;
-        this.createTaskJobRetrieveCaseIdListService = createTaskJobRetrieveCaseIdListService;
+        this.elasticSearchCaseRetrieverService = elasticSearchCaseRetrieverService;
     }
 
     @Override
@@ -39,7 +41,6 @@ public class CreateTaskJob implements JobService {
     public boolean canRun(JobName jobName) {
         return AD_HOC_CREATE_TASKS.equals(jobName);
     }
-
 
     @Override
     public void run(String serviceToken) {
@@ -54,14 +55,21 @@ public class CreateTaskJob implements JobService {
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     private List<CreateTaskJobOutcome> createTasks(String serviceToken) {
+        // todo: get admin user token
+        String userToken = "some user token";
         List<CreateTaskJobOutcome> outcomeList = new ArrayList<>();
-        createTaskJobRetrieveCaseIdListService.getCaseIdList().getCaseIds().forEach(caseId -> {
-            sendMessageToInitiateTask(serviceToken, caseId);
-            CreateTaskJobOutcome createTaskJobOutcome = (CreateTaskJobOutcome) createTaskJobOutcomeService
-                .getJobOutcome(serviceToken, caseId);
-            outcomeList.add(createTaskJobOutcome);
 
-        });
+        elasticSearchCaseRetrieverService.getCaseIdList(ElasticSearchRetrieverParameter.builder()
+                                                            .authentication(userToken)
+                                                            .serviceAuthentication(serviceToken)
+                                                            .build()).getCases()
+            .forEach(ccdCase -> {
+                sendMessageToInitiateTask(serviceToken, ccdCase.getId());
+                CreateTaskJobOutcome createTaskJobOutcome = (CreateTaskJobOutcome) createTaskJobOutcomeService
+                    .getJobOutcome(serviceToken, ccdCase.getId());
+                outcomeList.add(createTaskJobOutcome);
+
+            });
         return outcomeList;
     }
 

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor.utils;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobCaseIdList;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.JsonResourceCaseList;
 import uk.gov.hmcts.reform.wataskmonitor.exceptions.ObjectMapperUtilityFailure;
 
 import java.util.List;
@@ -21,16 +21,16 @@ class ObjectMapperUtilityTest {
                         + "  ]\n"
                         + "}\n";
 
-        CreateTaskJobCaseIdList actual = stringToObject(source, CreateTaskJobCaseIdList.class);
-        assertThat(actual).isEqualTo(new CreateTaskJobCaseIdList(List.of("1626272789070361", "1626272789070362")));
+        JsonResourceCaseList actual = stringToObject(source, JsonResourceCaseList.class);
+        assertThat(actual).isEqualTo(new JsonResourceCaseList(List.of("1626272789070361", "1626272789070362")));
     }
 
     @Test
     void stringToObjectThrowException() {
         assertThatThrownBy(() ->
-                               stringToObject("invalid source", CreateTaskJobCaseIdList.class))
+                               stringToObject("invalid source", JsonResourceCaseList.class))
             .hasMessage("Error deserializing object[class "
-                        + "uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobCaseIdList] "
+                        + "uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.JsonResourceCaseList] "
                         + "from string[invalid source]")
             .isInstanceOf(ObjectMapperUtilityFailure.class);
     }

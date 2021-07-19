@@ -12,14 +12,14 @@ import java.util.List;
 @ToString
 @EqualsAndHashCode(callSuper = false)
 @Getter
-public class CreateTaskJobCaseIdList extends CaseIdList {
+public class ElasticSearchCaseList extends CaseIdList {
 
-    List<String> caseIds;
+    List<ElasticSearchCase> cases;
 
     @JsonCreator
-    public CreateTaskJobCaseIdList(@JsonProperty("caseIds") List<String> caseIds) {
+    public ElasticSearchCaseList(@JsonProperty("cases") List<ElasticSearchCase> cases) {
         super();
-        this.caseIds = caseIds;
+        this.cases = cases;
     }
 
 }
