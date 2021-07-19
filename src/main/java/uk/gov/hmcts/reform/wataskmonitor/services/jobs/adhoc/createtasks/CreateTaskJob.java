@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler.EventInformation;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCase;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchRetrieverParameter;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
@@ -55,22 +56,20 @@ public class CreateTaskJob implements JobService {
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     private List<CreateTaskJobOutcome> createTasks(String serviceToken) {
-        // todo: get admin user token
-        String userToken = "some user token";
         List<CreateTaskJobOutcome> outcomeList = new ArrayList<>();
-
-        elasticSearchCaseRetrieverService.getCaseIdList(ElasticSearchRetrieverParameter.builder()
-                                                            .authentication(userToken)
-                                                            .serviceAuthentication(serviceToken)
-                                                            .build()).getCases()
-            .forEach(ccdCase -> {
-                sendMessageToInitiateTask(serviceToken, ccdCase.getId());
-                CreateTaskJobOutcome createTaskJobOutcome = (CreateTaskJobOutcome) createTaskJobOutcomeService
-                    .getJobOutcome(serviceToken, ccdCase.getId());
-                outcomeList.add(createTaskJobOutcome);
-
-            });
+        getCases(serviceToken).forEach(ccdCase -> outcomeList.add(sendMessageAndReturnOutcome(serviceToken, ccdCase)));
         return outcomeList;
+    }
+
+    private CreateTaskJobOutcome sendMessageAndReturnOutcome(String serviceToken, ElasticSearchCase ccdCase) {
+        sendMessageToInitiateTask(serviceToken, ccdCase.getId());
+        return (CreateTaskJobOutcome) createTaskJobOutcomeService.getJobOutcome(serviceToken, ccdCase.getId());
+    }
+
+    private List<ElasticSearchCase> getCases(String serviceToken) {
+        return elasticSearchCaseRetrieverService.getCaseList(ElasticSearchRetrieverParameter.builder()
+                                                                 .serviceAuthentication(serviceToken)
+                                                                 .build()).getCases();
     }
 
     private void sendMessageToInitiateTask(String serviceToken, String caseId) {

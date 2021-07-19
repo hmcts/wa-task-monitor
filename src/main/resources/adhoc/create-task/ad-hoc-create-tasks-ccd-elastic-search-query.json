@@ -1,0 +1,23 @@
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "state": "caseUnderReview"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "last_state_modified_date": {
+              "lte": "2021-07-12",
+              "gte": "2021-05-13"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -57,8 +57,7 @@ class CreateTaskJobTest {
     void run() {
         when(createTaskJobOutcomeService.getJobOutcome(eq(SOME_SERVICE_TOKEN), anyString()))
             .thenReturn(CreateTaskJobOutcome.builder().build());
-        when(elasticSearchCaseRetrieverService.getCaseIdList(ElasticSearchRetrieverParameter.builder()
-                                                                 .authentication("some user token")
+        when(elasticSearchCaseRetrieverService.getCaseList(ElasticSearchRetrieverParameter.builder()
                                                                  .serviceAuthentication(SOME_SERVICE_TOKEN)
                                                                  .build()
         )).thenReturn(new ElasticSearchCaseList(List.of(
