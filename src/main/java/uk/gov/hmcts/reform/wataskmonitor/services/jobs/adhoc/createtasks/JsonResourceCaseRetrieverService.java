@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 public class JsonResourceCaseRetrieverService implements RetrieveCaseListService<RetrieveCaseListParam> {
 
     @Override
-    public JsonResourceCaseList getCaseList(RetrieveCaseListParam param) {
+    public JsonResourceCaseList retrieveCaseList(RetrieveCaseListParam param) {
         return ObjectMapperUtility.stringToObject(
             ResourceUtility.getResource(ResourceEnum.AD_HOC_CREATE_TASKS),
             JsonResourceCaseList.class

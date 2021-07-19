@@ -14,11 +14,14 @@ import java.util.List;
 @Getter
 public class ElasticSearchCaseList extends CaseIdList {
 
-    List<ElasticSearchCase> cases;
+    private final int total;
+    private final List<ElasticSearchCase> cases;
 
     @JsonCreator
-    public ElasticSearchCaseList(@JsonProperty("cases") List<ElasticSearchCase> cases) {
+    public ElasticSearchCaseList(@JsonProperty("total") int total,
+                                 @JsonProperty("cases") List<ElasticSearchCase> cases) {
         super();
+        this.total = total;
         this.cases = cases;
     }
 

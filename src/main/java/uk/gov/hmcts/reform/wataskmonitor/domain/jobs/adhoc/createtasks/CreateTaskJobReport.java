@@ -13,10 +13,13 @@ import java.util.List;
 public class CreateTaskJobReport extends JobReport {
 
     @ToString.Include
+    private final int totalNumberOfCasesInSearchResult;
+    @ToString.Include
     private final List<CreateTaskJobOutcome> outcomeList;
 
-    public CreateTaskJobReport(List<CreateTaskJobOutcome> outcomeList) {
+    public CreateTaskJobReport(int totalNumberOfCasesInSearchResult, List<CreateTaskJobOutcome> outcomeList) {
         super();
+        this.totalNumberOfCasesInSearchResult = totalNumberOfCasesInSearchResult;
         this.outcomeList = outcomeList;
     }
 

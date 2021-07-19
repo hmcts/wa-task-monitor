@@ -18,7 +18,7 @@ public class ElasticSearchCaseRetrieverService implements RetrieveCaseListServic
     }
 
     @Override
-    public ElasticSearchCaseList getCaseList(ElasticSearchRetrieverParameter param) {
+    public ElasticSearchCaseList retrieveCaseList(ElasticSearchRetrieverParameter param) {
         return ccdClient.searchCases(
             "some Bearer token",
             param.getServiceAuthentication(),

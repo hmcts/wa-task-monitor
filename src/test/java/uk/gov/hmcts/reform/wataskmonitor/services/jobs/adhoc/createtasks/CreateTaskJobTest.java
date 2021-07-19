@@ -57,10 +57,10 @@ class CreateTaskJobTest {
     void run() {
         when(createTaskJobOutcomeService.getJobOutcome(eq(SOME_SERVICE_TOKEN), anyString()))
             .thenReturn(CreateTaskJobOutcome.builder().build());
-        when(elasticSearchCaseRetrieverService.getCaseList(ElasticSearchRetrieverParameter.builder()
-                                                                 .serviceAuthentication(SOME_SERVICE_TOKEN)
-                                                                 .build()
-        )).thenReturn(new ElasticSearchCaseList(List.of(
+        when(elasticSearchCaseRetrieverService.retrieveCaseList(ElasticSearchRetrieverParameter.builder()
+                                                               .serviceAuthentication(SOME_SERVICE_TOKEN)
+                                                               .build()
+        )).thenReturn(new ElasticSearchCaseList(2, List.of(
             new ElasticSearchCase("1626272789070362"),
             new ElasticSearchCase("1626272789070361")
         )));

@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler.EventInformatio
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCase;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCaseList;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchRetrieverParameter;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
@@ -46,19 +47,16 @@ public class CreateTaskJob implements JobService {
     @Override
     public void run(String serviceToken) {
         log.info("Starting '{}'", AD_HOC_CREATE_TASKS);
-        List<CreateTaskJobOutcome> outcomeList = createTasks(serviceToken);
-        log.info(
-            "{} finished successfully: {}",
-            AD_HOC_CREATE_TASKS,
-            logPrettyPrint(new CreateTaskJobReport(outcomeList))
-        );
+        log.info("{} finished successfully: {}", AD_HOC_CREATE_TASKS, logPrettyPrint(createTasks(serviceToken)));
     }
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-    private List<CreateTaskJobOutcome> createTasks(String serviceToken) {
-        List<CreateTaskJobOutcome> outcomeList = new ArrayList<>();
-        getCases(serviceToken).forEach(ccdCase -> outcomeList.add(sendMessageAndReturnOutcome(serviceToken, ccdCase)));
-        return outcomeList;
+    private CreateTaskJobReport createTasks(String serviceToken) {
+        ElasticSearchCaseList searchCaseList = retrieveCasesFromCcd(serviceToken);
+        List<CreateTaskJobOutcome> partialOutcomeList = new ArrayList<>();
+        searchCaseList.getCases().forEach(ccdCase ->
+                                        partialOutcomeList.add(sendMessageAndReturnOutcome(serviceToken, ccdCase)));
+        return new CreateTaskJobReport(searchCaseList.getTotal(), partialOutcomeList);
     }
 
     private CreateTaskJobOutcome sendMessageAndReturnOutcome(String serviceToken, ElasticSearchCase ccdCase) {
@@ -66,10 +64,10 @@ public class CreateTaskJob implements JobService {
         return (CreateTaskJobOutcome) createTaskJobOutcomeService.getJobOutcome(serviceToken, ccdCase.getId());
     }
 
-    private List<ElasticSearchCase> getCases(String serviceToken) {
-        return elasticSearchCaseRetrieverService.getCaseList(ElasticSearchRetrieverParameter.builder()
-                                                                 .serviceAuthentication(serviceToken)
-                                                                 .build()).getCases();
+    private ElasticSearchCaseList retrieveCasesFromCcd(String serviceToken) {
+        return elasticSearchCaseRetrieverService.retrieveCaseList(ElasticSearchRetrieverParameter.builder()
+                                                                      .serviceAuthentication(serviceToken)
+                                                                      .build());
     }
 
     private void sendMessageToInitiateTask(String serviceToken, String caseId) {
