@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient.S
 
 @FeignClient(
     name = "ccd-client",
-    url = "${core_case_data.api.url}"
+    url = "${core_case_data.api.search.url}"
 )
 @SuppressWarnings("PMD.UseObjectForClearerAPI")
 public interface CcdClient {

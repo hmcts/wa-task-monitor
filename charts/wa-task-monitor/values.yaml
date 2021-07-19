@@ -8,7 +8,7 @@ java:
     CAMUNDA_URL: "http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest"
     TASK_CONFIGURATION_SERVICE_URL: "http://wa-task-configuration-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CASE_EVENT_HANDLER_SERVICE_URL: "http://wa-case-event-handler-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
-    CCD_URL: "http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    CCD_SEARCH_URL: "http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
   keyVaults:
     wa:
       secrets:
