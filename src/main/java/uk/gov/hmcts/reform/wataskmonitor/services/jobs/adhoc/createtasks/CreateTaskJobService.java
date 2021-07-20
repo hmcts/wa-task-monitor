@@ -42,6 +42,7 @@ public class CreateTaskJobService {
         );
     }
 
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     private List<CreateTaskJobOutcome> sendMessagesAndReturnOutcomes(String serviceToken,
                                                                      ElasticSearchCaseList searchCaseList) {
         List<CreateTaskJobOutcome> partialOutcomeList = new ArrayList<>();
