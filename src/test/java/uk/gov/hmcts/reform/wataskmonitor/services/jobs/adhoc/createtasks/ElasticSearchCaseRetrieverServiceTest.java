@@ -7,22 +7,28 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CcdClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.idam.IdamTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchRetrieverParameter;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ElasticSearchCaseRetrieverServiceTest {
 
     @Mock
     private CcdClient ccdClient;
+    @Mock
+    private IdamTokenGenerator systemUserIdamToken;
 
     @InjectMocks
     private ElasticSearchCaseRetrieverService elasticSearchCaseRetrieverService;
 
     @Test
     void retrieveCaseList() {
+        when(systemUserIdamToken.generate()).thenReturn("some user token");
+
         elasticSearchCaseRetrieverService.retrieveCaseList(
             new ElasticSearchRetrieverParameter("some service token"));
 
@@ -52,7 +58,7 @@ class ElasticSearchCaseRetrieverServiceTest {
                           + "}\n";
 
         Mockito.verify(ccdClient).searchCases(
-            eq("some Bearer token"),
+            eq("some user token"),
             eq("some service token"),
             eq("Asylum"),
             eq(expected)
