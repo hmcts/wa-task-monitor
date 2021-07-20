@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.createtasks;
 
-import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,22 +7,14 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient;
-import uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler.EventInformation;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCase;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCaseList;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchRetrieverParameter;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,12 +22,9 @@ import static org.mockito.Mockito.when;
 class CreateTaskJobTest {
 
     public static final String SOME_SERVICE_TOKEN = "some service token";
+
     @Mock
-    private CaseEventHandlerClient caseEventHandlerClient;
-    @Mock
-    private JobOutcomeService createTaskJobOutcomeService;
-    @Mock
-    private ElasticSearchCaseRetrieverService elasticSearchCaseRetrieverService;
+    private CreateTaskJobService createTaskJobService;
 
     @InjectMocks
     private CreateTaskJob createTaskJob;
@@ -55,33 +43,21 @@ class CreateTaskJobTest {
 
     @Test
     void run() {
-        when(createTaskJobOutcomeService.getJobOutcome(eq(SOME_SERVICE_TOKEN), anyString()))
-            .thenReturn(CreateTaskJobOutcome.builder().build());
-        when(elasticSearchCaseRetrieverService.retrieveCaseList(
-            new ElasticSearchRetrieverParameter(SOME_SERVICE_TOKEN)))
-            .thenReturn(new ElasticSearchCaseList(2, List.of(
-                new ElasticSearchCase("1626272789070362"),
-                new ElasticSearchCase("1626272789070361")
-            )));
+        CreateTaskJobReport someCreateTaskJobReport = new CreateTaskJobReport(
+            1,
+            List.of(CreateTaskJobOutcome.builder()
+                        .created(true)
+                        .caseId("some case Id")
+                        .taskId("some task id")
+                        .build())
+        );
+        when(createTaskJobService.createTasks(SOME_SERVICE_TOKEN))
+            .thenReturn(someCreateTaskJobReport);
 
         createTaskJob.run(SOME_SERVICE_TOKEN);
 
-        verify(caseEventHandlerClient, times(2)).sendMessage(
-            eq(SOME_SERVICE_TOKEN),
-            argThat(this::eventInformationMatcher)
-        );
+        verify(createTaskJobService).createTasks(eq(SOME_SERVICE_TOKEN));
 
-        verify(createTaskJobOutcomeService, times(2))
-            .getJobOutcome(eq(SOME_SERVICE_TOKEN), anyString());
     }
 
-    private boolean eventInformationMatcher(EventInformation eventInformation) {
-        return eventInformation.getEventId().equals("buildCase") && eventInformation.getJurisdictionId().equals("ia")
-               && eventInformation.getCaseTypeId().equals("asylum")
-               && eventInformation.getNewStateId().equals("caseUnderReview")
-               && StringUtils.isNotBlank(eventInformation.getEventInstanceId())
-               && eventInformation.getEventTimeStamp() != null
-               && StringUtils.isNotBlank(eventInformation.getCaseId())
-               && StringUtils.isNotBlank(eventInformation.getUserId());
-    }
 }
