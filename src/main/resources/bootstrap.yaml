@@ -7,3 +7,5 @@ spring:
       aliases:
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
         s2s-secret-task-monitor: S2S_SECRET_TASK_MONITOR
+        wa-system-username: WA_SYSTEM_USERNAME
+        wa-system-password: WA_SYSTEM_PASSWORD
