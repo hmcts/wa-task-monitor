@@ -27,6 +27,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CreateTaskJobOutcomeServiceTest {
 
+    public static final String SOME_SERVICE_TOKEN = "some service token";
+    public static final String SOME_CASE_ID = "someCaseId";
     @Mock
     private CamundaClient camundaClient;
 
@@ -54,21 +56,21 @@ class CreateTaskJobOutcomeServiceTest {
     }
 
     @Test
-    void GivenCamundaClientThrowsExceptionShouldGetJobOutcome() {
+    void givenCamundaClientThrowsExceptionShouldGetJobOutcome() {
         when(camundaClient.getTasksByTaskVariables(
-            eq("some service token"),
+            eq(SOME_SERVICE_TOKEN),
             eq("caseId_eq_someCaseId,taskType_eq_reviewAppealSkeletonArgument"),
             eq("created"),
             eq("desc")
         )).thenThrow(new RuntimeException("some exception"));
 
         CreateTaskJobOutcome actual = createTaskJobOutcomeService.getJobOutcome(
-            "some service token",
-            "someCaseId"
+            SOME_SERVICE_TOKEN,
+            SOME_CASE_ID
         );
 
         assertThat(actual).isEqualTo(CreateTaskJobOutcome.builder()
-                                         .caseId("someCaseId")
+                                         .caseId(SOME_CASE_ID)
                                          .created(false)
                                          .build());
     }
@@ -77,15 +79,15 @@ class CreateTaskJobOutcomeServiceTest {
     @MethodSource("scenarioProvider")
     void shouldGetJobOutcome(List<CamundaTask> camundaTaskList, CreateTaskJobOutcome expectedOutcome) {
         when(camundaClient.getTasksByTaskVariables(
-            eq("some service token"),
+            eq(SOME_SERVICE_TOKEN),
             eq("caseId_eq_someCaseId,taskType_eq_reviewAppealSkeletonArgument"),
             eq("created"),
             eq("desc")
         )).thenReturn(camundaTaskList);
 
         CreateTaskJobOutcome actual = createTaskJobOutcomeService.getJobOutcome(
-            "some service token",
-            "someCaseId"
+            SOME_SERVICE_TOKEN,
+            SOME_CASE_ID
         );
 
         assertThat(actual).isEqualTo(expectedOutcome);
@@ -102,7 +104,7 @@ class CreateTaskJobOutcomeServiceTest {
             CreateTaskJobOutcome.builder()
                 .taskId("some task id")
                 .processInstanceId("some process instance id")
-                .caseId("someCaseId")
+                .caseId(SOME_CASE_ID)
                 .created(true)
                 .build()
         );
@@ -110,7 +112,7 @@ class CreateTaskJobOutcomeServiceTest {
         Arguments taskIsNotFoundScenario = Arguments.of(
             Collections.emptyList(),
             CreateTaskJobOutcome.builder()
-                .caseId("someCaseId")
+                .caseId(SOME_CASE_ID)
                 .created(false)
                 .build()
         );
@@ -118,7 +120,7 @@ class CreateTaskJobOutcomeServiceTest {
         Arguments camundaTaskListIsNullScenario = Arguments.of(
             null,
             CreateTaskJobOutcome.builder()
-                .caseId("someCaseId")
+                .caseId(SOME_CASE_ID)
                 .created(false)
                 .build()
         );
