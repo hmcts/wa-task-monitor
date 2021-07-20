@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobC
 @RunWith(SpringIntegrationSerenityRunner.class)
 @Slf4j
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
+@Ignore
 class MonitorTaskJobControllerForConfigurationJobTest {
 
     @Value("${targets.instance}")
@@ -46,7 +47,6 @@ class MonitorTaskJobControllerForConfigurationJobTest {
     }
 
     @Test
-    @Ignore
     void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() {
         given()
             .contentType(APPLICATION_JSON_VALUE)
@@ -60,7 +60,6 @@ class MonitorTaskJobControllerForConfigurationJobTest {
     }
 
     @Test
-    @Ignore
     void givenMonitorTaskJobRequestWithNoServiceAuthenticationHeaderShouldReturnStatus401Response() {
         given()
             .contentType(APPLICATION_JSON_VALUE)
