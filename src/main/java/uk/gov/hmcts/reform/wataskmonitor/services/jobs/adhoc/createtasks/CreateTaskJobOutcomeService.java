@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.createtasks;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
@@ -12,6 +13,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 
 @Component
+@Slf4j
 public class CreateTaskJobOutcomeService implements JobOutcomeService {
 
     public static final Integer TIMEOUT = 60;
@@ -24,6 +26,7 @@ public class CreateTaskJobOutcomeService implements JobOutcomeService {
 
     @Override
     public CreateTaskJobOutcome getJobOutcome(String serviceToken, String caseId) {
+        log.info("Getting job outcome...");
         try {
             return await()
                 .ignoreExceptions()

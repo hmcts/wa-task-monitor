@@ -46,7 +46,11 @@ public class CreateTaskJobService {
                                                                      ElasticSearchCaseList searchCaseList) {
         List<CreateTaskJobOutcome> partialOutcomeList = new ArrayList<>();
         searchCaseList.getCases()
-            .forEach(ccdCase -> partialOutcomeList.add(sendMessageAndReturnOutcome(serviceToken, ccdCase)));
+            .forEach(ccdCase -> {
+                CreateTaskJobOutcome partialOutcome = sendMessageAndReturnOutcome(serviceToken, ccdCase);
+                log.info(partialOutcome.toString());
+                partialOutcomeList.add(partialOutcome);
+            });
         return partialOutcomeList;
     }
 
@@ -67,6 +71,7 @@ public class CreateTaskJobService {
     }
 
     private void sendMessageToInitiateTask(String serviceToken, String caseId) {
+        log.info("Sending message(caseId={}) to CEH...", caseId);
         caseEventHandlerClient.sendMessage(
             serviceToken,
             EventInformation.builder()

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.createtasks;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CcdClient;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.wataskmonitor.services.jobs.RetrieveCaseListService;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
 @Component
+@Slf4j
 public class ElasticSearchCaseRetrieverService implements RetrieveCaseListService<ElasticSearchRetrieverParameter> {
 
     private final CcdClient ccdClient;
@@ -23,6 +25,7 @@ public class ElasticSearchCaseRetrieverService implements RetrieveCaseListServic
 
     @Override
     public ElasticSearchCaseList retrieveCaseList(ElasticSearchRetrieverParameter param) {
+        log.info("Retrieving case list from CCD...");
         if (StringUtils.isBlank(param.getServiceAuthentication())) {
             throw new IllegalArgumentException("service token is missing");
         }
