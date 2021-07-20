@@ -28,7 +28,6 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HO
 @RunWith(SpringIntegrationSerenityRunner.class)
 @Slf4j
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
-@Ignore
 class MonitorTaskJobControllerForAdHocDeleteProcessInstanceTest {
 
     @Value("${targets.instance}")
@@ -47,6 +46,7 @@ class MonitorTaskJobControllerForAdHocDeleteProcessInstanceTest {
     }
 
     @Test
+    @Ignore
     void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() {
         given()
             .contentType(APPLICATION_JSON_VALUE)
@@ -60,6 +60,7 @@ class MonitorTaskJobControllerForAdHocDeleteProcessInstanceTest {
     }
 
     @Test
+    @Ignore
     void givenMonitorTaskJobRequestWithNoServiceAuthenticationHeaderShouldReturnStatus401Response() {
         given()
             .contentType(APPLICATION_JSON_VALUE)
