@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.wataskmonitor;
 import io.restassured.RestAssured;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ class MonitorTaskJobControllerForAdHocCreateTasksTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     void givenMonitorTaskJobRequestWithNoServiceAuthenticationHeaderShouldReturnStatus401Response() {
         given()
             .contentType(APPLICATION_JSON_VALUE)
