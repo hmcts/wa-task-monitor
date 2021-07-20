@@ -16,3 +16,4 @@ java:
         - s2s-secret-task-monitor
         - wa-system-username
         - wa-system-password
+        - wa-idam-client-secret
