@@ -19,14 +19,15 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(properties = {
-    "camunda.url=http://localhost:9561",
-    "task.configurator.scheduling.enable=false"
+    "camunda.url=http://localhost:9561"
 })
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(profiles = {"local"})
 @EnableConfigurationProperties
 @ContextConfiguration(classes = {CamundaWireMockConfig.class})
 class CamundaClientTest {
+
+    public static final String TASK_NAME = "task name";
 
     @Autowired
     private WireMockServer camundaMockServer;
@@ -49,8 +50,12 @@ class CamundaClientTest {
         );
 
         assertThat(camundaTasks).isEqualTo(Arrays.asList(
-            new CamundaTask("090e80f0-c3be-11eb-a06f-164a82de09f9"),
-            new CamundaTask("21827953-c3c3-11eb-adeb-3a61f2fe2b47")
+            new CamundaTask("090e80f0-c3be-11eb-a06f-164a82de09f9",
+                "task name 1",
+                "08c87753-c3be-11eb-b156-c2f10288f330"),
+            new CamundaTask("21827953-c3c3-11eb-adeb-3a61f2fe2b47",
+                "task name 2",
+                "2151a580-c3c3-11eb-8b76-d26a7287fec2")
         ));
 
     }

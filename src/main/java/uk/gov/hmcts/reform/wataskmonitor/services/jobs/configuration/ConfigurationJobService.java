@@ -12,8 +12,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.RequestsEnum.CONFIGURATION_JOB_SERVICE;
-
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum.CONFIGURATION_JOB_SERVICE;
 
 @Component
 @Slf4j
@@ -62,7 +61,7 @@ public class ConfigurationJobService {
     }
 
     private String getQueryParameters() {
-        return ResourceUtility.getResource(CONFIGURATION_JOB_SERVICE.getRequestParameterBody())
+        return ResourceUtility.getResource(CONFIGURATION_JOB_SERVICE)
             .replace("CREATED_BEFORE_PLACEHOLDER", getCreatedBeforeDate());
     }
 

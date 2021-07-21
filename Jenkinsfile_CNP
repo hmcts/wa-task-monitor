@@ -26,8 +26,6 @@ withPipeline(type, product, component) {
   disableLegacyDeployment()
 
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-  env.CAMUNDA_URL = "http://camunda-api-aat.service.core-compute-aat.internal/engine-rest"
-  env.TASK_CONFIGURATION_SERVICE_URL = "http://wa-task-configuration-api-aat.service.core-compute-aat.internal"
 
   loadVaultSecrets(secrets)
 

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
@@ -16,24 +15,20 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.CONFI
 @Component
 public class ConfigurationJob implements JobService {
     private final ConfigurationJobService configurationJobService;
-    private final AuthTokenGenerator authTokenGenerator;
 
     @Autowired
-    public ConfigurationJob(ConfigurationJobService configurationJobService,
-                            AuthTokenGenerator authTokenGenerator) {
+    public ConfigurationJob(ConfigurationJobService configurationJobService) {
         this.configurationJobService = configurationJobService;
-        this.authTokenGenerator = authTokenGenerator;
     }
 
     @Override
-    public boolean canHandle(JobName jobName) {
+    public boolean canRun(JobName jobName) {
         return CONFIGURATION.equals(jobName);
     }
 
     @Override
-    public void run() {
+    public void run(String serviceToken) {
         log.info("Starting task configuration job.");
-        String serviceToken = authTokenGenerator.generate();
         List<CamundaTask> tasks = configurationJobService.getUnConfiguredTasks(serviceToken);
         configurationJobService.configureTasks(tasks, serviceToken);
         log.info("Task configuration job finished successfully.");

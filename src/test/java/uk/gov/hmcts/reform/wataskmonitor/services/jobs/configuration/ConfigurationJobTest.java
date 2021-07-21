@@ -7,7 +7,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 
@@ -24,8 +23,6 @@ class ConfigurationJobTest {
 
     public static final String SERVICE_TOKEN = "some s2s token";
     @Mock
-    private AuthTokenGenerator authTokenGenerator;
-    @Mock
     private ConfigurationJobService configurationJobService;
     @InjectMocks
     private ConfigurationJob configurationJob;
@@ -38,18 +35,18 @@ class ConfigurationJobTest {
         "AD_HOC_DELETE_PROCESS_INSTANCES, false"
     })
     void canRun(JobName jobName, boolean expectedResult) {
-        assertThat(configurationJob.canHandle(jobName)).isEqualTo(expectedResult);
+        assertThat(configurationJob.canRun(jobName)).isEqualTo(expectedResult);
     }
 
     @Test
     void run() {
-        when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
         CamundaTask camundaTask = mock(CamundaTask.class);
         List<CamundaTask> taskList = singletonList(camundaTask);
         when(configurationJobService.getUnConfiguredTasks(SERVICE_TOKEN))
             .thenReturn(taskList);
-        configurationJob.run();
-        verify(authTokenGenerator).generate();
+
+        configurationJob.run(SERVICE_TOKEN);
+
         verify(configurationJobService).getUnConfiguredTasks(SERVICE_TOKEN);
         verify(configurationJobService).configureTasks(taskList, SERVICE_TOKEN);
     }
