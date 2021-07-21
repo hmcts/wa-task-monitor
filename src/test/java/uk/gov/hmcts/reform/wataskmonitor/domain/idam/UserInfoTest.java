@@ -9,7 +9,7 @@ class UserInfoTest {
 
     @Test
     void isWellImplemented() {
-        final Class<?> classUnderTest = Token.class;
+        final Class<?> classUnderTest = UserInfo.class;
         assertPojoMethodsFor(classUnderTest)
             .testing(Method.GETTER)
             .testing(Method.CONSTRUCTOR)
