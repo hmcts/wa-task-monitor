@@ -108,6 +108,17 @@ class CreateTaskJobOutcomeServiceTest {
                 .created(true)
                 .build()
         );
+        Arguments taskNameIsNotEqualScenario = Arguments.of(
+            List.of(new CamundaTask(
+                "some task id",
+                "some other name",
+                "some process instance id"
+            )),
+            CreateTaskJobOutcome.builder()
+                .caseId(SOME_CASE_ID)
+                .created(false)
+                .build()
+        );
 
         Arguments taskIsNotFoundScenario = Arguments.of(
             Collections.emptyList(),
@@ -127,6 +138,7 @@ class CreateTaskJobOutcomeServiceTest {
 
         return Stream.of(
             taskIsCreatedScenario,
+            taskNameIsNotEqualScenario,
             taskIsNotFoundScenario,
             camundaTaskListIsNullScenario
         );
