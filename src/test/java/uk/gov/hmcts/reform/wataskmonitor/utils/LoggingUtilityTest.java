@@ -2,9 +2,11 @@ package uk.gov.hmcts.reform.wataskmonitor.utils;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
+import uk.gov.hmcts.reform.wataskmonitor.exceptions.LoggingUtilityFailure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 class LoggingUtilityTest {
@@ -27,6 +29,11 @@ class LoggingUtilityTest {
     }
 
     @Test
+    void logPrettyPrintStringArgumentShouldThrowException() {
+        assertThrows(LoggingUtilityFailure.class, () -> LoggingUtility.logPrettyPrint("invalid input"));
+    }
+
+    @Test
     void logPrettyPrintObjectArgument() {
         CreateTaskJobOutcome input = CreateTaskJobOutcome.builder()
             .taskId("some task id")
@@ -46,6 +53,11 @@ class LoggingUtilityTest {
                                 + "}";
 
         assertEquals(expectedOutput, output, "output does not match expected output");
+    }
+
+    @Test
+    void logPrettyPrintObjectArgumentArgumentShouldThrowException() {
+        assertThrows(LoggingUtilityFailure.class, () -> LoggingUtility.logPrettyPrint(new Object()));
     }
 
 }
