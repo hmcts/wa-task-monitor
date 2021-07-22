@@ -54,7 +54,7 @@ class ElasticSearchCaseRetrieverServiceTest {
                           + "      ]\n"
                           + "    }\n"
                           + "  },\n"
-                          + "  \"size\": 10\n"
+                          + "  \"size\": 276\n"
                           + "}\n";
 
         Mockito.verify(ccdClient).searchCases(
