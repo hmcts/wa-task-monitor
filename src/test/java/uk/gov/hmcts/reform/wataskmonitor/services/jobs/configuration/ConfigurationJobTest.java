@@ -8,13 +8,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 
 import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,10 +41,24 @@ class ConfigurationJobTest {
 
     @Test
     void run() {
-        CamundaTask camundaTask = mock(CamundaTask.class);
+        CamundaTask camundaTask = new CamundaTask(
+            "some taskId",
+            "some name",
+            "someProcessInstanceId"
+        );
         List<CamundaTask> taskList = singletonList(camundaTask);
         when(configurationJobService.getUnConfiguredTasks(SERVICE_TOKEN))
             .thenReturn(taskList);
+        GenericJobReport jobReport = new GenericJobReport(
+            1,
+            singletonList(GenericJobOutcome.builder()
+                              .taskId("some taskId")
+                              .processInstanceId("some processInstanceId")
+                              .created(true)
+                              .build())
+        );
+        when(configurationJobService.configureTasks(taskList, SERVICE_TOKEN))
+            .thenReturn(jobReport);
 
         configurationJob.run(SERVICE_TOKEN);
 

@@ -6,12 +6,16 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum.CONFIGURATION_JOB_SERVICE;
 
 @Component
@@ -43,21 +47,44 @@ public class ConfigurationJobService {
 
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-    public void configureTasks(List<CamundaTask> camundaTasks, String serviceToken) {
+    public GenericJobReport configureTasks(List<CamundaTask> camundaTasks, String serviceToken) {
         if (camundaTasks.isEmpty()) {
             log.info("There was no task(s) to configure.");
+            return new GenericJobReport(0, emptyList());
         } else {
-            log.info("Attempting to configure {} task(s)", camundaTasks.size());
-            camundaTasks.forEach(task -> {
-                try {
-                    log.info("Attempting to configure task with id: '{}'", task.getId());
-                    taskConfigurationClient.configureTask(serviceToken, task.getId());
-                    log.info("Task with id: '{}' configured successfully.", task.getId());
-                } catch (Exception e) {
-                    log.info("Error while configuring task with id: '{}'", task.getId());
-                }
-            });
+            List<GenericJobOutcome> outcomesList = configureTasksAndReturnOutcome(camundaTasks, serviceToken);
+            return new GenericJobReport(camundaTasks.size(), outcomesList);
         }
+    }
+
+    private List<GenericJobOutcome> configureTasksAndReturnOutcome(List<CamundaTask> camundaTasks,
+                                                                   String serviceToken) {
+        log.info("Attempting to configure {} task(s)", camundaTasks.size());
+        List<GenericJobOutcome> outcomeList = new ArrayList<>();
+        camundaTasks.forEach(task -> {
+            try {
+                log.info("Attempting to configure task with id: '{}'", task.getId());
+                taskConfigurationClient.configureTask(serviceToken, task.getId());
+                log.info("Task with id: '{}' configured successfully.", task.getId());
+                outcomeList.add(
+                    GenericJobOutcome.builder()
+                        .taskId(task.getId())
+                        .processInstanceId(task.getProcessInstanceId())
+                        .created(true)
+                        .build()
+                );
+            } catch (Exception e) {
+                log.info("Error while configuring task with id: '{}'", task.getId());
+                outcomeList.add(
+                    GenericJobOutcome.builder()
+                        .taskId(task.getId())
+                        .processInstanceId(task.getProcessInstanceId())
+                        .created(false)
+                        .build()
+                );
+            }
+        });
+        return outcomeList;
     }
 
     private String getQueryParameters() {
