@@ -30,12 +30,12 @@ class CreateTaskJobTest {
     private CreateTaskJob createTaskJob;
 
     @Test
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void canRun() {
         Arrays.stream(JobName.values())
             .forEach(name ->
                          assertThat(createTaskJob.canRun(name)).isEqualTo(AD_HOC_CREATE_TASKS.equals(name)));
     }
-
 
     @Test
     void run() {
@@ -53,7 +53,6 @@ class CreateTaskJobTest {
         createTaskJob.run(SOME_SERVICE_TOKEN);
 
         verify(createTaskJobService).createTasks(eq(SOME_SERVICE_TOKEN));
-
     }
 
 }

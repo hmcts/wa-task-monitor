@@ -23,6 +23,7 @@ class UpdateCaseDataJobTest {
     private UpdateCaseDataJob updateCaseDataJob;
 
     @Test
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void canRun() {
         Arrays.stream(JobName.values())
             .forEach(name ->

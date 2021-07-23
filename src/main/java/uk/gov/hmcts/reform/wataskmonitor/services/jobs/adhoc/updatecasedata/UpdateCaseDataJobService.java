@@ -2,8 +2,9 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.updatecasedata;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.JobReport;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCaseList;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.ElasticSearchRetrieverParameter;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCaseList;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.retrievecaselist.ElasticSearchCaseRetrieverService;
 
@@ -27,6 +28,6 @@ public class UpdateCaseDataJobService {
     }
 
     private JobReport updateCases(ElasticSearchCaseList searchCaseList) {
-        return null;
+        return new CreateTaskJobReport(searchCaseList.getTotal(), null);
     }
 }
