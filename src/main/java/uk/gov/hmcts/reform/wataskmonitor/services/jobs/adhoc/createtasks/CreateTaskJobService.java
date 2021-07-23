@@ -8,8 +8,10 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTas
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCase;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCaseList;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchRetrieverParameter;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.ElasticSearchRetrieverParameter;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.retrievecaselist.ElasticSearchCaseRetrieverService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,8 +36,11 @@ public class CreateTaskJobService {
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public CreateTaskJobReport createTasks(String serviceToken) {
-        ElasticSearchCaseList searchCaseList =
-            retrieverService.retrieveCaseList(new ElasticSearchRetrieverParameter(serviceToken));
+        ElasticSearchCaseList searchCaseList = retrieverService.retrieveCaseList(
+            new ElasticSearchRetrieverParameter(
+                serviceToken,
+                ResourceEnum.AD_HOC_CREATE_TASKS_CCD_ELASTIC_SEARCH_QUERY
+            ));
         return new CreateTaskJobReport(
             searchCaseList.getTotal(),
             sendMessagesAndReturnOutcomes(serviceToken, searchCaseList)

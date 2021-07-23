@@ -8,7 +8,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CcdClient;
 import uk.gov.hmcts.reform.wataskmonitor.config.idam.IdamTokenGenerator;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchRetrieverParameter;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.ElasticSearchRetrieverParameter;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.retrievecaselist.ElasticSearchCaseRetrieverService;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
@@ -30,7 +32,10 @@ class ElasticSearchCaseRetrieverServiceTest {
         when(systemUserIdamToken.generate()).thenReturn("some user token");
 
         elasticSearchCaseRetrieverService.retrieveCaseList(
-            new ElasticSearchRetrieverParameter("some service token"));
+            new ElasticSearchRetrieverParameter(
+                "some service token",
+                ResourceEnum.AD_HOC_CREATE_TASKS_CCD_ELASTIC_SEARCH_QUERY
+            ));
 
         String expected = "{\n"
                           + "  \"query\": {\n"
@@ -68,7 +73,10 @@ class ElasticSearchCaseRetrieverServiceTest {
     @Test
     void retrieveCaseListThrowException() {
         assertThatThrownBy(() -> elasticSearchCaseRetrieverService
-            .retrieveCaseList(new ElasticSearchRetrieverParameter(null)))
+            .retrieveCaseList(new ElasticSearchRetrieverParameter(
+                null,
+                ResourceEnum.AD_HOC_CREATE_TASKS_CCD_ELASTIC_SEARCH_QUERY
+            )))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("service token is missing");
     }

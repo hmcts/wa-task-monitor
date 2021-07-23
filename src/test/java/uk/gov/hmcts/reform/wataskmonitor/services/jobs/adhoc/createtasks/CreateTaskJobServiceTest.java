@@ -12,8 +12,10 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTas
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCase;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCaseList;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchRetrieverParameter;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.ElasticSearchRetrieverParameter;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.retrievecaselist.ElasticSearchCaseRetrieverService;
 
 import java.util.List;
 
@@ -49,12 +51,13 @@ class CreateTaskJobServiceTest {
 
     @Test
     void givenCaseEventHandlerThrowsExceptionShouldHandleIt() {
-        when(elasticSearchCaseRetrieverService.retrieveCaseList(
-            new ElasticSearchRetrieverParameter(SOME_SERVICE_TOKEN)))
-            .thenReturn(new ElasticSearchCaseList(2, List.of(
-                new ElasticSearchCase(SOME_CASE_ID_1),
-                new ElasticSearchCase(SOME_CASE_ID_2)
-            )));
+        when(elasticSearchCaseRetrieverService.retrieveCaseList(new ElasticSearchRetrieverParameter(
+            SOME_SERVICE_TOKEN,
+            ResourceEnum.AD_HOC_CREATE_TASKS_CCD_ELASTIC_SEARCH_QUERY
+        ))).thenReturn(new ElasticSearchCaseList(2, List.of(
+            new ElasticSearchCase(SOME_CASE_ID_1),
+            new ElasticSearchCase(SOME_CASE_ID_2)
+        )));
 
         when(caseEventHandlerClient.sendMessage(eq(SOME_SERVICE_TOKEN), any(EventInformation.class)))
             .thenThrow(new RuntimeException("some exception"));
@@ -103,12 +106,13 @@ class CreateTaskJobServiceTest {
         when(createTaskJobOutcomeService.getJobOutcome(eq(SOME_SERVICE_TOKEN), eq(SOME_CASE_ID_2)))
             .thenReturn(taskJobOutcome2);
 
-        when(elasticSearchCaseRetrieverService.retrieveCaseList(
-            new ElasticSearchRetrieverParameter(SOME_SERVICE_TOKEN)))
-            .thenReturn(new ElasticSearchCaseList(2, List.of(
-                new ElasticSearchCase(SOME_CASE_ID_1),
-                new ElasticSearchCase(SOME_CASE_ID_2)
-            )));
+        when(elasticSearchCaseRetrieverService.retrieveCaseList(new ElasticSearchRetrieverParameter(
+            SOME_SERVICE_TOKEN,
+            ResourceEnum.AD_HOC_CREATE_TASKS_CCD_ELASTIC_SEARCH_QUERY
+        ))).thenReturn(new ElasticSearchCaseList(2, List.of(
+            new ElasticSearchCase(SOME_CASE_ID_1),
+            new ElasticSearchCase(SOME_CASE_ID_2)
+        )));
 
         CreateTaskJobReport actual = createTaskJobService.createTasks(SOME_SERVICE_TOKEN);
 
