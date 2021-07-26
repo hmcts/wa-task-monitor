@@ -46,7 +46,7 @@ class ManagementCategoryDataServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
+    @CsvSource({
         "some data, true",
         ",false"
     })
