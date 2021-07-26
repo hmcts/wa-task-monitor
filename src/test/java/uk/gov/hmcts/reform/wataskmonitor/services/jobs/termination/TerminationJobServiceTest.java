@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.termination;
 
+import feign.FeignException;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
@@ -18,10 +19,13 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.Terminate
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options.TerminateInfo;
 
+import java.util.Collections;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,6 +46,42 @@ class TerminationJobServiceTest {
     private TerminationJobService terminationJobService;
     @Captor
     private ArgumentCaptor<String> actualQueryParametersCaptor;
+
+    @Test
+    void shouldThrowExceptionWhenCamundaCallFails() {
+
+        doThrow(FeignException.GatewayTimeout.class)
+            .when(camundaClient)
+            .getTasksFromHistory(
+                eq(SERVICE_TOKEN),
+                eq("0"),
+                eq("1000"),
+                any()
+            );
+
+        assertThatThrownBy(() -> terminationJobService.terminateTasks(SERVICE_TOKEN))
+            .isInstanceOf(FeignException.class)
+            .hasNoCause();
+    }
+
+
+    @Test
+    void shouldSucceedWhenNoTasksReturned() throws JSONException {
+
+        when(camundaClient.getTasksFromHistory(
+            eq(SERVICE_TOKEN),
+            eq("0"),
+            eq("1000"),
+            actualQueryParametersCaptor.capture()
+        )).thenReturn(Collections.emptyList());
+
+        terminationJobService.terminateTasks(SERVICE_TOKEN);
+
+        assertQuery();
+        verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason(COMPLETED, 0);
+    }
+
 
     @Test
     void shouldFetchTasksAndTerminateThem() throws JSONException {
