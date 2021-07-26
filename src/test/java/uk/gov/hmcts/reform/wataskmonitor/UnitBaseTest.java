@@ -4,7 +4,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("PMD.AbstractClassWithoutAnyMethod")
+@SuppressWarnings({"PMD.AbstractClassWithoutAnyMethod", "PMD.AbstractClassWithoutAbstractMethod"})
 public abstract class UnitBaseTest {
 
     public static final String SOME_SERVICE_TOKEN = "some service token";
@@ -12,6 +12,7 @@ public abstract class UnitBaseTest {
     public static final String SOME_USER_ID = "some user id";
 
     public static final String SOME_CASE_ID = "some case id";
+    public static final String SOME_CASE_ID_CAMEL_CASE = "someCaseId";
     public static final String SOME_OTHER_CASE_ID = "some other case id";
     public static final String SOME_CASE_ID_1 = "some case id1";
     public static final String SOME_CASE_ID_2 = "some case id2";

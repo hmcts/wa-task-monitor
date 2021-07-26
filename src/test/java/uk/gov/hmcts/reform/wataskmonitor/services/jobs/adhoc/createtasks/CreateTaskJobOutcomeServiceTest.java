@@ -62,11 +62,11 @@ class CreateTaskJobOutcomeServiceTest extends UnitBaseTest {
 
         CreateTaskJobOutcome actual = createTaskJobOutcomeService.getJobOutcome(
             SOME_SERVICE_TOKEN,
-            SOME_CASE_ID_1
+            SOME_CASE_ID_CAMEL_CASE
         );
 
         assertThat(actual).isEqualTo(CreateTaskJobOutcome.builder()
-                                         .caseId(SOME_CASE_ID_1)
+                                         .caseId(SOME_CASE_ID_CAMEL_CASE)
                                          .created(false)
                                          .build());
     }
@@ -83,7 +83,7 @@ class CreateTaskJobOutcomeServiceTest extends UnitBaseTest {
 
         CreateTaskJobOutcome actual = createTaskJobOutcomeService.getJobOutcome(
             SOME_SERVICE_TOKEN,
-            SOME_CASE_ID_1
+            SOME_CASE_ID_CAMEL_CASE
         );
 
         assertThat(actual).isEqualTo(expectedOutcome);
@@ -100,7 +100,7 @@ class CreateTaskJobOutcomeServiceTest extends UnitBaseTest {
             CreateTaskJobOutcome.builder()
                 .taskId("some task id")
                 .processInstanceId("some process instance id")
-                .caseId(SOME_CASE_ID_1)
+                .caseId(SOME_CASE_ID_CAMEL_CASE)
                 .created(true)
                 .build()
         );
@@ -111,7 +111,7 @@ class CreateTaskJobOutcomeServiceTest extends UnitBaseTest {
                 "some process instance id"
             )),
             CreateTaskJobOutcome.builder()
-                .caseId(SOME_CASE_ID_1)
+                .caseId(SOME_CASE_ID_CAMEL_CASE)
                 .created(false)
                 .build()
         );
@@ -119,7 +119,7 @@ class CreateTaskJobOutcomeServiceTest extends UnitBaseTest {
         Arguments taskIsNotFoundScenario = Arguments.of(
             Collections.emptyList(),
             CreateTaskJobOutcome.builder()
-                .caseId(SOME_CASE_ID_1)
+                .caseId(SOME_CASE_ID_CAMEL_CASE)
                 .created(false)
                 .build()
         );
@@ -127,7 +127,7 @@ class CreateTaskJobOutcomeServiceTest extends UnitBaseTest {
         Arguments camundaTaskListIsNullScenario = Arguments.of(
             null,
             CreateTaskJobOutcome.builder()
-                .caseId(SOME_CASE_ID_1)
+                .caseId(SOME_CASE_ID_CAMEL_CASE)
                 .created(false)
                 .build()
         );

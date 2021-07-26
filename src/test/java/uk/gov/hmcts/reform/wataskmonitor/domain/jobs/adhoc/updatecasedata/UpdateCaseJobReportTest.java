@@ -23,7 +23,7 @@ class UpdateCaseJobReportTest extends UnitBaseTest {
     }
 
     @Test
-    void getTotalNumberOfNonUpdatedCasesTest() {
+    void totalNumberOfNonUpdatedCases() {
         UpdateCaseJobReport updateCaseJobReport = new UpdateCaseJobReport(
             2,
             List.of(
