@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-class ConfigurationJobTestService extends UnitBaseTest {
+class ConfigurationJobServiceTest extends UnitBaseTest {
 
     @Mock
     private CamundaClient camundaClient;

@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.deleteprocessinstan
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.deleteprocessinstances.DeleteProcessInstancesJobService;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +40,6 @@ class DeleteProcessInstancesJobTest extends UnitBaseTest {
 
         deleteProcessInstancesJob.run(SOME_SERVICE_TOKEN);
 
-        verify(deleteProcessInstancesJobService).deleteProcessInstances(eq(SOME_SERVICE_TOKEN));
+        verify(deleteProcessInstancesJobService).deleteProcessInstances(SOME_SERVICE_TOKEN);
     }
 }
