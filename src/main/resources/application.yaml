@@ -36,8 +36,11 @@ spring:
 camunda:
   url: ${CAMUNDA_URL:http://camunda-local-bpm/engine-rest}
 
-task.configuration.service:
+task-configuration:
   url: ${TASK_CONFIGURATION_SERVICE_URL:http://localhost:8091}
+
+task-management:
+  url: ${TASK_MANAGEMENT_SERVICE_URL:http://localhost:8087}
 
 case-event-handler.service.url: ${CASE_EVENT_HANDLER_SERVICE_URL:http://localhost:8088}
 

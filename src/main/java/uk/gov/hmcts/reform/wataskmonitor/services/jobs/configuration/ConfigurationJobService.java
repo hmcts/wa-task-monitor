@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
-import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum.CONFIGURATION_JOB_SERVICE;
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum.CAMUNDA_TASKS_UNCONFIGURED;
 
 @Component
 @Slf4j
@@ -88,7 +88,7 @@ public class ConfigurationJobService {
     }
 
     private String getQueryParameters() {
-        return ResourceUtility.getResource(CONFIGURATION_JOB_SERVICE)
+        return ResourceUtility.getResource(CAMUNDA_TASKS_UNCONFIGURED)
             .replace("CREATED_BEFORE_PLACEHOLDER", getCreatedBeforeDate());
     }
 
