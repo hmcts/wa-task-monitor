@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
-import uk.gov.hmcts.reform.wataskmonitor.services.MonitorTaskJobService;
+import uk.gov.hmcts.reform.wataskmonitor.services.controllers.MonitorTaskJobService;
 
 @RestController
 @Slf4j

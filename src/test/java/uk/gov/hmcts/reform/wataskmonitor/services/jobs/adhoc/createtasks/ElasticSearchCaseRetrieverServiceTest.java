@@ -9,8 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CcdClient;
 import uk.gov.hmcts.reform.wataskmonitor.config.idam.IdamTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.ElasticSearchRetrieverParameter;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.retrievecaselist.ElasticSearchCaseRetrieverService;
+import uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum;
+import uk.gov.hmcts.reform.wataskmonitor.services.retrievecaselist.ElasticSearchCaseRetrieverService;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.jobs.retrievecaselist;
+package uk.gov.hmcts.reform.wataskmonitor.services.retrievecaselist;
 
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.CaseIdList;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.RetrieveCaseListParam;

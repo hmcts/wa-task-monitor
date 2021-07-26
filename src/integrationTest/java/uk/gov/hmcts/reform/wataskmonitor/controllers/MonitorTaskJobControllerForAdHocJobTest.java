@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_DELETE_PROCESS_INSTANCES;
-import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum.DELETE_PROCESS_INSTANCES_JOB_SERVICE;
+import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.DELETE_PROCESS_INSTANCES_JOB_SERVICE;
 
 @ExtendWith(MockitoExtension.class)
 class MonitorTaskJobControllerForAdHocJobTest extends SpringBootIntegrationBaseTest {

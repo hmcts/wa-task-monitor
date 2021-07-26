@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
+import uk.gov.hmcts.reform.wataskmonitor.services.JobService;
 
 import java.util.List;
 

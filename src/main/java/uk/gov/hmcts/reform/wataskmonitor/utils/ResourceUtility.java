@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.wataskmonitor.utils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileCopyUtils;
 import uk.gov.hmcts.reform.wataskmonitor.exceptions.CamundaRequestFailure;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
+import uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

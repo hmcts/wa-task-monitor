@@ -13,9 +13,9 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTas
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCase;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCaseList;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.retrievecaselist.ElasticSearchCaseRetrieverService;
+import uk.gov.hmcts.reform.wataskmonitor.services.JobOutcomeService;
+import uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum;
+import uk.gov.hmcts.reform.wataskmonitor.services.retrievecaselist.ElasticSearchCaseRetrieverService;
 
 import java.util.List;
 

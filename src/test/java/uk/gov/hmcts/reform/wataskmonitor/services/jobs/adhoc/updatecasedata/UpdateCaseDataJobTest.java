@@ -34,6 +34,6 @@ class UpdateCaseDataJobTest {
     void run() {
         updateCaseDataJob.run("some service token");
 
-        Mockito.verify(updateCaseDataJobService).updateCaseData("some service token");
+        Mockito.verify(updateCaseDataJobService).updateCcdCases("some service token");
     }
 }

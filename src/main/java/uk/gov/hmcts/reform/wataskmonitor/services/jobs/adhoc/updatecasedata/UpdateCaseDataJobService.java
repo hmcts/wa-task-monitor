@@ -1,33 +1,68 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.updatecasedata;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.JobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.ElasticSearchRetrieverParameter;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCaseList;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.retrievecaselist.ElasticSearchCaseRetrieverService;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.updatecasedata.UpdateCaseJobOutcome;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.updatecasedata.UpdateCaseJobReport;
+import uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum;
+import uk.gov.hmcts.reform.wataskmonitor.services.retrievecaselist.ElasticSearchCaseRetrieverService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
+@Slf4j
 public class UpdateCaseDataJobService {
 
-    private final ElasticSearchCaseRetrieverService caseRetrieverService;
 
-    public UpdateCaseDataJobService(ElasticSearchCaseRetrieverService caseRetrieverService) {
+    private final ElasticSearchCaseRetrieverService caseRetrieverService;
+    private final ManagementCategoryDataService managementCategoryDataService;
+
+
+    public UpdateCaseDataJobService(ElasticSearchCaseRetrieverService caseRetrieverService,
+                                    ManagementCategoryDataService managementCategoryDataService) {
         this.caseRetrieverService = caseRetrieverService;
+        this.managementCategoryDataService = managementCategoryDataService;
     }
 
-    public JobReport updateCaseData(String serviceToken) {
+    public JobReport updateCcdCases(String serviceToken) {
         ElasticSearchCaseList searchCaseList = caseRetrieverService.retrieveCaseList(
             new ElasticSearchRetrieverParameter(
                 serviceToken,
                 ResourceEnum.AD_HOC_UPDATE_CASE_CCD_ELASTIC_SEARCH_QUERY
             ));
 
-        return updateCases(searchCaseList);
+        return updateCasesAndReturnReport(searchCaseList, serviceToken);
     }
 
-    private JobReport updateCases(ElasticSearchCaseList searchCaseList) {
-        return new CreateTaskJobReport(searchCaseList.getTotal(), null);
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    private JobReport updateCasesAndReturnReport(ElasticSearchCaseList searchCaseList, String serviceToken) {
+        log.info("Found {} cases to update...", searchCaseList.getTotal());
+        List<UpdateCaseJobOutcome> partialOutcomeList = new ArrayList<>();
+        searchCaseList.getCases().forEach(ccdCase -> {
+            UpdateCaseJobOutcome partialOutcome = updateCaseInCcdAndReturnOutcome(ccdCase.getId(), serviceToken);
+            log.info(partialOutcome.toString());
+            partialOutcomeList.add(partialOutcome);
+        });
+        return new UpdateCaseJobReport(searchCaseList.getTotal(), partialOutcomeList);
     }
+
+    private UpdateCaseJobOutcome updateCaseInCcdAndReturnOutcome(String caseId, String serviceToken) {
+        try {
+            return UpdateCaseJobOutcome.builder()
+                .updated(managementCategoryDataService.updateCaseInCcd(caseId, serviceToken))
+                .caseId(caseId)
+                .build();
+        } catch (Exception e) {
+            log.info("Error when updating case in CCD for caseId({}), we carry on...", caseId);
+            return UpdateCaseJobOutcome.builder()
+                .updated(false)
+                .caseId(caseId)
+                .build();
+        }
+    }
+
 }

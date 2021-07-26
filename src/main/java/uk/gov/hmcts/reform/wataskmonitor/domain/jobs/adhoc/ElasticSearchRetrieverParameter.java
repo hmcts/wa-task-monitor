@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.RetrieveCaseListParam;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum;
+import uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum;
 
 @ToString
 @EqualsAndHashCode(callSuper = false)

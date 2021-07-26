@@ -12,7 +12,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum.CONFIGURATION_JOB_SERVICE;
+import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CONFIGURATION_JOB_SERVICE;
 
 @Component
 @Slf4j
