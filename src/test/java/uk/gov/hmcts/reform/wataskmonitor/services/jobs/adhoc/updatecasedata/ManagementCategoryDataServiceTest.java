@@ -1,17 +1,16 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.updatecasedata;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.config.idam.IdamTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.idam.UserInfo;
 
@@ -20,14 +19,8 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-class ManagementCategoryDataServiceTest {
+class ManagementCategoryDataServiceTest extends UnitBaseTest {
 
-    public static final String SOME_USER_TOKEN = "some user token";
-    public static final String SOME_USER_ID = "some user id";
-    public static final String SOME_SERVICE_TOKEN = "some service token";
-    public static final String SOME_CASE_ID = "some case id";
-    public static final String SOME_ACCESS_TOKEN = "some access token";
     @Mock
     private CoreCaseDataApi coreCaseDataApi;
     @Mock

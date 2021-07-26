@@ -3,13 +3,12 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.createtasks;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
@@ -24,11 +23,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-class CreateTaskJobOutcomeServiceTest {
+class CreateTaskJobOutcomeServiceTest extends UnitBaseTest {
 
-    public static final String SOME_SERVICE_TOKEN = "some service token";
-    public static final String SOME_CASE_ID = "someCaseId";
     @Mock
     private CamundaClient camundaClient;
 
@@ -66,11 +62,11 @@ class CreateTaskJobOutcomeServiceTest {
 
         CreateTaskJobOutcome actual = createTaskJobOutcomeService.getJobOutcome(
             SOME_SERVICE_TOKEN,
-            SOME_CASE_ID
+            SOME_CASE_ID_1
         );
 
         assertThat(actual).isEqualTo(CreateTaskJobOutcome.builder()
-                                         .caseId(SOME_CASE_ID)
+                                         .caseId(SOME_CASE_ID_1)
                                          .created(false)
                                          .build());
     }
@@ -87,7 +83,7 @@ class CreateTaskJobOutcomeServiceTest {
 
         CreateTaskJobOutcome actual = createTaskJobOutcomeService.getJobOutcome(
             SOME_SERVICE_TOKEN,
-            SOME_CASE_ID
+            SOME_CASE_ID_1
         );
 
         assertThat(actual).isEqualTo(expectedOutcome);
@@ -104,7 +100,7 @@ class CreateTaskJobOutcomeServiceTest {
             CreateTaskJobOutcome.builder()
                 .taskId("some task id")
                 .processInstanceId("some process instance id")
-                .caseId(SOME_CASE_ID)
+                .caseId(SOME_CASE_ID_1)
                 .created(true)
                 .build()
         );
@@ -115,7 +111,7 @@ class CreateTaskJobOutcomeServiceTest {
                 "some process instance id"
             )),
             CreateTaskJobOutcome.builder()
-                .caseId(SOME_CASE_ID)
+                .caseId(SOME_CASE_ID_1)
                 .created(false)
                 .build()
         );
@@ -123,7 +119,7 @@ class CreateTaskJobOutcomeServiceTest {
         Arguments taskIsNotFoundScenario = Arguments.of(
             Collections.emptyList(),
             CreateTaskJobOutcome.builder()
-                .caseId(SOME_CASE_ID)
+                .caseId(SOME_CASE_ID_1)
                 .created(false)
                 .build()
         );
@@ -131,7 +127,7 @@ class CreateTaskJobOutcomeServiceTest {
         Arguments camundaTaskListIsNullScenario = Arguments.of(
             null,
             CreateTaskJobOutcome.builder()
-                .caseId(SOME_CASE_ID)
+                .caseId(SOME_CASE_ID_1)
                 .created(false)
                 .build()
         );

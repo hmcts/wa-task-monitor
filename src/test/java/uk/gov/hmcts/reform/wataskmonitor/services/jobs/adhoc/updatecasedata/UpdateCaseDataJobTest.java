@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.updatecasedata;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 
 import java.util.Arrays;
@@ -13,8 +12,7 @@ import java.util.Arrays;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_UPDATE_CASE_DATA;
 
-@ExtendWith(MockitoExtension.class)
-class UpdateCaseDataJobTest {
+class UpdateCaseDataJobTest extends UnitBaseTest {
 
     @Mock
     private UpdateCaseDataJobService updateCaseDataJobService;

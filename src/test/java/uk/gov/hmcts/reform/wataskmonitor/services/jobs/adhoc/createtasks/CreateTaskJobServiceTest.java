@@ -2,10 +2,9 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.createtasks;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler.EventInformation;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.ElasticSearchRetrieverParameter;
@@ -29,16 +28,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-class CreateTaskJobServiceTest {
+class CreateTaskJobServiceTest extends UnitBaseTest {
 
-    public static final String SOME_SERVICE_TOKEN = "some service token";
-    public static final String SOME_CASE_ID_1 = "some case id1";
-    public static final String SOME_CASE_ID_2 = "some case id2";
-    public static final String SOME_TASK_ID_1 = "some task id1";
-    private static final String SOME_TASK_ID_2 = "some task id2";
-    public static final String SOME_PROCESS_INSTANCE_ID_1 = "some process instance id1";
-    private static final String SOME_PROCESS_INSTANCE_ID_2 = "some process instance id2";
     @Mock
     private CaseEventHandlerClient caseEventHandlerClient;
     @Mock

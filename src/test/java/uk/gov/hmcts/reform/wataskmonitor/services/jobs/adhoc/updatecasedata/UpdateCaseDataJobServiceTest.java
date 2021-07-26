@@ -2,10 +2,9 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.updatecasedata;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.JobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.ElasticSearchRetrieverParameter;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCase;
@@ -21,12 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-class UpdateCaseDataJobServiceTest {
+class UpdateCaseDataJobServiceTest extends UnitBaseTest {
 
-    public static final String SOME_SERVICE_TOKEN = "some service token";
-    public static final String SOME_CASE_ID = "some case id";
-    public static final String SOME_OTHER_CASE_ID = "some other case id";
     @Mock
     private ElasticSearchCaseRetrieverService caseRetrieverService;
     @Mock
