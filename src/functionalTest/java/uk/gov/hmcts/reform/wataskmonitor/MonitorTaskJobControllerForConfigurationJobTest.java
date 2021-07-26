@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
@@ -13,10 +13,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
-class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootFunctionalBaseTest {
+public class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootFunctionalBaseTest {
 
     @Test
-    void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() {
+    public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() {
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .header("ServiceAuthorization", serviceToken)

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor.adhoc;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.SpringBootFunctionalBaseTest;
@@ -14,10 +14,10 @@ import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobC
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_UPDATE_CASE_DATA;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
-class MonitorTaskJobControllerForAdHocUpdateCasesTest extends SpringBootFunctionalBaseTest {
+public class MonitorTaskJobControllerForAdHocUpdateCasesTest extends SpringBootFunctionalBaseTest {
 
     @Test
-    void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() {
+    public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() {
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .header("ServiceAuthorization", serviceToken)

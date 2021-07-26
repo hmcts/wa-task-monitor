@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.wataskmonitor;
 
 import io.restassured.RestAssured;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,8 +28,8 @@ public class SpringBootFunctionalBaseTest {
     private AuthTokenGenerator authTokenGenerator;
     public String serviceToken;
 
-    @BeforeEach
-    void setUp() {
+    @Before
+    public void setUp() {
         RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();
 
@@ -37,7 +37,7 @@ public class SpringBootFunctionalBaseTest {
     }
 
     @Test
-    void givenMonitorTaskJobRequestWithNoServiceAuthenticationHeaderShouldReturnStatus401Response() {
+    public void givenMonitorTaskJobRequestWithNoServiceAuthenticationHeaderShouldReturnStatus401Response() {
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .when()
