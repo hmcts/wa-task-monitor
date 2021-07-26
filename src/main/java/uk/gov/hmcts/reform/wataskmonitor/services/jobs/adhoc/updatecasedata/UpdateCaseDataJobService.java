@@ -52,8 +52,9 @@ public class UpdateCaseDataJobService {
 
     private UpdateCaseJobOutcome updateCaseInCcdAndReturnOutcome(String caseId, String serviceToken) {
         try {
+            boolean updated = managementCategoryDataService.updateCaseInCcd(caseId, serviceToken);
             return UpdateCaseJobOutcome.builder()
-                .updated(managementCategoryDataService.updateCaseInCcd(caseId, serviceToken))
+                .updated(updated)
                 .caseId(caseId)
                 .build();
         } catch (Exception e) {

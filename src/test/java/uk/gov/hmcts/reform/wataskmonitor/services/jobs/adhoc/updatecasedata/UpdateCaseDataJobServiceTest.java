@@ -78,8 +78,10 @@ class UpdateCaseDataJobServiceTest {
     @Test
     void givenExceptionShouldCatchItAndContinue() {
         when(managementCategoryDataService.updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN))
-            .thenReturn(true)
-            .thenThrow(new RuntimeException("some exception"));
+            .thenReturn(true);
+
+        when(managementCategoryDataService.updateCaseInCcd(SOME_OTHER_CASE_ID, SOME_SERVICE_TOKEN))
+            .thenThrow(new RuntimeException("some error"));
 
         JobReport actual = updateCaseDataJobService.updateCcdCases(SOME_SERVICE_TOKEN);
 
