@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.termination;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
 
@@ -13,13 +12,10 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TERMI
 @Component
 public class TerminationJob implements JobService {
     private final TerminationJobService terminationJobService;
-    private final AuthTokenGenerator authTokenGenerator;
 
     @Autowired
-    public TerminationJob(TerminationJobService terminationJobService,
-                          AuthTokenGenerator authTokenGenerator) {
+    public TerminationJob(TerminationJobService terminationJobService) {
         this.terminationJobService = terminationJobService;
-        this.authTokenGenerator = authTokenGenerator;
     }
 
     @Override
@@ -28,9 +24,10 @@ public class TerminationJob implements JobService {
     }
 
     @Override
-    public void run() {
+    public void run(String serviceToken) {
         log.info("Starting task termination job.");
-        terminationJobService.terminateTasks(authTokenGenerator.generate());
+        terminationJobService.terminateTasks(serviceToken);
         log.info("Task termination job completed successfully.");
+
     }
 }

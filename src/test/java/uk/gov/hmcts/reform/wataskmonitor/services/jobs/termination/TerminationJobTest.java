@@ -7,19 +7,15 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TerminationJobTest {
 
     public static final String SERVICE_TOKEN = "some s2s token";
-    @Mock
-    private AuthTokenGenerator authTokenGenerator;
     @Mock
     private TerminationJobService terminationJobService;
     @InjectMocks
@@ -38,9 +34,7 @@ class TerminationJobTest {
 
     @Test
     void run() {
-        when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
-        terminationJob.run();
-        verify(authTokenGenerator).generate();
+        terminationJob.run(SERVICE_TOKEN);
         verify(terminationJobService).terminateTasks(SERVICE_TOKEN);
     }
 }
