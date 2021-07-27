@@ -19,13 +19,13 @@ public class UpdateCaseDataJobService {
 
 
     private final ElasticSearchCaseRetrieverService caseRetrieverService;
-    private final ManagementCategoryDataService managementCategoryDataService;
+    private final CaseManagementDataService caseManagementDataService;
 
 
     public UpdateCaseDataJobService(ElasticSearchCaseRetrieverService caseRetrieverService,
-                                    ManagementCategoryDataService managementCategoryDataService) {
+                                    CaseManagementDataService caseManagementDataService) {
         this.caseRetrieverService = caseRetrieverService;
-        this.managementCategoryDataService = managementCategoryDataService;
+        this.caseManagementDataService = caseManagementDataService;
     }
 
     public JobReport updateCcdCases(String serviceToken) {
@@ -52,7 +52,7 @@ public class UpdateCaseDataJobService {
 
     private UpdateCaseJobOutcome updateCaseInCcdAndReturnOutcome(String caseId, String serviceToken) {
         try {
-            boolean updated = managementCategoryDataService.updateCaseInCcd(caseId, serviceToken);
+            boolean updated = caseManagementDataService.updateCaseInCcd(caseId, serviceToken);
             return UpdateCaseJobOutcome.builder()
                 .updated(updated)
                 .caseId(caseId)

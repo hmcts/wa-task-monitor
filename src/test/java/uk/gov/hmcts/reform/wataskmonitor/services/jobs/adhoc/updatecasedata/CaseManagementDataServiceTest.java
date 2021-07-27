@@ -19,7 +19,7 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-class ManagementCategoryDataServiceTest extends UnitBaseTest {
+class CaseManagementDataServiceTest extends UnitBaseTest {
 
     @Mock
     private CoreCaseDataApi coreCaseDataApi;
@@ -27,7 +27,7 @@ class ManagementCategoryDataServiceTest extends UnitBaseTest {
     private IdamTokenGenerator idamTokenGenerator;
 
     @InjectMocks
-    private ManagementCategoryDataService managementCategoryDataService;
+    private CaseManagementDataService caseManagementDataService;
 
     @BeforeEach
     void setUp() {
@@ -66,20 +66,20 @@ class ManagementCategoryDataServiceTest extends UnitBaseTest {
             true,
             CaseDataContent.builder()
                 .event(Event.builder()
-                           .id(ManagementCategoryDataService.EVENT_ID)
-                           .summary(ManagementCategoryDataService.EVENT_SUMMARY)
-                           .description(ManagementCategoryDataService.EVEN_DESCRIPTION)
+                           .id(CaseManagementDataService.EVENT_ID)
+                           .summary(CaseManagementDataService.EVENT_SUMMARY)
+                           .description(CaseManagementDataService.EVEN_DESCRIPTION)
                            .build())
                 .eventToken(SOME_ACCESS_TOKEN)
                 .build()
         )).thenReturn(CaseDetails.builder()
                           .data(Collections.singletonMap(
-                              ManagementCategoryDataService.CASE_MANAGEMENT_CATEGORY_FIELD_NAME,
+                              CaseManagementDataService.CASE_MANAGEMENT_CATEGORY_FIELD_NAME,
                               someData
                           ))
                           .build());
 
-        boolean actual = managementCategoryDataService.updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN);
+        boolean actual = caseManagementDataService.updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN);
 
         assertThat(actual).isEqualTo(expected);
     }

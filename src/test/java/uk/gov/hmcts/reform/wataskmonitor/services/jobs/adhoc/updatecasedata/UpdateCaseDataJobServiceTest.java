@@ -25,7 +25,7 @@ class UpdateCaseDataJobServiceTest extends UnitBaseTest {
     @Mock
     private ElasticSearchCaseRetrieverService caseRetrieverService;
     @Mock
-    private ManagementCategoryDataService managementCategoryDataService;
+    private CaseManagementDataService caseManagementDataService;
 
     @InjectMocks
     private UpdateCaseDataJobService updateCaseDataJobService;
@@ -46,7 +46,7 @@ class UpdateCaseDataJobServiceTest extends UnitBaseTest {
 
     @Test
     void updateCaseData() {
-        when(managementCategoryDataService.updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN))
+        when(caseManagementDataService.updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN))
             .thenReturn(true, false);
 
         JobReport actual = updateCaseDataJobService.updateCcdCases(SOME_SERVICE_TOKEN);
@@ -66,16 +66,16 @@ class UpdateCaseDataJobServiceTest extends UnitBaseTest {
         ));
 
         verify(caseRetrieverService).retrieveCaseList(expectedElasticSearchParameter);
-        verify(managementCategoryDataService).updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN);
-        verify(managementCategoryDataService).updateCaseInCcd(SOME_OTHER_CASE_ID, SOME_SERVICE_TOKEN);
+        verify(caseManagementDataService).updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN);
+        verify(caseManagementDataService).updateCaseInCcd(SOME_OTHER_CASE_ID, SOME_SERVICE_TOKEN);
     }
 
     @Test
     void givenExceptionShouldCatchItAndContinue() {
-        when(managementCategoryDataService.updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN))
+        when(caseManagementDataService.updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN))
             .thenReturn(true);
 
-        when(managementCategoryDataService.updateCaseInCcd(SOME_OTHER_CASE_ID, SOME_SERVICE_TOKEN))
+        when(caseManagementDataService.updateCaseInCcd(SOME_OTHER_CASE_ID, SOME_SERVICE_TOKEN))
             .thenThrow(new RuntimeException("some error"));
 
         JobReport actual = updateCaseDataJobService.updateCcdCases(SOME_SERVICE_TOKEN);
@@ -95,7 +95,7 @@ class UpdateCaseDataJobServiceTest extends UnitBaseTest {
         ));
 
         verify(caseRetrieverService).retrieveCaseList(expectedElasticSearchParameter);
-        verify(managementCategoryDataService).updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN);
-        verify(managementCategoryDataService).updateCaseInCcd(SOME_OTHER_CASE_ID, SOME_SERVICE_TOKEN);
+        verify(caseManagementDataService).updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN);
+        verify(caseManagementDataService).updateCaseInCcd(SOME_OTHER_CASE_ID, SOME_SERVICE_TOKEN);
     }
 }

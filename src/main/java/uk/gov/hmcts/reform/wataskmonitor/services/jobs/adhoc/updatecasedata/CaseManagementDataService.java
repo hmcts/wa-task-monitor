@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.idam.UserInfo;
 import uk.gov.hmcts.reform.wataskmonitor.services.UpdateCaseDataService;
 
 @Component
-public class ManagementCategoryDataService implements UpdateCaseDataService {
+public class CaseManagementDataService implements UpdateCaseDataService {
 
     public static final String EVEN_DESCRIPTION =
         "caseManagementCategory data added by WA-TASK-MONITOR service and AD_HOC_UPDATE_CASE_DATA job";
@@ -22,8 +22,8 @@ public class ManagementCategoryDataService implements UpdateCaseDataService {
     private final CoreCaseDataApi coreCaseDataApi;
     private final IdamTokenGenerator systemUserIdamToken;
 
-    public ManagementCategoryDataService(CoreCaseDataApi coreCaseDataApi,
-                                         IdamTokenGenerator systemUserIdamToken) {
+    public CaseManagementDataService(CoreCaseDataApi coreCaseDataApi,
+                                     IdamTokenGenerator systemUserIdamToken) {
         this.coreCaseDataApi = coreCaseDataApi;
         this.systemUserIdamToken = systemUserIdamToken;
     }
