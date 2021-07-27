@@ -51,7 +51,7 @@ class ManagementCategoryDataServiceTest extends UnitBaseTest {
             "IA",
             "Asylum",
             SOME_CASE_ID,
-            "editAppealAfterSubmit"
+            "adminCaseUpdate"
         )).thenReturn(StartEventResponse.builder()
                           .token(SOME_ACCESS_TOKEN)
                           .build());

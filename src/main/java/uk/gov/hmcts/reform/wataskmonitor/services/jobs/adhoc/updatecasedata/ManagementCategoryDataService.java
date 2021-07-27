@@ -16,7 +16,7 @@ public class ManagementCategoryDataService implements UpdateCaseDataService {
     public static final String EVEN_DESCRIPTION =
         "caseManagementCategory data added by WA-TASK-MONITOR service and AD_HOC_UPDATE_CASE_DATA job";
     public static final String EVENT_SUMMARY = "caseManagementCategory data added by WA-TASK-MONITOR service";
-    public static final String EVENT_ID = "editAppealAfterSubmit";
+    public static final String EVENT_ID = "adminCaseUpdate";
     public static final String CASE_MANAGEMENT_CATEGORY_FIELD_NAME = "caseManagementCategory";
 
     private final CoreCaseDataApi coreCaseDataApi;
