@@ -4,14 +4,13 @@ import feign.FeignException;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
@@ -33,10 +32,8 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.en
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.COMPLETED;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-@ExtendWith(MockitoExtension.class)
-class TerminationJobServiceTest {
+class TerminationJobServiceTest extends UnitBaseTest {
 
-    public static final String SERVICE_TOKEN = "some service token";
     @Mock
     private CamundaClient camundaClient;
 
@@ -54,13 +51,13 @@ class TerminationJobServiceTest {
         doThrow(FeignException.GatewayTimeout.class)
             .when(camundaClient)
             .getTasksFromHistory(
-                eq(SERVICE_TOKEN),
+                eq(SOME_SERVICE_TOKEN),
                 eq("0"),
                 eq("1000"),
                 any()
             );
 
-        assertThatThrownBy(() -> terminationJobService.terminateTasks(SERVICE_TOKEN))
+        assertThatThrownBy(() -> terminationJobService.terminateTasks(SOME_SERVICE_TOKEN))
             .isInstanceOf(FeignException.class)
             .hasNoCause();
     }
@@ -70,13 +67,13 @@ class TerminationJobServiceTest {
     void shouldSucceedWhenNoTasksReturned() throws JSONException {
 
         when(camundaClient.getTasksFromHistory(
-            eq(SERVICE_TOKEN),
+            eq(SOME_SERVICE_TOKEN),
             eq("0"),
             eq("1000"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(Collections.emptyList());
 
-        terminationJobService.terminateTasks(SERVICE_TOKEN);
+        terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
         assertQuery();
         verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 0);
@@ -92,13 +89,13 @@ class TerminationJobServiceTest {
         );
 
         when(camundaClient.getTasksFromHistory(
-            eq(SERVICE_TOKEN),
+            eq(SOME_SERVICE_TOKEN),
             eq("0"),
             eq("1000"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
-        terminationJobService.terminateTasks(SERVICE_TOKEN);
+        terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
         assertQuery();
         verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 1);
@@ -113,13 +110,13 @@ class TerminationJobServiceTest {
         );
 
         when(camundaClient.getTasksFromHistory(
-            eq(SERVICE_TOKEN),
+            eq(SOME_SERVICE_TOKEN),
             eq("0"),
             eq("1000"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
-        terminationJobService.terminateTasks(SERVICE_TOKEN);
+        terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
         assertQuery();
         verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 1);
@@ -133,13 +130,13 @@ class TerminationJobServiceTest {
         );
 
         when(camundaClient.getTasksFromHistory(
-            eq(SERVICE_TOKEN),
+            eq(SOME_SERVICE_TOKEN),
             eq("0"),
             eq("1000"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
-        terminationJobService.terminateTasks(SERVICE_TOKEN);
+        terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
         assertQuery();
         verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 0);
@@ -149,7 +146,7 @@ class TerminationJobServiceTest {
     private void verifyTerminateEndpointWasCalledWithTerminateReason(TerminateReason terminateReason,
                                                                      int times) {
         TerminateTaskRequest request = new TerminateTaskRequest(new TerminateInfo(terminateReason));
-        verify(taskManagementClient, times(times)).terminateTask(eq(SERVICE_TOKEN), any(), eq(request));
+        verify(taskManagementClient, times(times)).terminateTask(eq(SOME_SERVICE_TOKEN), any(), eq(request));
     }
 
     private void assertQuery() throws JSONException {

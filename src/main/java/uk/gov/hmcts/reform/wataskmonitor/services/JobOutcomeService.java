@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.jobs;
+package uk.gov.hmcts.reform.wataskmonitor.services;
 
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.JobOutcome;
 

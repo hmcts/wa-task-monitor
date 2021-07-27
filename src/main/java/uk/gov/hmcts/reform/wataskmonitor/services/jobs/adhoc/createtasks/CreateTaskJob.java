@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
+import uk.gov.hmcts.reform.wataskmonitor.services.JobService;
 
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_CREATE_TASKS;
 import static uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility.logPrettyPrint;
@@ -28,8 +28,8 @@ public class CreateTaskJob implements JobService {
     @Override
     public void run(String serviceToken) {
         log.info("Starting '{}'", AD_HOC_CREATE_TASKS);
-        CreateTaskJobReport tasks = createTaskJobService.createTasks(serviceToken);
-        log.info("{} finished successfully: {}", AD_HOC_CREATE_TASKS, logPrettyPrint(tasks));
+        CreateTaskJobReport taskJobReport = createTaskJobService.createTasks(serviceToken);
+        log.info("{} finished successfully: {}", AD_HOC_CREATE_TASKS, logPrettyPrint(taskJobReport));
     }
 
 }

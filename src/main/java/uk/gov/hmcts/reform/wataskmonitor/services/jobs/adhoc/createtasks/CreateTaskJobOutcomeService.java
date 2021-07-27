@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
+import uk.gov.hmcts.reform.wataskmonitor.services.JobOutcomeService;
 
 import java.util.List;
 

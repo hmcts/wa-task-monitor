@@ -2,18 +2,19 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.createtasks;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler.EventInformation;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.ElasticSearchRetrieverParameter;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCase;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCaseList;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchRetrieverParameter;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobOutcomeService;
+import uk.gov.hmcts.reform.wataskmonitor.services.JobOutcomeService;
+import uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum;
+import uk.gov.hmcts.reform.wataskmonitor.services.retrievecaselist.ElasticSearchCaseRetrieverService;
 
 import java.util.List;
 
@@ -27,16 +28,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-class CreateTaskJobServiceTest {
+class CreateTaskJobServiceTest extends UnitBaseTest {
 
-    public static final String SOME_SERVICE_TOKEN = "some service token";
-    public static final String SOME_CASE_ID_1 = "some case id1";
-    public static final String SOME_CASE_ID_2 = "some case id2";
-    public static final String SOME_TASK_ID_1 = "some task id1";
-    private static final String SOME_TASK_ID_2 = "some task id2";
-    public static final String SOME_PROCESS_INSTANCE_ID_1 = "some process instance id1";
-    private static final String SOME_PROCESS_INSTANCE_ID_2 = "some process instance id2";
     @Mock
     private CaseEventHandlerClient caseEventHandlerClient;
     @Mock
@@ -49,12 +42,13 @@ class CreateTaskJobServiceTest {
 
     @Test
     void givenCaseEventHandlerThrowsExceptionShouldHandleIt() {
-        when(elasticSearchCaseRetrieverService.retrieveCaseList(
-            new ElasticSearchRetrieverParameter(SOME_SERVICE_TOKEN)))
-            .thenReturn(new ElasticSearchCaseList(2, List.of(
-                new ElasticSearchCase(SOME_CASE_ID_1),
-                new ElasticSearchCase(SOME_CASE_ID_2)
-            )));
+        when(elasticSearchCaseRetrieverService.retrieveCaseList(new ElasticSearchRetrieverParameter(
+            SOME_SERVICE_TOKEN,
+            ResourceEnum.AD_HOC_CREATE_TASKS_CCD_ELASTIC_SEARCH_QUERY
+        ))).thenReturn(new ElasticSearchCaseList(2, List.of(
+            new ElasticSearchCase(SOME_CASE_ID_1),
+            new ElasticSearchCase(SOME_CASE_ID_2)
+        )));
 
         when(caseEventHandlerClient.sendMessage(eq(SOME_SERVICE_TOKEN), any(EventInformation.class)))
             .thenThrow(new RuntimeException("some exception"));
@@ -103,12 +97,13 @@ class CreateTaskJobServiceTest {
         when(createTaskJobOutcomeService.getJobOutcome(eq(SOME_SERVICE_TOKEN), eq(SOME_CASE_ID_2)))
             .thenReturn(taskJobOutcome2);
 
-        when(elasticSearchCaseRetrieverService.retrieveCaseList(
-            new ElasticSearchRetrieverParameter(SOME_SERVICE_TOKEN)))
-            .thenReturn(new ElasticSearchCaseList(2, List.of(
-                new ElasticSearchCase(SOME_CASE_ID_1),
-                new ElasticSearchCase(SOME_CASE_ID_2)
-            )));
+        when(elasticSearchCaseRetrieverService.retrieveCaseList(new ElasticSearchRetrieverParameter(
+            SOME_SERVICE_TOKEN,
+            ResourceEnum.AD_HOC_CREATE_TASKS_CCD_ELASTIC_SEARCH_QUERY
+        ))).thenReturn(new ElasticSearchCaseList(2, List.of(
+            new ElasticSearchCase(SOME_CASE_ID_1),
+            new ElasticSearchCase(SOME_CASE_ID_2)
+        )));
 
         CreateTaskJobReport actual = createTaskJobService.createTasks(SOME_SERVICE_TOKEN);
 

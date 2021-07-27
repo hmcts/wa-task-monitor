@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.CANCELLED;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.COMPLETED;
-import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum.CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION;
+import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION;
 
 @Slf4j
 @Component

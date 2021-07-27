@@ -1,9 +1,10 @@
-package uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks;
+package uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.RetrieveCaseListParam;
+import uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum;
 
 @ToString
 @EqualsAndHashCode(callSuper = false)
@@ -11,9 +12,11 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.RetrieveCaseListParam;
 public class ElasticSearchRetrieverParameter extends RetrieveCaseListParam {
 
     private final String serviceAuthentication;
+    private final ResourceEnum resourceEnum;
 
-    public ElasticSearchRetrieverParameter(String serviceAuthentication) {
+    public ElasticSearchRetrieverParameter(String serviceAuthentication, ResourceEnum resourceEnum) {
         super();
         this.serviceAuthentication = serviceAuthentication;
+        this.resourceEnum = resourceEnum;
     }
 }

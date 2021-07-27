@@ -1,21 +1,18 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.termination;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
-class TerminationJobTest {
+class TerminationJobTest extends UnitBaseTest {
 
-    public static final String SERVICE_TOKEN = "some s2s token";
     @Mock
     private TerminationJobService terminationJobService;
     @InjectMocks
@@ -34,7 +31,7 @@ class TerminationJobTest {
 
     @Test
     void run() {
-        terminationJob.run(SERVICE_TOKEN);
-        verify(terminationJobService).terminateTasks(SERVICE_TOKEN);
+        terminationJob.run(SOME_SERVICE_TOKEN);
+        verify(terminationJobService).terminateTasks(SOME_SERVICE_TOKEN);
     }
 }

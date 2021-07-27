@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
-import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum.CAMUNDA_TASKS_UNCONFIGURED;
+import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_TASKS_UNCONFIGURED;
 
 @Component
 @Slf4j
