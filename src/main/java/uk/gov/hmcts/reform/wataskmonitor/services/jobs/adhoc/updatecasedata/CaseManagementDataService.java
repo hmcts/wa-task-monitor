@@ -6,12 +6,10 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.wataskmonitor.config.idam.IdamTokenGenerator;
-import uk.gov.hmcts.reform.wataskmonitor.domain.idam.UserInfo;
 import uk.gov.hmcts.reform.wataskmonitor.services.UpdateCaseDataService;
 
 @Component
-public class CaseManagementDataService implements UpdateCaseDataService {
+public class CaseManagementDataService implements UpdateCaseDataService<CaseManagementDataParameter> {
 
     public static final String EVEN_DESCRIPTION =
         "caseManagementCategory data added by WA-TASK-MONITOR service and AD_HOC_UPDATE_CASE_DATA job";
@@ -20,36 +18,30 @@ public class CaseManagementDataService implements UpdateCaseDataService {
     public static final String CASE_MANAGEMENT_CATEGORY_FIELD_NAME = "caseManagementCategory";
 
     private final CoreCaseDataApi coreCaseDataApi;
-    private final IdamTokenGenerator systemUserIdamToken;
 
-    public CaseManagementDataService(CoreCaseDataApi coreCaseDataApi,
-                                     IdamTokenGenerator systemUserIdamToken) {
+    public CaseManagementDataService(CoreCaseDataApi coreCaseDataApi) {
         this.coreCaseDataApi = coreCaseDataApi;
-        this.systemUserIdamToken = systemUserIdamToken;
     }
 
     @Override
-    public boolean updateCaseInCcd(String caseId, String serviceToken) {
-        String userToken = systemUserIdamToken.generate();
-        UserInfo userInfo = systemUserIdamToken.getUserInfo(userToken);
-
+    public boolean updateCaseInCcd(CaseManagementDataParameter parameter) {
         StartEventResponse startEventResponse = coreCaseDataApi.startEventForCaseWorker(
-            userToken,
-            serviceToken,
-            userInfo.getUid(),
+            parameter.getUserAuthorization(),
+            parameter.getServiceAuthorization(),
+            parameter.getUserId(),
             "IA",
             "Asylum",
-            caseId,
+            parameter.getCaseId(),
             EVENT_ID
         );
 
         CaseDetails result = coreCaseDataApi.submitEventForCaseWorker(
-            userToken,
-            serviceToken,
-            userInfo.getUid(),
+            parameter.getUserAuthorization(),
+            parameter.getServiceAuthorization(),
+            parameter.getUserId(),
             "IA",
             "Asylum",
-            caseId,
+            parameter.getCaseId(),
             true,
             CaseDataContent.builder()
                 .event(Event.builder()

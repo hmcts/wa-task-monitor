@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
+import uk.gov.hmcts.reform.wataskmonitor.config.idam.IdamTokenGenerator;
+import uk.gov.hmcts.reform.wataskmonitor.domain.idam.UserInfo;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.JobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.ElasticSearchRetrieverParameter;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCase;
@@ -26,27 +28,42 @@ class UpdateCaseDataJobServiceTest extends UnitBaseTest {
     private ElasticSearchCaseRetrieverService caseRetrieverService;
     @Mock
     private CaseManagementDataService caseManagementDataService;
-
+    @Mock
+    private IdamTokenGenerator systemUserIdamToken;
     @InjectMocks
     private UpdateCaseDataJobService updateCaseDataJobService;
+
     private ElasticSearchRetrieverParameter expectedElasticSearchParameter;
+    private CaseManagementDataParameter expectedCaseManagementDataParameter;
 
     @BeforeEach
+    @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName")
     void setUp() {
         expectedElasticSearchParameter = new ElasticSearchRetrieverParameter(
             SOME_SERVICE_TOKEN,
             ResourceEnum.AD_HOC_UPDATE_CASE_CCD_ELASTIC_SEARCH_QUERY
         );
+
+        expectedCaseManagementDataParameter = CaseManagementDataParameter.builder()
+            .userId(SOME_USER_ID)
+            .serviceAuthorization(SOME_SERVICE_TOKEN)
+            .userAuthorization(SOME_USER_TOKEN)
+            .caseId(SOME_CASE_ID)
+            .build();
         when(caseRetrieverService.retrieveCaseList(expectedElasticSearchParameter))
             .thenReturn(new ElasticSearchCaseList(
                 2,
                 List.of(new ElasticSearchCase(SOME_CASE_ID), new ElasticSearchCase(SOME_OTHER_CASE_ID))
             ));
+
+        when(systemUserIdamToken.generate()).thenReturn(SOME_USER_TOKEN);
+        when(systemUserIdamToken.getUserInfo(SOME_USER_TOKEN)).thenReturn(UserInfo.builder().uid(SOME_USER_ID).build());
     }
 
     @Test
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     void updateCaseData() {
-        when(caseManagementDataService.updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN))
+        when(caseManagementDataService.updateCaseInCcd(expectedCaseManagementDataParameter))
             .thenReturn(true, false);
 
         JobReport actual = updateCaseDataJobService.updateCcdCases(SOME_SERVICE_TOKEN);
@@ -66,16 +83,14 @@ class UpdateCaseDataJobServiceTest extends UnitBaseTest {
         ));
 
         verify(caseRetrieverService).retrieveCaseList(expectedElasticSearchParameter);
-        verify(caseManagementDataService).updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN);
-        verify(caseManagementDataService).updateCaseInCcd(SOME_OTHER_CASE_ID, SOME_SERVICE_TOKEN);
+        verify(caseManagementDataService).updateCaseInCcd(expectedCaseManagementDataParameter);
+        verify(caseManagementDataService).updateCaseInCcd(expectedCaseManagementDataParameter);
     }
 
     @Test
     void givenExceptionShouldCatchItAndContinue() {
-        when(caseManagementDataService.updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN))
-            .thenReturn(true);
-
-        when(caseManagementDataService.updateCaseInCcd(SOME_OTHER_CASE_ID, SOME_SERVICE_TOKEN))
+        when(caseManagementDataService.updateCaseInCcd(expectedCaseManagementDataParameter))
+            .thenReturn(true)
             .thenThrow(new RuntimeException("some error"));
 
         JobReport actual = updateCaseDataJobService.updateCcdCases(SOME_SERVICE_TOKEN);
@@ -95,7 +110,7 @@ class UpdateCaseDataJobServiceTest extends UnitBaseTest {
         ));
 
         verify(caseRetrieverService).retrieveCaseList(expectedElasticSearchParameter);
-        verify(caseManagementDataService).updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN);
-        verify(caseManagementDataService).updateCaseInCcd(SOME_OTHER_CASE_ID, SOME_SERVICE_TOKEN);
+        verify(caseManagementDataService).updateCaseInCcd(expectedCaseManagementDataParameter);
+        verify(caseManagementDataService).updateCaseInCcd(expectedCaseManagementDataParameter);
     }
 }

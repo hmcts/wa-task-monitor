@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.wataskmonitor.services;
 
-public interface UpdateCaseDataService {
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.updatecasedata.UpdateCaseDataParameter;
 
-    boolean updateCaseInCcd(String caseId, String serviceToken);
+public interface UpdateCaseDataService<T extends UpdateCaseDataParameter> {
+
+    boolean updateCaseInCcd(T parameter);
 }
