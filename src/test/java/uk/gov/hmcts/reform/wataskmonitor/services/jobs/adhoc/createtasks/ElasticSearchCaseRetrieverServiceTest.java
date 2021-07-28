@@ -46,6 +46,7 @@ class ElasticSearchCaseRetrieverServiceTest extends UnitBaseTest {
         );
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private String getExpectation(ResourceEnum resourceEnum) {
         switch (resourceEnum) {
             case AD_HOC_CREATE_TASKS_CCD_ELASTIC_SEARCH_QUERY:
