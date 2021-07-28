@@ -1,11 +1,23 @@
 {
   "query": {
     "bool": {
-      "must_not": {
-        "exists": {
-          "field": "data.caseManagementCategory"
+      "must_not": [
+        {
+          "exists": {
+            "field": "data.caseManagementCategory"
+          }
+        },
+        {
+          "match": {
+            "state": "ended"
+          }
+        },
+        {
+          "match": {
+            "state": "appealTakenOffline"
+          }
         }
-      }
+      ]
     }
   }
 }
