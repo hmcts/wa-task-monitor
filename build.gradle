@@ -82,13 +82,13 @@ tasks.withType(JavaCompile) {
 }
 
 tasks.withType(Test) {
+  useJUnitPlatform()
   testLogging {
     exceptionFormat = 'full'
   }
 }
 
 test {
-  useJUnitPlatform()
   failFast = true
 }
 
@@ -236,8 +236,6 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: versions.springFrameworkCloud
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.0.3'
 
-  implementation 'org.springframework.security:spring-security-test'
-
   implementation group: 'io.springfox', name: 'springfox-boot-starter', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
@@ -256,6 +254,7 @@ dependencies {
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+  testImplementation 'org.springframework.security:spring-security-test'
 
   testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
