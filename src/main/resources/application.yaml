@@ -12,6 +12,8 @@ management:
         include: health, info, prometheus
 
 spring:
+  config:
+    import: "optional:configtree:/mnt/secrets/wa/"
   jackson.serialization.INDENT_OUTPUT: true
   application:
     name: WA Task monitor
