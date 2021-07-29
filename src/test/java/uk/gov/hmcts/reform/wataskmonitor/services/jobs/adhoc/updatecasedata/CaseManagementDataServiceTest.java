@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.updatecasedata;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
@@ -11,8 +10,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
-import uk.gov.hmcts.reform.wataskmonitor.config.idam.IdamTokenGenerator;
-import uk.gov.hmcts.reform.wataskmonitor.domain.idam.UserInfo;
 
 import java.util.Collections;
 
@@ -23,26 +20,16 @@ class CaseManagementDataServiceTest extends UnitBaseTest {
 
     @Mock
     private CoreCaseDataApi coreCaseDataApi;
-    @Mock
-    private IdamTokenGenerator idamTokenGenerator;
 
     @InjectMocks
     private CaseManagementDataService caseManagementDataService;
-
-    @BeforeEach
-    void setUp() {
-        when(idamTokenGenerator.generate()).thenReturn(SOME_USER_TOKEN);
-        when(idamTokenGenerator.getUserInfo(SOME_USER_TOKEN))
-            .thenReturn(UserInfo.builder()
-                            .uid(SOME_USER_ID)
-                            .build());
-    }
 
     @ParameterizedTest
     @CsvSource({
         "some data, true",
         ",false"
     })
+    @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName")
     void updateCaseInCcd(String someData, boolean expected) {
         when(coreCaseDataApi.startEventForCaseWorker(
             SOME_USER_TOKEN,
@@ -79,7 +66,12 @@ class CaseManagementDataServiceTest extends UnitBaseTest {
                           ))
                           .build());
 
-        boolean actual = caseManagementDataService.updateCaseInCcd(SOME_CASE_ID, SOME_SERVICE_TOKEN);
+        boolean actual = caseManagementDataService.updateCaseInCcd(CaseManagementDataParameter.builder()
+                                                                       .caseId(SOME_CASE_ID)
+                                                                       .userAuthorization(SOME_USER_TOKEN)
+                                                                       .serviceAuthorization(SOME_SERVICE_TOKEN)
+                                                                       .userId(SOME_USER_ID)
+                                                                       .build());
 
         assertThat(actual).isEqualTo(expected);
     }

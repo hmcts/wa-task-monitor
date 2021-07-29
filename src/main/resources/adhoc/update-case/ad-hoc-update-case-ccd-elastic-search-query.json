@@ -9,15 +9,19 @@
         },
         {
           "match": {
-            "state": "ended"
+            "state": "appealTakenOffline"
           }
         },
         {
           "match": {
-            "state": "appealTakenOffline"
+            "state": "ended"
           }
         }
       ]
     }
-  }
+  },
+  "_source": [
+    "id"
+  ],
+  "size": 1000
 }
