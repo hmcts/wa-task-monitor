@@ -83,6 +83,7 @@ tasks.withType(JavaCompile) {
 
 tasks.withType(Test) {
   useJUnitPlatform()
+
   testLogging {
     exceptionFormat = 'full'
   }
@@ -253,7 +254,11 @@ dependencies {
   implementation group: 'org.awaitility', name: 'awaitility', version: '4.1.0'
 
   testImplementation libraries.junit5
-  testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+  testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
+    exclude group: 'junit', module: 'junit'
+    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+  }
+  testImplementation "org.junit.vintage:junit-vintage-engine:${versions.junit}"
   testImplementation 'org.springframework.security:spring-security-test'
 
   testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity

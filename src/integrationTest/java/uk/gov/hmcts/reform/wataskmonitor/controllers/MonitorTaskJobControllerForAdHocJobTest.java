@@ -43,7 +43,6 @@ class MonitorTaskJobControllerForAdHocJobTest extends SpringBootIntegrationBaseT
         MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(
             AD_HOC_DELETE_PROCESS_INSTANCES));
 
-        System.out.println("content: " + TestUtility.asJsonString(monitorTaskJobReq));
         mockMvc.perform(
             post("/monitor/tasks/jobs")
                 .contentType(MediaType.APPLICATION_JSON)
