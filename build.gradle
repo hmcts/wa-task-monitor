@@ -210,7 +210,6 @@ def versions = [
   junit               : '5.7.2',
   junitPlatform       : '1.7.2',
   reformLogging       : '5.1.7',
-  springBoot          : springBoot.class.package.implementationVersion,
   springfoxSwagger    : '3.0.0',
   serenity            : '2.2.12',
   springFrameworkCloud: '2.2.8.RELEASE'
@@ -231,8 +230,8 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
-  implementation 'org.springframework.boot:spring-boot-starter-security'
-  implementation('org.springframework.boot:spring-boot-starter-validation')
+  implementation 'org.springframework.boot:spring-boot-starter-security:2.5.3'
+  implementation 'org.springframework.boot:spring-boot-starter-validation:2.5.3'
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: versions.springFrameworkCloud
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.0.3'
@@ -259,14 +258,14 @@ dependencies {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
   testImplementation "org.junit.vintage:junit-vintage-engine:${versions.junit}"
-  testImplementation 'org.springframework.security:spring-security-test'
+  testImplementation 'org.springframework.security:spring-security-test:5.5.1'
 
   testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
 
-  testImplementation "com.github.tomakehurst:wiremock-jre8:2.28.0"
+  testImplementation 'com.github.tomakehurst:wiremock-jre8:2.29.1'
   testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
   testCompile group: 'pl.pojo', name: 'pojo-tester', version: '0.7.6'
 
