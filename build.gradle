@@ -203,6 +203,7 @@ repositories {
   mavenLocal()
   mavenCentral()
   maven { url 'https://jitpack.io' }
+  //noinspection JCenterRepository
   jcenter()
 }
 
@@ -212,7 +213,7 @@ def versions = [
   reformLogging       : '5.1.7',
   springfoxSwagger    : '3.0.0',
   serenity            : '2.2.12',
-  springFrameworkCloud: '2.2.8.RELEASE'
+  springFrameworkCloud: '2.2.9.RELEASE'
 ]
 
 ext.libraries = [
