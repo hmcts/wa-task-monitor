@@ -4,14 +4,13 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
@@ -28,10 +27,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-class ConfigurationJobTestService {
+class ConfigurationJobServiceTest extends UnitBaseTest {
 
-    public static final String SERVICE_TOKEN = "some service token";
     @Mock
     private CamundaClient camundaClient;
     @Mock
@@ -63,13 +60,13 @@ class ConfigurationJobTestService {
     @Test
     void givenGetTasksCamundaRequestShouldRetrieveUserTasksAndNotDelayedTasks() throws JSONException {
         when(camundaClient.getTasks(
-            eq(SERVICE_TOKEN),
+            eq(SOME_SERVICE_TOKEN),
             eq("0"),
             eq("1000"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(camundaTasks);
 
-        List<CamundaTask> actualCamundaTasks = configurationJobService.getUnConfiguredTasks(SERVICE_TOKEN);
+        List<CamundaTask> actualCamundaTasks = configurationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN);
 
         assertQueryTargetsUserTasksAndNotDelayedTasks("{taskDefinitionKey: processTask}");
         assertQueryTargetsUserTasksAndNotDelayedTasks(getExpectedQueryParameters());
@@ -106,27 +103,27 @@ class ConfigurationJobTestService {
     @Test
     void givenUnConfiguredTaskThatCanBeConfiguredShouldConfigureThemSuccessfully() {
         when(taskConfigurationClient.configureTask(
-            eq(SERVICE_TOKEN),
+            eq(SOME_SERVICE_TOKEN),
             taskIdCaptor.capture()
         )).thenReturn("OK");
 
-        configurationJobService.configureTasks(camundaTasks, SERVICE_TOKEN);
+        configurationJobService.configureTasks(camundaTasks, SOME_SERVICE_TOKEN);
 
         assertThat(taskIdCaptor.getAllValues()).isEqualTo(List.of(task1.getId(), task2.getId()));
         verify(taskConfigurationClient, times(camundaTasks.size()))
-            .configureTask(eq(SERVICE_TOKEN), anyString());
+            .configureTask(eq(SOME_SERVICE_TOKEN), anyString());
     }
 
     @Test
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void givenUnConfiguredTaskThatCanNotBeConfiguredShouldCatchException() {
         when(taskConfigurationClient.configureTask(any(), any())).thenThrow(new RuntimeException());
-        Assertions.assertDoesNotThrow(() -> configurationJobService.configureTasks(camundaTasks, SERVICE_TOKEN));
+        Assertions.assertDoesNotThrow(() -> configurationJobService.configureTasks(camundaTasks, SOME_SERVICE_TOKEN));
     }
 
     @Test
     void givenThereAreNoTasksToConfigureShouldNotRunConfigureTaskLogic() {
-        configurationJobService.configureTasks(Collections.emptyList(), SERVICE_TOKEN);
+        configurationJobService.configureTasks(Collections.emptyList(), SOME_SERVICE_TOKEN);
 
         verifyNoInteractions(taskConfigurationClient);
     }

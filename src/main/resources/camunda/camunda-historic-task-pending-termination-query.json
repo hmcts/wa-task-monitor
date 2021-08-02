@@ -1,0 +1,10 @@
+{
+  "taskVariables": [
+    {
+      "name": "cftTaskState",
+      "operator": "eq",
+      "value": "pendingTermination"
+    }
+  ],
+  "processDefinitionKey": "wa-task-initiation-ia-asylum"
+}

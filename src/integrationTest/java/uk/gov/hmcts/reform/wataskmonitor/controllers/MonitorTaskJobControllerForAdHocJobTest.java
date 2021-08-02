@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
+import uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -22,7 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_DELETE_PROCESS_INSTANCES;
-import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.ResourceEnum.DELETE_PROCESS_INSTANCES_JOB_SERVICE;
 
 @ExtendWith(MockitoExtension.class)
 class MonitorTaskJobControllerForAdHocJobTest extends SpringBootIntegrationBaseTest {
@@ -38,16 +38,6 @@ class MonitorTaskJobControllerForAdHocJobTest extends SpringBootIntegrationBaseT
     @BeforeEach
     void setUp() {
         mockExternalDependencies();
-    }
-
-
-    private void mockExternalDependencies() {
-        when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
-
-        requestParameter = ResourceUtility.getResource(DELETE_PROCESS_INSTANCES_JOB_SERVICE);
-        String someResponse = "{\"id\": \"78e1a849-d9b3-11eb-bb4f-d62f1f620fc5\",\"type\": \"instance-deletion\" }";
-        when(camundaClient.deleteProcessInstance(eq(SERVICE_TOKEN), eq(requestParameter)))
-            .thenReturn(someResponse);
     }
 
     @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
@@ -66,6 +56,15 @@ class MonitorTaskJobControllerForAdHocJobTest extends SpringBootIntegrationBaseT
 
         verify(authTokenGenerator).generate();
         verify(camundaClient).deleteProcessInstance(eq(SERVICE_TOKEN), eq(requestParameter));
+    }
+
+    private void mockExternalDependencies() {
+        when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
+
+        requestParameter = ResourceUtility.getResource(ResourceEnum.DELETE_PROCESS_INSTANCES_JOB_SERVICE);
+        String someResponse = "{\"id\": \"78e1a849-d9b3-11eb-bb4f-d62f1f620fc5\",\"type\": \"instance-deletion\" }";
+        when(camundaClient.deleteProcessInstance(eq(SERVICE_TOKEN), eq(requestParameter)))
+            .thenReturn(someResponse);
     }
 
 }

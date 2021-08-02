@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.deleteprocessinsta
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.JobService;
+import uk.gov.hmcts.reform.wataskmonitor.services.JobService;
 
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_DELETE_PROCESS_INSTANCES;
 import static uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility.logPrettyPrint;
