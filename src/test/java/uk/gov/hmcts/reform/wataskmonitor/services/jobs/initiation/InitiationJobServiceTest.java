@@ -99,7 +99,7 @@ class InitiationJobServiceTest extends UnitBaseTest {
         GenericJobOutcome outcome = GenericJobOutcome.builder()
             .taskId(camundaTask.getId())
             .processInstanceId(camundaTask.getProcessInstanceId())
-            .success(true)
+            .successful(true)
             .jobType("Task Initiation")
             .build();
 

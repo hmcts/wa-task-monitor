@@ -84,7 +84,7 @@ public class ConfigurationJobService {
         return GenericJobOutcome.builder()
             .taskId(task.getId())
             .processInstanceId(task.getProcessInstanceId())
-            .success(isSuccessful)
+            .successful(isSuccessful)
             .jobType("Task Creation")
             .build();
     }

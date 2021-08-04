@@ -51,7 +51,7 @@ class ConfigurationJobTest extends UnitBaseTest {
             singletonList(GenericJobOutcome.builder()
                               .taskId("some taskId")
                               .processInstanceId("some processInstanceId")
-                              .success(true)
+                              .successful(true)
                               .jobType("Task Configuration")
                               .build())
         );

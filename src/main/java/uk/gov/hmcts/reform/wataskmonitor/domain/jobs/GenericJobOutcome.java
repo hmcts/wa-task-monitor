@@ -12,6 +12,6 @@ import lombok.ToString;
 public class GenericJobOutcome extends JobOutcome {
     String taskId;
     String processInstanceId;
-    boolean success;
+    boolean successful;
     String jobType;
 }

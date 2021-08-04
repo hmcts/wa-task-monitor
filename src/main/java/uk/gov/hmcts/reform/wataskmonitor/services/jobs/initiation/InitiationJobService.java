@@ -102,7 +102,7 @@ public class InitiationJobService {
         return GenericJobOutcome.builder()
             .taskId(task.getId())
             .processInstanceId(task.getProcessInstanceId())
-            .success(isSuccessful)
+            .successful(isSuccessful)
             .jobType("Task Initiation")
             .build();
     }
