@@ -1,0 +1,16 @@
+{
+  "orQueries": [
+    {
+      "taskVariables": [
+        {
+          "name": "cftTaskState",
+          "operator": "eq",
+          "value": "unconfigured"
+        }
+      ]
+    }
+  ],
+  "createdBefore": "CREATED_BEFORE_PLACEHOLDER",
+  "taskDefinitionKey": "processTask",
+  "processDefinitionKey": "wa-task-initiation-ia-asylum"
+}
