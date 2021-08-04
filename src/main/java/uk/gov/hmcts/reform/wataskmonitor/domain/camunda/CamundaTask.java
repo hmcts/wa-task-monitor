@@ -19,23 +19,22 @@ public class CamundaTask {
     private final String id;
     private final String name;
     private final String processInstanceId;
-    private String assignee;
+    private final String assignee;
     @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     @JsonFormat(pattern = CAMUNDA_DATA_TIME_FORMAT)
-    private ZonedDateTime created;
+    private final ZonedDateTime created;
     @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     @JsonFormat(pattern = CAMUNDA_DATA_TIME_FORMAT)
-    private ZonedDateTime due;
-    private String description;
-    private String owner;
-    private String formKey;
+    private final ZonedDateTime due;
+    private final String description;
+    private final String owner;
+    private final String formKey;
 
-    public CamundaTask(@JsonProperty("id") String id,
-                       @JsonProperty("name") String name,
-                       @JsonProperty("processInstanceId") String processInstanceId) {
-        this.id = id;
-        this.name = name;
-        this.processInstanceId = processInstanceId;
+    public CamundaTask(String id,
+                       String name,
+                       String processInstanceId) {
+
+        this(id, name, processInstanceId, null, null, null, null, null, null);
     }
 
     public CamundaTask(@JsonProperty("id") String id,

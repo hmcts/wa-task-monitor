@@ -30,6 +30,29 @@ import static org.mockito.Mockito.when;
 
 class ConfigurationJobServiceTest extends UnitBaseTest {
 
+    private final CamundaTask task1 = new CamundaTask(
+        "some id",
+        "task name 1",
+        "2151a580-c3c3-11eb-8b76-d26a7287fec2",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+    private final CamundaTask task2 = new CamundaTask(
+        "some other id",
+        "task name 2",
+        "2151a580-c3c3-11eb-8b76-d26a7287f000",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+    private final List<CamundaTask> camundaTasks = List.of(task1, task2);
     @Mock
     private CamundaClient camundaClient;
     @Mock
@@ -45,19 +68,8 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
     @Captor
     private ArgumentCaptor<String> taskIdCaptor;
 
-    private final CamundaTask task1 = new CamundaTask(
-        "some id",
-        "task name 1",
-        "2151a580-c3c3-11eb-8b76-d26a7287fec2"
-    );
-
-    private final CamundaTask task2 = new CamundaTask(
-        "some other id",
-        "task name 2",
-        "2151a580-c3c3-11eb-8b76-d26a7287f000"
-    );
-
     private final List<CamundaTask> camundaTasks = List.of(task1, task2);
+
 
     @Test
     void givenGetTasksCamundaRequestShouldRetrieveUserTasksAndNotDelayedTasks() throws JSONException {
@@ -75,6 +87,34 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
         assertQueryTargetsUserTasksAndNotDelayedTasks("{taskDefinitionKey: processTask}");
         assertQueryTargetsUserTasksAndNotDelayedTasks(getExpectedQueryParameters());
         assertThat(actualCamundaTasks).isEqualTo(camundaTasks);
+    }
+
+    @Test
+    void givenUnConfiguredTaskThatCanBeConfiguredShouldConfigureThemSuccessfully() {
+        when(taskConfigurationClient.configureTask(
+            eq(SOME_SERVICE_TOKEN),
+            taskIdCaptor.capture()
+        )).thenReturn("OK");
+
+        configurationJobService.configureTasks(camundaTasks, SOME_SERVICE_TOKEN);
+
+        assertThat(taskIdCaptor.getAllValues()).isEqualTo(List.of(task1.getId(), task2.getId()));
+        verify(taskConfigurationClient, times(camundaTasks.size()))
+            .configureTask(eq(SOME_SERVICE_TOKEN), anyString());
+    }
+
+    @Test
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+    void givenUnConfiguredTaskThatCanNotBeConfiguredShouldCatchException() {
+        when(taskConfigurationClient.configureTask(any(), any())).thenThrow(new RuntimeException());
+        Assertions.assertDoesNotThrow(() -> configurationJobService.configureTasks(camundaTasks, SOME_SERVICE_TOKEN));
+    }
+
+    @Test
+    void givenThereAreNoTasksToConfigureShouldNotRunConfigureTaskLogic() {
+        configurationJobService.configureTasks(Collections.emptyList(), SOME_SERVICE_TOKEN);
+
+        verifyNoInteractions(taskConfigurationClient);
     }
 
     private void assertQueryTargetsUserTasksAndNotDelayedTasks(String expected) throws JSONException {

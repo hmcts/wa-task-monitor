@@ -13,10 +13,13 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUNDA_DATA_TIME_FORMATTER;
 
 @SpringBootTest(properties = {
     "camunda.url=http://localhost:9561"
@@ -26,8 +29,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @EnableConfigurationProperties
 @ContextConfiguration(classes = {CamundaWireMockConfig.class})
 class CamundaClientTest {
-
-    public static final String TASK_NAME = "task name";
 
     @Autowired
     private WireMockServer camundaMockServer;
@@ -50,13 +51,40 @@ class CamundaClientTest {
         );
 
         assertThat(camundaTasks).isEqualTo(Arrays.asList(
-            new CamundaTask("090e80f0-c3be-11eb-a06f-164a82de09f9",
+            new CamundaTask(
+                "090e80f0-c3be-11eb-a06f-164a82de09f9",
                 "task name 1",
-                "08c87753-c3be-11eb-b156-c2f10288f330"),
-            new CamundaTask("21827953-c3c3-11eb-adeb-3a61f2fe2b47",
+                "08c87753-c3be-11eb-b156-c2f10288f330",
+                null,
+                ZonedDateTime.parse(
+                    "2021-06-02T16:17:32.808+0000",
+                    CAMUNDA_DATA_TIME_FORMATTER.withZone(ZoneId.of("UTC"))
+                ),
+                ZonedDateTime.parse(
+                    "2021-06-04T16:17:32.325+0000",
+                    CAMUNDA_DATA_TIME_FORMATTER.withZone(ZoneId.of("UTC"))
+                ),
+                null,
+                null,
+                null
+            ),
+            new CamundaTask(
+                "21827953-c3c3-11eb-adeb-3a61f2fe2b47",
                 "task name 2",
-                "2151a580-c3c3-11eb-8b76-d26a7287fec2")
+                "2151a580-c3c3-11eb-8b76-d26a7287fec2",
+                null,
+                ZonedDateTime.parse(
+                    "2021-06-02T16:54:01.317+0000",
+                    CAMUNDA_DATA_TIME_FORMATTER.withZone(ZoneId.of("UTC"))
+                ),
+                ZonedDateTime.parse(
+                    "2021-06-04T16:54:00.973+0000",
+                    CAMUNDA_DATA_TIME_FORMATTER.withZone(ZoneId.of("UTC"))
+                ),
+                null,
+                null,
+                null
+            )
         ));
-
     }
 }
