@@ -88,10 +88,6 @@ class InitiationJobServiceTest extends UnitBaseTest {
         List<CamundaTask> tasks = singletonList(camundaTask);
 
         Map<String, CamundaVariable> mockedVariables = InitiationHelpers.createMockCamundaVariables();
-        when(camundaClient.getTask(
-            SOME_SERVICE_TOKEN,
-            camundaTask.getId()
-        )).thenReturn(camundaTask);
 
         when(camundaClient.getVariables(
             SOME_SERVICE_TOKEN,

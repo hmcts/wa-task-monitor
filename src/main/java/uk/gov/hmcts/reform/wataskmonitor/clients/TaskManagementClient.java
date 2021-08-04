@@ -32,7 +32,7 @@ public interface TaskManagementClient {
         produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    String initiateTask(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
-                        @PathVariable("task-id") String taskId,
-                        @RequestBody InitiateTaskRequest body);
+    void initiateTask(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+                      @PathVariable("task-id") String taskId,
+                      @RequestBody InitiateTaskRequest body);
 }

@@ -73,15 +73,13 @@ public class InitiationJobService {
         camundaTasks.forEach(task -> {
             try {
                 log.info("Attempting to initiate task with id: '{}'", task.getId());
-                log.debug("-> Retrieving task variables for task with id: '{}'", task.getId());
-                CamundaTask camundaTask = camundaClient.getTask(serviceToken, task.getId());
                 log.debug("-> Retrieving process variables for task with id: '{}'", task.getId());
                 Map<String, CamundaVariable> variables = camundaClient.getVariables(
                     serviceToken,
                     task.getId()
                 );
                 List<TaskAttribute> taskAttributes = initiationTaskAttributesMapper.mapTaskAttributes(
-                    camundaTask,
+                    task,
                     variables
                 );
                 log.debug("-> Initiating task with id: '{}'", task.getId());

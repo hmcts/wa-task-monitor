@@ -78,13 +78,5 @@ public interface CamundaClient {
     Map<String, CamundaVariable> getVariables(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
                                               @PathVariable("task-id") String id);
 
-    @GetMapping(
-        value = "/task/{task-id}",
-        produces = APPLICATION_JSON_VALUE
-    )
-    @ResponseBody
-    CamundaTask getTask(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
-                        @PathVariable("task-id") String id);
-
 }
 
