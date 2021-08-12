@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.wataskmonitor.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -24,7 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_DELETE_PROCESS_INSTANCES;
 
-@ExtendWith(MockitoExtension.class)
 class MonitorTaskJobControllerForAdHocJobTest extends SpringBootIntegrationBaseTest {
 
     public static final String SERVICE_TOKEN = "some service token";
@@ -46,10 +43,10 @@ class MonitorTaskJobControllerForAdHocJobTest extends SpringBootIntegrationBaseT
         MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(
             AD_HOC_DELETE_PROCESS_INSTANCES));
 
-
         mockMvc.perform(
             post("/monitor/tasks/jobs")
                 .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("utf8")
                 .content(TestUtility.asJsonString(monitorTaskJobReq)))
             .andExpect(status().isOk())
             .andExpect(content().string(equalTo(expectedResponse.apply(AD_HOC_DELETE_PROCESS_INSTANCES.name()))));
