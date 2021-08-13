@@ -1,18 +1,20 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskAttribute;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.CFTTaskState;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TaskAttributeDefinition;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUNDA_DATA_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.AUTO_ASSIGNED;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.CASE_ID;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.CASE_MANAGEMENT_CATEGORY;
@@ -32,6 +34,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVari
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.WARNING_LIST;
 
 
+@Slf4j
 @Service
 public class InitiationTaskAttributesMapper {
 
@@ -44,16 +47,17 @@ public class InitiationTaskAttributesMapper {
     public List<TaskAttribute> mapTaskAttributes(CamundaTask camundaTask, Map<String, CamundaVariable> variables) {
         // Camunda Attributes
         String name = camundaTask.getName();
-        ZonedDateTime createdDate = camundaTask.getCreated();
-        ZonedDateTime dueDate = camundaTask.getDue();
+        String createdDate = CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getCreated());
+        String dueDate = CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getDue());
         String assignee = camundaTask.getAssignee();
         String description = camundaTask.getDescription();
         // Local Variables
         String type = getVariableValue(variables.get(TASK_TYPE.value()), String.class);
-        String taskState = getVariableValue(variables.get(TASK_STATE.value()), String.class);
+        CFTTaskState taskState = extractTaskState(variables);
+        String executionTypeName = getVariableValue(variables.get(EXECUTION_TYPE.value()), String.class);
         String securityClassification = getVariableValue(variables.get(SECURITY_CLASSIFICATION.value()), String.class);
         String taskTitle = getVariableValue(variables.get(TITLE.value()), String.class);
-        String executionType = getVariableValue(variables.get(EXECUTION_TYPE.value()), String.class);
+
         boolean autoAssigned = getVariableValue(variables.get(AUTO_ASSIGNED.value()), Boolean.class);
         String taskSystem = getVariableValue(variables.get(TASK_SYSTEM.value()), String.class);
         String jurisdiction = getVariableValue(variables.get(JURISDICTION.value()), String.class);
@@ -77,13 +81,13 @@ public class InitiationTaskAttributesMapper {
             new TaskAttribute(TaskAttributeDefinition.TASK_CREATED, createdDate),
             new TaskAttribute(TaskAttributeDefinition.TASK_DUE_DATE, dueDate),
             new TaskAttribute(TaskAttributeDefinition.TASK_DESCRIPTION, description),
-            new TaskAttribute(TaskAttributeDefinition.TASK_EXECUTION_TYPE_CODE, executionType),
+            new TaskAttribute(TaskAttributeDefinition.TASK_EXECUTION_TYPE_NAME, executionTypeName),
             new TaskAttribute(TaskAttributeDefinition.TASK_HAS_WARNINGS, hasWarnings),
             new TaskAttribute(TaskAttributeDefinition.TASK_JURISDICTION, jurisdiction),
             new TaskAttribute(TaskAttributeDefinition.TASK_LOCATION, location),
             new TaskAttribute(TaskAttributeDefinition.TASK_LOCATION_NAME, locationName),
             new TaskAttribute(TaskAttributeDefinition.TASK_NAME, name),
-            new TaskAttribute(TaskAttributeDefinition.TASK_NOTES, warningList),
+            new TaskAttribute(TaskAttributeDefinition.TASK_WARNINGS, warningList),
             new TaskAttribute(TaskAttributeDefinition.TASK_REGION, region),
             new TaskAttribute(TaskAttributeDefinition.TASK_SECURITY_CLASSIFICATION, securityClassification),
             new TaskAttribute(TaskAttributeDefinition.TASK_STATE, taskState),
@@ -99,12 +103,31 @@ public class InitiationTaskAttributesMapper {
             new TaskAttribute(TaskAttributeDefinition.TASK_ROLE_CATEGORY, null),
             new TaskAttribute(TaskAttributeDefinition.TASK_REGION_NAME, null),
             new TaskAttribute(TaskAttributeDefinition.TASK_TERMINATION_REASON, null),
-            new TaskAttribute(TaskAttributeDefinition.TASK_WORK_TYPE, null)
+            new TaskAttribute(TaskAttributeDefinition.TASK_WORK_TYPE, null),
+            new TaskAttribute(TaskAttributeDefinition.TASK_NOTES, null)
         );
     }
 
     public <T> Optional<T> read(CamundaVariable variable, Class<T> type) {
         return map(variable, type);
+    }
+
+    private CFTTaskState extractTaskState(Map<String, CamundaVariable> variables) {
+        String taskStateValue = getVariableValue(variables.get(TASK_STATE.value()), String.class);
+        log.info("{}", taskStateValue);
+        if (taskStateValue != null) {
+            Optional<CFTTaskState> value = CFTTaskState.from(taskStateValue);
+            log.info("{}", value);
+            if (value.isPresent()) {
+                return value.get();
+            } else {
+                log.error("could not be mapped");
+                throw new IllegalStateException(
+                    "taskState " + taskStateValue + " could not be mapped to CFTTaskState enum"
+                );
+            }
+        }
+        throw new IllegalStateException("taskState cannot be null");
     }
 
     private <T> T getVariableValue(CamundaVariable variable, Class<T> type) {

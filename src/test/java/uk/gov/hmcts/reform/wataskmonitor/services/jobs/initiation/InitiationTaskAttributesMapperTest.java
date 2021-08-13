@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskAttribute;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.CFTTaskState;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TaskAttributeDefinition;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.InitiationHelpers;
 
@@ -56,7 +57,7 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
             new TaskAttribute(TaskAttributeDefinition.TASK_CREATED, createdDate),
             new TaskAttribute(TaskAttributeDefinition.TASK_DUE_DATE, dueDate),
             new TaskAttribute(TaskAttributeDefinition.TASK_DESCRIPTION, "someCamundaTaskDescription"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_EXECUTION_TYPE_CODE, "someExecutionType"),
+            new TaskAttribute(TaskAttributeDefinition.TASK_EXECUTION_TYPE_NAME, "someExecutionType"),
             new TaskAttribute(TaskAttributeDefinition.TASK_HAS_WARNINGS, true),
             new TaskAttribute(TaskAttributeDefinition.TASK_JURISDICTION, "someJurisdiction"),
             new TaskAttribute(TaskAttributeDefinition.TASK_LOCATION, "someStaffLocationId"),
@@ -65,7 +66,7 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
             new TaskAttribute(TaskAttributeDefinition.TASK_NOTES, "SomeWarningListValue"),
             new TaskAttribute(TaskAttributeDefinition.TASK_REGION, "someRegion"),
             new TaskAttribute(TaskAttributeDefinition.TASK_SECURITY_CLASSIFICATION, "SC"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_STATE, "configured"),
+            new TaskAttribute(TaskAttributeDefinition.TASK_STATE, CFTTaskState.UNCONFIGURED),
             new TaskAttribute(TaskAttributeDefinition.TASK_SYSTEM, "someTaskSystem"),
             new TaskAttribute(TaskAttributeDefinition.TASK_TITLE, "someTitle"),
             new TaskAttribute(TaskAttributeDefinition.TASK_TYPE, "someTaskType"),

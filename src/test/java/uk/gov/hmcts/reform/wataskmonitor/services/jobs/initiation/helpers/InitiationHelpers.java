@@ -49,7 +49,7 @@ public final class InitiationHelpers {
         variables.put("caseId", new CamundaVariable("00000", "String"));
         variables.put("caseName", new CamundaVariable("someCaseName", "String"));
         variables.put("caseTypeId", new CamundaVariable("someCaseType", "String"));
-        variables.put("taskState", new CamundaVariable("configured", "String"));
+        variables.put("taskState", new CamundaVariable("unconfigured", "String"));
         variables.put("location", new CamundaVariable("someStaffLocationId", "String"));
         variables.put("locationName", new CamundaVariable("someStaffLocationName", "String"));
         variables.put("securityClassification", new CamundaVariable("SC", "String"));
