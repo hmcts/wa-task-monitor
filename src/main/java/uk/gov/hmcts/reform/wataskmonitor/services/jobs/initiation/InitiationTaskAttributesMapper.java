@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVari
 
 @Slf4j
 @Service
+@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 public class InitiationTaskAttributesMapper {
 
     private final ObjectMapper objectMapper;
