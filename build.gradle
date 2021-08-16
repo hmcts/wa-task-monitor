@@ -196,6 +196,9 @@ dependencyManagement {
 
     // CVE-2020-13956 - misinterpret malformed authority component in request URIs - check for update available to com.warrenstrange:googleauth in service-auth-provider-client
     dependency group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+
+    //CVE-2021-28170
+    dependency group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
   }
 }
 
