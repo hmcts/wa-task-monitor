@@ -19,6 +19,7 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.38.0'
   id 'org.sonarqube' version '3.0'
   id 'io.freefair.lombok' version '5.3.0'
+  id 'info.solidsoft.pitest' version '1.5.2'
 }
 
 
@@ -145,14 +146,37 @@ jacocoTestReport {
   }
 }
 
+pitest {
+  junit5PluginVersion = '0.12'
+  targetClasses = ['uk.gov.hmcts.reform.wataskmonitor.*']
+  excludedClasses = [
+    'uk.gov.hmcts.reform.wataskmonitor.config.*',
+    'uk.gov.hmcts.reform.wataskmonitor.Application'
+  ]
+  threads = 10
+  outputFormats = ['XML', 'HTML']
+  timestampedReports = false
+  mutationThreshold = 80
+}
+
+project.tasks['pitest'].group = "Verification"
+
 project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
+
+// Ensures that functional tests index page is generated
+// Functional tests should run two tasks "functional" and "aggregate"
+gradle.startParameter.continueOnFailure = true
+functional.finalizedBy aggregate
 
 sonarqube {
   properties {
     property "sonar.projectName", "Reform :: wa-task-monitor"
     property "sonar.projectKey", "uk.gov.hmcts.reform:wa-task-monitor"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
+    property "sonar.pitest.mode", "reuseReport"
+    property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/wataskmonitor/config/**," +
+      "src/testUtils/java/uk/gov/hmcts/reform/wataskmonitor/**," +
       "src/main/java/uk/gov/hmcts/reform/wataskmonitor/Application.java"
   }
 }
@@ -214,7 +238,8 @@ def versions = [
   reformLogging       : '5.1.5',
   springfoxSwagger    : '3.0.0',
   serenity            : '2.2.12',
-  springFrameworkCloud: '2.2.9.RELEASE'
+  springFrameworkCloud: '2.2.9.RELEASE',
+  pitest          : '1.5.2',
 ]
 
 ext.libraries = [
@@ -266,6 +291,10 @@ dependencies {
   testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
+
+  testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
+  testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.6.0'
+  testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
 
   testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8', version:'2.29.1', {
     exclude group: 'com.github.jknack.handlebars.java'
