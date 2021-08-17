@@ -13,6 +13,8 @@ class JobDetailsTest {
         assertPojoMethodsFor(classUnderTest)
             .testing(Method.GETTER)
             .testing(Method.CONSTRUCTOR)
+            .testing(Method.EQUALS)
+            .testing(Method.HASH_CODE)
             .testing(Method.TO_STRING)
             .areWellImplemented();
     }
