@@ -40,10 +40,9 @@ class MonitorTaskJobControllerForAdHocJobTest extends SpringBootIntegrationBaseT
     @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
     @Test
     public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() throws Exception {
-        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(
-            AD_HOC_DELETE_PROCESS_INSTANCES,
-            "1000"
-        ));
+        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(JobDetails.builder()
+                                                                                .name(AD_HOC_DELETE_PROCESS_INSTANCES)
+                                                                                .build());
 
         mockMvc.perform(
                 post("/monitor/tasks/jobs")
