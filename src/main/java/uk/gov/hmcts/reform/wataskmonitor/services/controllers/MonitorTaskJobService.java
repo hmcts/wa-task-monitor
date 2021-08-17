@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.services.JobService;
 
 import java.util.List;
@@ -24,12 +24,12 @@ public class MonitorTaskJobService {
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     @Async
-    public void execute(JobName jobName) {
+    public void execute(JobDetails jobDetails) {
         String serviceToken = authTokenGenerator.generate();
         jobServices.forEach(job -> {
-            if (job.canRun(jobName)) {
-                log.info("Running job '{}'", jobName.name());
-                job.run(serviceToken);
+            if (job.canRun(jobDetails.getName())) {
+                log.info("Running job '{}'", jobDetails.getName());
+                job.run(serviceToken, jobDetails);
             }
         });
     }

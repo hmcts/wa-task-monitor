@@ -20,7 +20,10 @@ public class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootF
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .header("ServiceAuthorization", serviceToken)
-            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(JobName.CONFIGURATION))))
+            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(
+                JobName.CONFIGURATION,
+                "1000"
+            ))))
             .when()
             .post("/monitor/tasks/jobs")
             .then()

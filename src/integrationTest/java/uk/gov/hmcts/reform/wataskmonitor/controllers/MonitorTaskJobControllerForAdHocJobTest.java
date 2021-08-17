@@ -41,13 +41,15 @@ class MonitorTaskJobControllerForAdHocJobTest extends SpringBootIntegrationBaseT
     @Test
     public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() throws Exception {
         MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(
-            AD_HOC_DELETE_PROCESS_INSTANCES));
+            AD_HOC_DELETE_PROCESS_INSTANCES,
+            "1000"
+        ));
 
         mockMvc.perform(
-            post("/monitor/tasks/jobs")
-                .contentType(MediaType.APPLICATION_JSON)
-                .characterEncoding("utf8")
-                .content(TestUtility.asJsonString(monitorTaskJobReq)))
+                post("/monitor/tasks/jobs")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("utf8")
+                    .content(TestUtility.asJsonString(monitorTaskJobReq)))
             .andExpect(status().isOk())
             .andExpect(content().string(equalTo(expectedResponse.apply(AD_HOC_DELETE_PROCESS_INSTANCES.name()))));
 

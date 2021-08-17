@@ -64,7 +64,10 @@ class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootIntegrat
     @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
     @Test
     public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() throws Exception {
-        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(JobName.CONFIGURATION));
+        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(
+            JobName.CONFIGURATION,
+            "1000"
+        ));
 
         mockMvc.perform(post("/monitor/tasks/jobs")
                             .contentType(MediaType.APPLICATION_JSON)

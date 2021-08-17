@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -31,7 +32,7 @@ class TerminationJobTest extends UnitBaseTest {
 
     @Test
     void run() {
-        terminationJob.run(SOME_SERVICE_TOKEN);
+        terminationJob.run(SOME_SERVICE_TOKEN, new JobDetails(JobName.TERMINATION, "1000"));
         verify(terminationJobService).terminateTasks(SOME_SERVICE_TOKEN);
     }
 }

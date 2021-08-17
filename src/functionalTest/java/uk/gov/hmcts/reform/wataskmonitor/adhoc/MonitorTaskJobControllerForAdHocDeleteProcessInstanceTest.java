@@ -21,7 +21,10 @@ public class MonitorTaskJobControllerForAdHocDeleteProcessInstanceTest extends S
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .header("ServiceAuthorization", serviceToken)
-            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(AD_HOC_DELETE_PROCESS_INSTANCES))))
+            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(
+                AD_HOC_DELETE_PROCESS_INSTANCES,
+                "1000"
+            ))))
             .when()
             .post("/monitor/tasks/jobs")
             .then()

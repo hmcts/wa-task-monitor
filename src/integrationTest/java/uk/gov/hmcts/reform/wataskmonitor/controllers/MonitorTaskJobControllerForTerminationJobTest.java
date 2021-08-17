@@ -53,7 +53,10 @@ class MonitorTaskJobControllerForTerminationJobTest extends SpringBootIntegratio
     @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
     @Test
     public void shouldSucceedAndTerminateTasks() throws Exception {
-        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(JobName.TERMINATION));
+        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(
+            JobName.TERMINATION,
+            "1000"
+        ));
 
         mockMvc.perform(post("/monitor/tasks/jobs")
                             .contentType(MediaType.APPLICATION_JSON)

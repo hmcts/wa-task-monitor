@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.CreateTaskJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,7 +47,7 @@ class CreateTaskJobTest extends UnitBaseTest {
         when(createTaskJobService.createTasks(SOME_SERVICE_TOKEN))
             .thenReturn(someCreateTaskJobReport);
 
-        createTaskJob.run(SOME_SERVICE_TOKEN);
+        createTaskJob.run(SOME_SERVICE_TOKEN, new JobDetails(AD_HOC_CREATE_TASKS, "1000"));
 
         verify(createTaskJobService).createTasks(eq(SOME_SERVICE_TOKEN));
     }

@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 
 import java.util.Arrays;
 
@@ -30,8 +31,11 @@ class UpdateCaseDataJobTest extends UnitBaseTest {
 
     @Test
     void run() {
-        updateCaseDataJob.run("some service token");
+        updateCaseDataJob.run(
+            SOME_SERVICE_TOKEN,
+            new JobDetails(AD_HOC_UPDATE_CASE_DATA, "1000")
+        );
 
-        Mockito.verify(updateCaseDataJobService).updateCcdCases("some service token");
+        Mockito.verify(updateCaseDataJobService).updateCcdCases(SOME_SERVICE_TOKEN);
     }
 }

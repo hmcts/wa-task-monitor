@@ -66,7 +66,7 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
             actualQueryParametersCaptor.capture()
         )).thenReturn(camundaTasks);
 
-        List<CamundaTask> actualCamundaTasks = configurationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN);
+        List<CamundaTask> actualCamundaTasks = configurationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN, "1000");
 
         assertQueryTargetsUserTasksAndNotDelayedTasks("{taskDefinitionKey: processTask}");
         assertQueryTargetsUserTasksAndNotDelayedTasks(getExpectedQueryParameters());

@@ -33,12 +33,12 @@ public class ConfigurationJobService {
         this.taskConfigurationClient = taskConfigurationClient;
     }
 
-    public List<CamundaTask> getUnConfiguredTasks(String serviceToken) {
+    public List<CamundaTask> getUnConfiguredTasks(String serviceToken, String camundaGetTaskMaxResults) {
         log.info("Retrieving unconfigured tasks from camunda.");
         List<CamundaTask> camundaTasks = camundaClient.getTasks(
             serviceToken,
             "0",
-            "1000",
+            camundaGetTaskMaxResults,
             getQueryParameters()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());

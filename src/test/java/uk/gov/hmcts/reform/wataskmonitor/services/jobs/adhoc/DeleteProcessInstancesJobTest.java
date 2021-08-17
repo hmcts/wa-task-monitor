@@ -7,12 +7,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.deleteprocessinstances.DeleteProcessInstancesJob;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.deleteprocessinstances.DeleteProcessInstancesJobService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_DELETE_PROCESS_INSTANCES;
 
 class DeleteProcessInstancesJobTest extends UnitBaseTest {
 
@@ -38,7 +40,10 @@ class DeleteProcessInstancesJobTest extends UnitBaseTest {
         when(deleteProcessInstancesJobService.deleteProcessInstances(SOME_SERVICE_TOKEN))
             .thenReturn(someResponse);
 
-        deleteProcessInstancesJob.run(SOME_SERVICE_TOKEN);
+        deleteProcessInstancesJob.run(
+            SOME_SERVICE_TOKEN,
+            new JobDetails(AD_HOC_DELETE_PROCESS_INSTANCES, "1000")
+        );
 
         verify(deleteProcessInstancesJobService).deleteProcessInstances(SOME_SERVICE_TOKEN);
     }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.services.JobService;
 
 import java.util.List;
@@ -29,9 +30,12 @@ public class ConfigurationJob implements JobService {
     }
 
     @Override
-    public void run(String serviceToken) {
+    public void run(String serviceToken, JobDetails jobDetails) {
         log.info("Starting task configuration job.");
-        List<CamundaTask> tasks = configurationJobService.getUnConfiguredTasks(serviceToken);
+        List<CamundaTask> tasks = configurationJobService.getUnConfiguredTasks(
+            serviceToken,
+            jobDetails.getCamundaGetTaskMaxResults()
+        );
         GenericJobReport report = configurationJobService.configureTasks(tasks, serviceToken);
         log.info("{} job finished successfully: {}", CONFIGURATION, logPrettyPrint(report));
     }
