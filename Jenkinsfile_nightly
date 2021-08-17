@@ -9,7 +9,7 @@ properties([
 
 def type = "java"
 def product = "rpe"
-def component = "spring-boot-template"
+def component = "task-monitor"
 
 def secrets = [
   's2s-${env}': [
@@ -30,6 +30,8 @@ withNightlyPipeline(type, product, component) {
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   loadVaultSecrets(secrets)
 
+  enableSecurityScan()
+  enableMutationTest()
   enableFullFunctionalTest()
   enableSlackNotifications('#wa-build')
 }
