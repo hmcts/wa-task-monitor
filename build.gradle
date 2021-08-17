@@ -204,16 +204,14 @@ dependencyManagement {
 
 repositories {
   mavenLocal()
-  mavenCentral()
   maven { url 'https://jitpack.io' }
-  //noinspection JCenterRepository
-  jcenter()
+  mavenCentral()
 }
 
 def versions = [
   junit               : '5.7.2',
   junitPlatform       : '1.7.2',
-  reformLogging       : '5.1.7',
+  reformLogging       : '5.1.5',
   springfoxSwagger    : '3.0.0',
   serenity            : '2.2.12',
   springFrameworkCloud: '2.2.9.RELEASE'
@@ -243,8 +241,8 @@ dependencies {
   implementation group: 'io.springfox', name: 'springfox-boot-starter', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
+  implementation group: 'com.github.hmcts.java-logging', name: 'java-logging', version: versions.reformLogging
+  implementation group: 'com.github.hmcts.java-logging', name: 'java-logging-appinsights', version: versions.reformLogging
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '3.1.2'
   implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '4.7.5'
 
@@ -269,7 +267,9 @@ dependencies {
   testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
 
-  testImplementation 'com.github.tomakehurst:wiremock-jre8:2.29.1'
+  testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8', version:'2.29.1', {
+    exclude group: 'com.github.jknack.handlebars.java'
+  }
   testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
   testCompile group: 'pl.pojo', name: 'pojo-tester', version: '0.7.6'
 
