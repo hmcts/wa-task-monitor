@@ -10,25 +10,25 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJ
 import static net.serenitybdd.rest.SerenityRest.given;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
 public class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootFunctionalBaseTest {
 
     @Test
     public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() {
+        String body = TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(
+            JobName.CONFIGURATION,
+            "1000"
+        )));
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .header("ServiceAuthorization", serviceToken)
-            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(
-                JobName.CONFIGURATION,
-                "1000"
-            ))))
+            .body(body)
             .when()
             .post("/monitor/tasks/jobs")
             .then()
             .statusCode(HttpStatus.OK.value())
-            .body(is(expectedResponse.apply(JobName.CONFIGURATION.name())));
+            .body(is(body));
     }
 
 }
