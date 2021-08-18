@@ -43,7 +43,7 @@ public class ConfigurationJobService {
         List<CamundaTask> camundaTasks = camundaClient.getTasks(
             serviceToken,
             "0",
-            configurationJobConfig.getMaxResults(),
+            configurationJobConfig.getCamundaMaxResults(),
             getQueryParameters()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());

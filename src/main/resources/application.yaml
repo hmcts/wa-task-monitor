@@ -92,6 +92,6 @@ feign:
 
 job:
   configuration:
-    max-results: ${MAX_RESULTS:10}
+    camunda-max-results: ${CONFIGURATION_CAMUNDA_MAX_RESULTS:10}
 
 

@@ -61,7 +61,7 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
 
     @Test
     void givenGetTasksCamundaRequestShouldRetrieveUserTasksAndNotDelayedTasks() throws JSONException {
-        when(configurationJobConfig.getMaxResults()).thenReturn("10");
+        when(configurationJobConfig.getCamundaMaxResults()).thenReturn("10");
 
         when(camundaClient.getTasks(
             eq(SOME_SERVICE_TOKEN),
