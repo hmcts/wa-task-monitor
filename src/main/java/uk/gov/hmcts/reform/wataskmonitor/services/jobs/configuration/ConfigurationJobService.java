@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.job.ConfigurationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
@@ -26,11 +27,15 @@ public class ConfigurationJobService {
 
     private final CamundaClient camundaClient;
     private final TaskConfigurationClient taskConfigurationClient;
+    private final ConfigurationJobConfig configurationJobConfig;
 
     @Autowired
-    public ConfigurationJobService(CamundaClient camundaClient, TaskConfigurationClient taskConfigurationClient) {
+    public ConfigurationJobService(CamundaClient camundaClient,
+                                   TaskConfigurationClient taskConfigurationClient,
+                                   ConfigurationJobConfig configurationJobConfig) {
         this.camundaClient = camundaClient;
         this.taskConfigurationClient = taskConfigurationClient;
+        this.configurationJobConfig = configurationJobConfig;
     }
 
     public List<CamundaTask> getUnConfiguredTasks(String serviceToken) {
@@ -38,7 +43,7 @@ public class ConfigurationJobService {
         List<CamundaTask> camundaTasks = camundaClient.getTasks(
             serviceToken,
             "0",
-            "1000",
+            configurationJobConfig.getMaxResults(),
             getQueryParameters()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());

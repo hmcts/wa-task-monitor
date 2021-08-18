@@ -88,3 +88,10 @@ feign:
         connectTimeout: 30000
         readTimeout: 30000
         loggerLevel: basic
+
+
+job:
+  configuration:
+    max-results: ${MAX_RESULTS:10}
+
+
