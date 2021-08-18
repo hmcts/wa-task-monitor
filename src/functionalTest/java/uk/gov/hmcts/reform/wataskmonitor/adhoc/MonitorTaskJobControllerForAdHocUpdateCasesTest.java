@@ -21,10 +21,11 @@ public class MonitorTaskJobControllerForAdHocUpdateCasesTest extends SpringBootF
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .header("ServiceAuthorization", serviceToken)
-            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(
-                AD_HOC_UPDATE_CASE_DATA,
-                "1000"
-            ))))
+            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(
+                JobDetails.builder()
+                    .name(AD_HOC_UPDATE_CASE_DATA)
+                    .build()
+            )))
             .when()
             .post("/monitor/tasks/jobs")
             .then()

@@ -21,10 +21,10 @@ public class MonitorTaskJobControllerForAdHocCreateTasksTest extends SpringBootF
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .header("ServiceAuthorization", serviceToken)
-            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(
-                AD_HOC_CREATE_TASKS,
-                "1000"
-            ))))
+            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(JobDetails.builder()
+                                                                         .name(AD_HOC_CREATE_TASKS)
+                                                                         .build()
+            )))
             .when()
             .post("/monitor/tasks/jobs")
             .then()
