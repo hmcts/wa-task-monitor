@@ -16,13 +16,13 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 @Builder
 public class JobDetails {
     private final JobName name;
-    private final String camundaGetTaskMaxResults;
+    private final String camundaMaxResults;
 
     @JsonCreator
     public JobDetails(@JsonProperty("name") JobName name,
-                      @JsonProperty("camundaGetTaskMaxResults") String camundaGetTaskMaxResults) {
+                      @JsonProperty("camundaMaxResults") String camundaMaxResults) {
         this.name = name;
-        this.camundaGetTaskMaxResults = camundaGetTaskMaxResults;
+        this.camundaMaxResults = camundaMaxResults;
     }
 
 }

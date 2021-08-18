@@ -34,7 +34,7 @@ public class ConfigurationJob implements JobService {
         log.info("Starting task configuration job.");
         List<CamundaTask> tasks = configurationJobService.getUnConfiguredTasks(
             serviceToken,
-            jobDetails.getCamundaGetTaskMaxResults()
+            jobDetails.getCamundaMaxResults()
         );
         GenericJobReport report = configurationJobService.configureTasks(tasks, serviceToken);
         log.info("{} job finished successfully: {}", CONFIGURATION, logPrettyPrint(report));
