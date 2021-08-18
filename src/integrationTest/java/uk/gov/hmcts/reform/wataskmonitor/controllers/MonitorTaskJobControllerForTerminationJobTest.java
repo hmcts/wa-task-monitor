@@ -22,7 +22,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -53,10 +52,9 @@ class MonitorTaskJobControllerForTerminationJobTest extends SpringBootIntegratio
     @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
     @Test
     public void shouldSucceedAndTerminateTasks() throws Exception {
-        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(
-            JobName.TERMINATION,
-            "1000"
-        ));
+        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(JobDetails.builder()
+                                                                                .name(JobName.TERMINATION)
+                                                                                .build());
 
         mockMvc.perform(post("/monitor/tasks/jobs")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -72,15 +70,14 @@ class MonitorTaskJobControllerForTerminationJobTest extends SpringBootIntegratio
             any()
         );
 
-        verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 1, CAMUNDA_TASK_ID_FOR_CANCELLATION);
-        verifyTerminateEndpointWasCalledWithTerminateReason(COMPLETED, 1, CAMUNDA_TASK_ID_FOR_COMPLETION);
+        verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, CAMUNDA_TASK_ID_FOR_CANCELLATION);
+        verifyTerminateEndpointWasCalledWithTerminateReason(COMPLETED, CAMUNDA_TASK_ID_FOR_COMPLETION);
     }
 
     private void verifyTerminateEndpointWasCalledWithTerminateReason(TerminateReason terminateReason,
-                                                                     int times,
                                                                      String taskId) {
         TerminateTaskRequest request = new TerminateTaskRequest(new TerminateInfo(terminateReason));
-        verify(taskManagementClient, times(times)).terminateTask(SERVICE_TOKEN, taskId, request);
+        verify(taskManagementClient).terminateTask(SERVICE_TOKEN, taskId, request);
     }
 
     private void mockExternalDependencies() {

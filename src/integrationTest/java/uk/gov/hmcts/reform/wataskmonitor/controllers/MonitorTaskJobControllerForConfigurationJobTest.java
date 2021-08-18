@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJ
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -24,7 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
+import static uk.gov.hmcts.reform.wacaseeventhandler.TestUtility.asJsonString;
 
 class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootIntegrationBaseTest {
 
@@ -69,11 +68,12 @@ class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootIntegrat
             "1000"
         ));
 
+        String content = asJsonString(monitorTaskJobReq);
         mockMvc.perform(post("/monitor/tasks/jobs")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(TestUtility.asJsonString(monitorTaskJobReq)))
+                            .content(content))
             .andExpect(status().isOk())
-            .andExpect(content().string(equalTo(expectedResponse.apply(JobName.CONFIGURATION.name()))));
+            .andExpect(content().string(content));
 
         verify(authTokenGenerator).generate();
         verify(camundaClient).getTasks(
