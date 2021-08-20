@@ -13,6 +13,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.job.ConfigurationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 
 import java.util.Collections;
@@ -33,6 +34,8 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
     private CamundaClient camundaClient;
     @Mock
     private TaskConfigurationClient taskConfigurationClient;
+    @Mock
+    private ConfigurationJobConfig configurationJobConfig;
 
     @InjectMocks
     private ConfigurationJobService configurationJobService;
@@ -56,13 +59,14 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
 
     private final List<CamundaTask> camundaTasks = List.of(task1, task2);
 
-
     @Test
     void givenGetTasksCamundaRequestShouldRetrieveUserTasksAndNotDelayedTasks() throws JSONException {
+        when(configurationJobConfig.getCamundaMaxResults()).thenReturn("10");
+
         when(camundaClient.getTasks(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("10"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(camundaTasks);
 
