@@ -73,7 +73,7 @@ public class ConfigurationJobService {
                 log.info("Task with id: '{}' configured successfully.", task.getId());
                 outcomeList.add(buildJobOutcome(task, true));
             } catch (Exception e) {
-                log.info("Error while configuring task with id: '{}'", task.getId());
+                log.error("Error while configuring task with id: '{}'", task.getId());
                 outcomeList.add(buildJobOutcome(task, false));
             }
         });
