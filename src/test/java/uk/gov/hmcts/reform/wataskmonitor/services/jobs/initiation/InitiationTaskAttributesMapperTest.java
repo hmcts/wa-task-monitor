@@ -18,6 +18,7 @@ import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUNDA_DATA_TIME_FORMATTER;
 
 class InitiationTaskAttributesMapperTest extends UnitBaseTest {
 
@@ -54,8 +55,8 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
             new TaskAttribute(TaskAttributeDefinition.TASK_CASE_ID, "00000"),
             new TaskAttribute(TaskAttributeDefinition.TASK_CASE_NAME, "someCaseName"),
             new TaskAttribute(TaskAttributeDefinition.TASK_CASE_TYPE_ID, "someCaseType"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_CREATED, createdDate),
-            new TaskAttribute(TaskAttributeDefinition.TASK_DUE_DATE, dueDate),
+            new TaskAttribute(TaskAttributeDefinition.TASK_CREATED, CAMUNDA_DATA_TIME_FORMATTER.format(createdDate)),
+            new TaskAttribute(TaskAttributeDefinition.TASK_DUE_DATE, CAMUNDA_DATA_TIME_FORMATTER.format(dueDate)),
             new TaskAttribute(TaskAttributeDefinition.TASK_DESCRIPTION, "someCamundaTaskDescription"),
             new TaskAttribute(TaskAttributeDefinition.TASK_EXECUTION_TYPE_NAME, "someExecutionType"),
             new TaskAttribute(TaskAttributeDefinition.TASK_HAS_WARNINGS, true),
@@ -63,7 +64,7 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
             new TaskAttribute(TaskAttributeDefinition.TASK_LOCATION, "someStaffLocationId"),
             new TaskAttribute(TaskAttributeDefinition.TASK_LOCATION_NAME, "someStaffLocationName"),
             new TaskAttribute(TaskAttributeDefinition.TASK_NAME, "someCamundaTaskName"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_NOTES, "SomeWarningListValue"),
+            new TaskAttribute(TaskAttributeDefinition.TASK_WARNINGS, "SomeWarningListValue"),
             new TaskAttribute(TaskAttributeDefinition.TASK_REGION, "someRegion"),
             new TaskAttribute(TaskAttributeDefinition.TASK_SECURITY_CLASSIFICATION, "SC"),
             new TaskAttribute(TaskAttributeDefinition.TASK_STATE, CFTTaskState.UNCONFIGURED),
@@ -79,7 +80,8 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
             new TaskAttribute(TaskAttributeDefinition.TASK_ROLE_CATEGORY, null),
             new TaskAttribute(TaskAttributeDefinition.TASK_REGION_NAME, null),
             new TaskAttribute(TaskAttributeDefinition.TASK_TERMINATION_REASON, null),
-            new TaskAttribute(TaskAttributeDefinition.TASK_WORK_TYPE, null)
+            new TaskAttribute(TaskAttributeDefinition.TASK_WORK_TYPE, null),
+            new TaskAttribute(TaskAttributeDefinition.TASK_NOTES, null)
         );
     }
 

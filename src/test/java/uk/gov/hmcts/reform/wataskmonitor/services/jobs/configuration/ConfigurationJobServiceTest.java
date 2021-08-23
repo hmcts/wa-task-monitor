@@ -59,17 +59,12 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
     private TaskConfigurationClient taskConfigurationClient;
     @Mock
     private ConfigurationJobConfig configurationJobConfig;
-
     @InjectMocks
     private ConfigurationJobService configurationJobService;
-
     @Captor
     private ArgumentCaptor<String> actualQueryParametersCaptor;
     @Captor
     private ArgumentCaptor<String> taskIdCaptor;
-
-    private final List<CamundaTask> camundaTasks = List.of(task1, task2);
-
 
     @Test
     void givenGetTasksCamundaRequestShouldRetrieveUserTasksAndNotDelayedTasks() throws JSONException {
@@ -142,34 +137,6 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
                + "  \"taskDefinitionKey\": \"processTask\",\n"
                + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n"
                + "}\n";
-    }
-
-    @Test
-    void givenUnConfiguredTaskThatCanBeConfiguredShouldConfigureThemSuccessfully() {
-        when(taskConfigurationClient.configureTask(
-            eq(SOME_SERVICE_TOKEN),
-            taskIdCaptor.capture()
-        )).thenReturn("OK");
-
-        configurationJobService.configureTasks(camundaTasks, SOME_SERVICE_TOKEN);
-
-        assertThat(taskIdCaptor.getAllValues()).isEqualTo(List.of(task1.getId(), task2.getId()));
-        verify(taskConfigurationClient, times(camundaTasks.size()))
-            .configureTask(eq(SOME_SERVICE_TOKEN), anyString());
-    }
-
-    @Test
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-    void givenUnConfiguredTaskThatCanNotBeConfiguredShouldCatchException() {
-        when(taskConfigurationClient.configureTask(any(), any())).thenThrow(new RuntimeException());
-        Assertions.assertDoesNotThrow(() -> configurationJobService.configureTasks(camundaTasks, SOME_SERVICE_TOKEN));
-    }
-
-    @Test
-    void givenThereAreNoTasksToConfigureShouldNotRunConfigureTaskLogic() {
-        configurationJobService.configureTasks(Collections.emptyList(), SOME_SERVICE_TOKEN);
-
-        verifyNoInteractions(taskConfigurationClient);
     }
 
 }
