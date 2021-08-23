@@ -115,10 +115,8 @@ public class InitiationTaskAttributesMapper {
 
     private CFTTaskState extractTaskState(Map<String, CamundaVariable> variables) {
         String taskStateValue = getVariableValue(variables.get(TASK_STATE.value()), String.class);
-        log.info("{}", taskStateValue);
         if (taskStateValue != null) {
             Optional<CFTTaskState> value = CFTTaskState.from(taskStateValue);
-            log.info("{}", value);
             if (value.isPresent()) {
                 return value.get();
             } else {
