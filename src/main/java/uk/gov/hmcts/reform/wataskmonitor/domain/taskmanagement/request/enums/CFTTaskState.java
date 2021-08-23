@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import static java.util.Arrays.stream;
 
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public enum CFTTaskState {
 
     UNCONFIGURED("unconfigured"),
