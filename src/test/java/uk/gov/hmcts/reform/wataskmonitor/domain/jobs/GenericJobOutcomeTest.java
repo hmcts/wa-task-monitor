@@ -6,6 +6,7 @@ import pl.pojo.tester.api.assertion.Method;
 import static pl.pojo.tester.api.assertion.Assertions.assertPojoMethodsFor;
 
 class GenericJobOutcomeTest {
+
     @Test
     void isWellImplemented() {
 
@@ -14,6 +15,8 @@ class GenericJobOutcomeTest {
         assertPojoMethodsFor(classUnderTest)
             .testing(Method.GETTER)
             .testing(Method.CONSTRUCTOR)
+            .testing(Method.EQUALS)
+            .testing(Method.HASH_CODE)
             .testing(Method.TO_STRING)
             .areWellImplemented();
 

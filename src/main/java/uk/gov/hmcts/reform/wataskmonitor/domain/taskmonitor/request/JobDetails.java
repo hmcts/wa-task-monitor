@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
@@ -11,7 +12,7 @@ public class JobDetails {
     private final JobName name;
 
     @JsonCreator
-    public JobDetails(JobName name) {
+    public JobDetails(@JsonProperty("name") JobName name) {
         this.name = name;
     }
 

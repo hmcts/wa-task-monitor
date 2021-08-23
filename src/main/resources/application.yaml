@@ -12,6 +12,8 @@ management:
         include: health, info, prometheus
 
 spring:
+  config:
+    import: "optional:configtree:/mnt/secrets/wa/"
   jackson.serialization.INDENT_OUTPUT: true
   application:
     name: WA Task monitor
@@ -86,3 +88,10 @@ feign:
         connectTimeout: 30000
         readTimeout: 30000
         loggerLevel: basic
+
+
+job:
+  configuration:
+    camunda-max-results: ${CONFIGURATION_CAMUNDA_MAX_RESULTS:10}
+
+

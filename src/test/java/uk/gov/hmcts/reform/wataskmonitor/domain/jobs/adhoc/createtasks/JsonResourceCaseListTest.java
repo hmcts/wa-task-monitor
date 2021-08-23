@@ -24,7 +24,7 @@ class JsonResourceCaseListTest {
         ObjectContent<JsonResourceCaseList> caseIdListObjectContent =
             jacksonTester.read("ad-hoc-create-tasks.json");
 
-        caseIdListObjectContent.assertThat().isEqualToComparingFieldByField(
+        caseIdListObjectContent.assertThat().isEqualTo(
             new JsonResourceCaseList(List.of("1626272789070361", "1626272789070362")));
     }
 
@@ -36,6 +36,8 @@ class JsonResourceCaseListTest {
         assertPojoMethodsFor(classUnderTest)
             .testing(Method.GETTER)
             .testing(Method.CONSTRUCTOR)
+            .testing(Method.EQUALS)
+            .testing(Method.HASH_CODE)
             .testing(Method.TO_STRING)
             .areWellImplemented();
 

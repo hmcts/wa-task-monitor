@@ -2,13 +2,42 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([cron('H 05 * * *')])
+  pipelineTriggers([cron('H 05 * * *')]),
+  parameters([
+    string(name: 'URL_TO_TEST', defaultValue: 'http://wa-task-monitor-aat.service.core-compute-aat.internal', description: 'The URL you want to run these tests against'),
+    string(name: 'SecurityRules',
+      defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
+      description: 'The URL you want to run these tests against'),
+  ])
 ])
 
 @Library("Infrastructure")
 
 def type = "java"
 def product = "rpe"
-def component = "spring-boot-template"
+def component = "task-monitor"
 
-withNightlyPipeline(type, product, component) {}
+def secrets = [
+  's2s-${env}': [
+    secret('microservicekey-wa-task-monitor', 'S2S_SECRET_TASK_MONITOR'),
+  ]
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [$class     : 'AzureKeyVaultSecret',
+   secretType : 'Secret',
+   name       : secretName,
+   version    : '',
+   envVariable: envVar
+  ]
+}
+
+withNightlyPipeline(type, product, component) {
+  env.TEST_URL = params.URL_TO_TEST
+  env.Rules = params.SecurityRules
+  env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+  loadVaultSecrets(secrets)
+
+  enableFullFunctionalTest()
+  enableSlackNotifications('#wa-build')
+}

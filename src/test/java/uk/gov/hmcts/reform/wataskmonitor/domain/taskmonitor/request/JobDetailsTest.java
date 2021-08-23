@@ -1,17 +1,15 @@
-package uk.gov.hmcts.reform.wataskmonitor.domain.jobs;
+package uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request;
 
 import org.junit.jupiter.api.Test;
 import pl.pojo.tester.api.assertion.Method;
 
 import static pl.pojo.tester.api.assertion.Assertions.assertPojoMethodsFor;
 
-class GenericJobReportTest {
+class JobDetailsTest {
 
     @Test
     void isWellImplemented() {
-
-        final Class<?> classUnderTest = GenericJobReport.class;
-
+        final Class<?> classUnderTest = JobDetails.class;
         assertPojoMethodsFor(classUnderTest)
             .testing(Method.GETTER)
             .testing(Method.CONSTRUCTOR)
@@ -19,6 +17,6 @@ class GenericJobReportTest {
             .testing(Method.HASH_CODE)
             .testing(Method.TO_STRING)
             .areWellImplemented();
-
     }
+
 }
