@@ -25,14 +25,14 @@ public class GenericJobReport extends JobReport {
     @ToString.Include
     public long getTotalNumberOfSuccesses() {
         return outcomeList.stream()
-            .filter(GenericJobOutcome::isCreated)
+            .filter(GenericJobOutcome::isSuccessful)
             .count();
     }
 
     @ToString.Include
     public long getTotalNumberOfFailures() {
         return outcomeList.stream()
-            .filter(outcome -> !outcome.isCreated())
+            .filter(outcome -> !outcome.isSuccessful())
             .count();
     }
 

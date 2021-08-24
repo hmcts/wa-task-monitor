@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.jobs.configuration;
+package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,22 +18,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class ConfigurationJobTest extends UnitBaseTest {
+class InitiationJobTest extends UnitBaseTest {
 
     @Mock
-    private ConfigurationJobService configurationJobService;
+    private InitiationJobService initiationJobService;
     @InjectMocks
-    private ConfigurationJob configurationJob;
+    private InitiationJob initiationJob;
 
     @ParameterizedTest(name = "jobName: {0} expected: {1}")
     @CsvSource({
         "TERMINATION, false",
-        "INITIATION, false",
-        "CONFIGURATION, true",
+        "INITIATION, true",
+        "CONFIGURATION, false",
         "AD_HOC_DELETE_PROCESS_INSTANCES, false"
     })
     void canRun(JobName jobName, boolean expectedResult) {
-        assertThat(configurationJob.canRun(jobName)).isEqualTo(expectedResult);
+        assertThat(initiationJob.canRun(jobName)).isEqualTo(expectedResult);
     }
 
     @Test
@@ -44,7 +44,7 @@ class ConfigurationJobTest extends UnitBaseTest {
             "someProcessInstanceId"
         );
         List<CamundaTask> taskList = singletonList(camundaTask);
-        when(configurationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN))
+        when(initiationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN))
             .thenReturn(taskList);
         GenericJobReport jobReport = new GenericJobReport(
             1,
@@ -52,15 +52,15 @@ class ConfigurationJobTest extends UnitBaseTest {
                               .taskId("some taskId")
                               .processInstanceId("some processInstanceId")
                               .successful(true)
-                              .jobType("Task Configuration")
+                              .jobType("Task Initiation")
                               .build())
         );
-        when(configurationJobService.configureTasks(taskList, SOME_SERVICE_TOKEN))
+        when(initiationJobService.initiateTasks(taskList, SOME_SERVICE_TOKEN))
             .thenReturn(jobReport);
 
-        configurationJob.run(SOME_SERVICE_TOKEN);
+        initiationJob.run(SOME_SERVICE_TOKEN);
 
-        verify(configurationJobService).getUnConfiguredTasks(SOME_SERVICE_TOKEN);
-        verify(configurationJobService).configureTasks(taskList, SOME_SERVICE_TOKEN);
+        verify(initiationJobService).getUnConfiguredTasks(SOME_SERVICE_TOKEN);
+        verify(initiationJobService).initiateTasks(taskList, SOME_SERVICE_TOKEN);
     }
 }

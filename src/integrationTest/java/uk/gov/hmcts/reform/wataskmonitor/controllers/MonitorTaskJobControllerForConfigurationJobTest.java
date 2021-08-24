@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.wacaseeventhandler.TestUtility;
-import uk.gov.hmcts.reform.wacaseeventhandler.matchers.CamundaQueryParametersMatcher;
+import uk.gov.hmcts.reform.wataskmonitor.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
+import uk.gov.hmcts.reform.wataskmonitor.matchers.CamundaQueryParametersMatcher;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.wacaseeventhandler.controllers.MonitorTaskJobControllerUtility.expectedResponse;
+import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
 class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootIntegrationBaseTest {
 
@@ -41,24 +41,6 @@ class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootIntegrat
     @BeforeEach
     void setUp() {
         mockExternalDependencies();
-    }
-
-    private void mockExternalDependencies() {
-        when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
-
-        when(camundaClient.getTasks(
-            eq(SERVICE_TOKEN),
-            eq("0"),
-            eq("10"),
-            argThat(new CamundaQueryParametersMatcher(TestUtility.getExpectedRequestForUnconfiguredTasks()))
-        )).thenReturn(List.of(new CamundaTask(
-            CAMUNDA_TASK_ID,
-            "task name",
-            "2151a580-c3c3-11eb-8b76-d26a7287fec2"
-        )));
-
-        when(taskConfigurationClient.configureTask(eq(SERVICE_TOKEN), eq(CAMUNDA_TASK_ID)))
-            .thenReturn("OK");
     }
 
     @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
@@ -80,6 +62,24 @@ class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootIntegrat
             argThat(new CamundaQueryParametersMatcher(TestUtility.getExpectedRequestForUnconfiguredTasks()))
         );
         verify(taskConfigurationClient).configureTask(eq(SERVICE_TOKEN), eq(CAMUNDA_TASK_ID));
+    }
+
+    private void mockExternalDependencies() {
+        when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
+
+        when(camundaClient.getTasks(
+            eq(SERVICE_TOKEN),
+            eq("0"),
+            eq("10"),
+            argThat(new CamundaQueryParametersMatcher(TestUtility.getExpectedRequestForUnconfiguredTasks()))
+        )).thenReturn(List.of(new CamundaTask(
+            CAMUNDA_TASK_ID,
+            "task name",
+            "2151a580-c3c3-11eb-8b76-d26a7287fec2"
+        )));
+
+        when(taskConfigurationClient.configureTask(eq(SERVICE_TOKEN), eq(CAMUNDA_TASK_ID)))
+            .thenReturn("OK");
     }
 
 }

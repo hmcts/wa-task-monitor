@@ -39,12 +39,12 @@ public class ConfigurationJobService {
     }
 
     public List<CamundaTask> getUnConfiguredTasks(String serviceToken) {
-        log.info("Retrieving unconfigured tasks from camunda.");
+        log.info("Retrieving tasks with '{}' = '{}' from camunda.", "taskState", "unconfigured");
         List<CamundaTask> camundaTasks = camundaClient.getTasks(
             serviceToken,
             "0",
             configurationJobConfig.getCamundaMaxResults(),
-            getQueryParameters()
+            buildSearchQuery()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());
         return camundaTasks;
@@ -71,28 +71,25 @@ public class ConfigurationJobService {
                 log.info("Attempting to configure task with id: '{}'", task.getId());
                 taskConfigurationClient.configureTask(serviceToken, task.getId());
                 log.info("Task with id: '{}' configured successfully.", task.getId());
-                outcomeList.add(
-                    GenericJobOutcome.builder()
-                        .taskId(task.getId())
-                        .processInstanceId(task.getProcessInstanceId())
-                        .created(true)
-                        .build()
-                );
+                outcomeList.add(buildJobOutcome(task, true));
             } catch (Exception e) {
-                log.info("Error while configuring task with id: '{}'", task.getId());
-                outcomeList.add(
-                    GenericJobOutcome.builder()
-                        .taskId(task.getId())
-                        .processInstanceId(task.getProcessInstanceId())
-                        .created(false)
-                        .build()
-                );
+                log.error("Error while configuring task with id: '{}'", task.getId());
+                outcomeList.add(buildJobOutcome(task, false));
             }
         });
         return outcomeList;
     }
 
-    private String getQueryParameters() {
+    private GenericJobOutcome buildJobOutcome(CamundaTask task, boolean isSuccessful) {
+        return GenericJobOutcome.builder()
+            .taskId(task.getId())
+            .processInstanceId(task.getProcessInstanceId())
+            .successful(isSuccessful)
+            .jobType("Task Creation")
+            .build();
+    }
+
+    private String buildSearchQuery() {
         return ResourceUtility.getResource(CAMUNDA_TASKS_UNCONFIGURED)
             .replace("CREATED_BEFORE_PLACEHOLDER", getCreatedBeforeDate());
     }

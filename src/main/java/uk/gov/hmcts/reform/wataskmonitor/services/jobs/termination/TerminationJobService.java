@@ -74,7 +74,7 @@ public class TerminationJobService {
                     taskManagementClient.terminateTask(serviceAuthorizationToken, task.getId(), request);
                     log.info("Task with id: '{}' terminated successfully.", task.getId());
                 } catch (Exception e) {
-                    log.info("Error while terminating task with id: '{}' and reason '{}'", task.getId(), reason);
+                    log.error("Error while terminating task with id: '{}' and reason '{}'", task.getId(), reason);
                 }
             });
         }

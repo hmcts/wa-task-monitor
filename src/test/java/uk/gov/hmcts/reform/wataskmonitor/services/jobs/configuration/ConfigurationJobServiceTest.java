@@ -30,34 +30,41 @@ import static org.mockito.Mockito.when;
 
 class ConfigurationJobServiceTest extends UnitBaseTest {
 
+    private final CamundaTask task1 = new CamundaTask(
+        "some id",
+        "task name 1",
+        "2151a580-c3c3-11eb-8b76-d26a7287fec2",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+    private final CamundaTask task2 = new CamundaTask(
+        "some other id",
+        "task name 2",
+        "2151a580-c3c3-11eb-8b76-d26a7287f000",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+    private final List<CamundaTask> camundaTasks = List.of(task1, task2);
     @Mock
     private CamundaClient camundaClient;
     @Mock
     private TaskConfigurationClient taskConfigurationClient;
     @Mock
     private ConfigurationJobConfig configurationJobConfig;
-
     @InjectMocks
     private ConfigurationJobService configurationJobService;
-
     @Captor
     private ArgumentCaptor<String> actualQueryParametersCaptor;
     @Captor
     private ArgumentCaptor<String> taskIdCaptor;
-
-    private final CamundaTask task1 = new CamundaTask(
-        "some id",
-        "task name 1",
-        "2151a580-c3c3-11eb-8b76-d26a7287fec2"
-    );
-
-    private final CamundaTask task2 = new CamundaTask(
-        "some other id",
-        "task name 2",
-        "2151a580-c3c3-11eb-8b76-d26a7287f000"
-    );
-
-    private final List<CamundaTask> camundaTasks = List.of(task1, task2);
 
     @Test
     void givenGetTasksCamundaRequestShouldRetrieveUserTasksAndNotDelayedTasks() throws JSONException {
@@ -75,33 +82,6 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
         assertQueryTargetsUserTasksAndNotDelayedTasks("{taskDefinitionKey: processTask}");
         assertQueryTargetsUserTasksAndNotDelayedTasks(getExpectedQueryParameters());
         assertThat(actualCamundaTasks).isEqualTo(camundaTasks);
-    }
-
-    private void assertQueryTargetsUserTasksAndNotDelayedTasks(String expected) throws JSONException {
-        JSONAssert.assertEquals(
-            expected,
-            actualQueryParametersCaptor.getValue(),
-            JSONCompareMode.LENIENT
-        );
-    }
-
-    @NotNull
-    private String getExpectedQueryParameters() {
-        return "{\n"
-               + "  \"orQueries\": [\n"
-               + "    {\n"
-               + "      \"taskVariables\": [\n"
-               + "        {\n"
-               + "          \"name\": \"taskState\",\n"
-               + "          \"operator\": \"eq\",\n"
-               + "          \"value\": \"unconfigured\"\n"
-               + "        }\n"
-               + "      ]\n"
-               + "    }\n"
-               + "  ],\n"
-               + "  \"taskDefinitionKey\": \"processTask\",\n"
-               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n"
-               + "}\n";
     }
 
     @Test
@@ -130,6 +110,33 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
         configurationJobService.configureTasks(Collections.emptyList(), SOME_SERVICE_TOKEN);
 
         verifyNoInteractions(taskConfigurationClient);
+    }
+
+    private void assertQueryTargetsUserTasksAndNotDelayedTasks(String expected) throws JSONException {
+        JSONAssert.assertEquals(
+            expected,
+            actualQueryParametersCaptor.getValue(),
+            JSONCompareMode.LENIENT
+        );
+    }
+
+    @NotNull
+    private String getExpectedQueryParameters() {
+        return "{\n"
+               + "  \"orQueries\": [\n"
+               + "    {\n"
+               + "      \"taskVariables\": [\n"
+               + "        {\n"
+               + "          \"name\": \"taskState\",\n"
+               + "          \"operator\": \"eq\",\n"
+               + "          \"value\": \"unconfigured\"\n"
+               + "        }\n"
+               + "      ]\n"
+               + "    }\n"
+               + "  ],\n"
+               + "  \"taskDefinitionKey\": \"processTask\",\n"
+               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n"
+               + "}\n";
     }
 
 }

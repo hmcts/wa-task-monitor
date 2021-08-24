@@ -30,7 +30,7 @@ public class ConfigurationJob implements JobService {
 
     @Override
     public void run(String serviceToken) {
-        log.info("Starting task configuration job.");
+        log.info("Starting {} job.", CONFIGURATION);
         List<CamundaTask> tasks = configurationJobService.getUnConfiguredTasks(serviceToken);
         GenericJobReport report = configurationJobService.configureTasks(tasks, serviceToken);
         log.info("{} job finished successfully: {}", CONFIGURATION, logPrettyPrint(report));

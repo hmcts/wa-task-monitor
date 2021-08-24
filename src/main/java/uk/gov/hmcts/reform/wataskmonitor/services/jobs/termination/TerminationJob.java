@@ -25,7 +25,7 @@ public class TerminationJob implements JobService {
 
     @Override
     public void run(String serviceToken) {
-        log.info("Starting task termination job.");
+        log.info("Starting task {} job.", TERMINATION);
         terminationJobService.terminateTasks(serviceToken);
         log.info("Task termination job completed successfully.");
 
