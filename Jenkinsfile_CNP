@@ -1,6 +1,8 @@
 #!groovy
 @Library("Infrastructure")
 
+import uk.gov.hmcts.contino.AppPipelineDsl
+
 def type = "java"
 def product = "wa"
 def component = "task-monitor"
