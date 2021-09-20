@@ -25,7 +25,7 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 public class IdamConsumerTestForPostUserInfo extends SpringBootContractBaseTest {
 
     @Autowired
-    IdamWebApi idamApi;
+    private IdamWebApi idamApi;
 
     @Pact(provider = "idamApi_oidc", consumer = "wa_task_monitor")
     public RequestResponsePact generatePactFragmentUserInfo(PactDslWithProvider builder) {
@@ -61,5 +61,5 @@ public class IdamConsumerTestForPostUserInfo extends SpringBootContractBaseTest 
             .minArrayLike("roles", 1, PactDslJsonRootValue.stringType("caseworker-ia-legalrep-solicitor"), 1)
             .stringType("IDAM_ADMIN_USER");
     }
-    
+
 }

@@ -25,7 +25,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class IdamConsumerTestForPostToken extends SpringBootContractBaseTest {
 
     @Autowired
-    IdamWebApi idamApi;
+    private IdamWebApi idamApi;
 
     @Pact(provider = "idamApi_oidc", consumer = "wa_task_monitor")
     public RequestResponsePact generatePactFragmentToken(PactDslWithProvider builder) {
