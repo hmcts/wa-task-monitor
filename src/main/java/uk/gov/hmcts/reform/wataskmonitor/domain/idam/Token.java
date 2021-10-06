@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.wataskmonitor.domain.idam;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @EqualsAndHashCode
 @ToString
-@Getter
 public class Token {
 
     private String accessToken;
@@ -19,6 +22,14 @@ public class Token {
     public Token(String accessToken, String scope) {
         this.accessToken = accessToken;
         this.scope = scope;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public String getScope() {
+        return scope;
     }
 
 }
