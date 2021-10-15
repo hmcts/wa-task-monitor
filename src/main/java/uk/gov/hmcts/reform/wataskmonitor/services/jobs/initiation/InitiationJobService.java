@@ -93,8 +93,8 @@ public class InitiationJobService {
             } catch (Exception e) {
                 log.error("Error while initiating taskId({}) and processId({})",
                     task.getId(),
-                    task.getProcessInstanceId());
-                e.printStackTrace();
+                    task.getProcessInstanceId(),
+                    e);
                 outcomeList.add(buildJobOutcome(task, false));
             }
         });
