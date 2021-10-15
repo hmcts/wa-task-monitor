@@ -91,7 +91,10 @@ public class InitiationJobService {
                 log.info("Task with id: '{}' initiated successfully.", task.getId());
                 outcomeList.add(buildJobOutcome(task, true));
             } catch (Exception e) {
-                log.error("Error while initiating task with id: '{}'", task.getId());
+                log.error("Error while initiating taskId({}) and processId({})",
+                    task.getId(),
+                    task.getProcessInstanceId(),
+                    e);
                 outcomeList.add(buildJobOutcome(task, false));
             }
         });
