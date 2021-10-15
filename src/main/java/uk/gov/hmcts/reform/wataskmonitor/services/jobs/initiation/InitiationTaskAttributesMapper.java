@@ -53,24 +53,30 @@ public class InitiationTaskAttributesMapper {
         String assignee = camundaTask.getAssignee();
         String description = camundaTask.getDescription();
         // Local Variables
-        String type = getVariableValue(variables.get(TASK_TYPE.value()), String.class);
+        String type = getVariableValue(variables.get(TASK_TYPE.value()), String.class, null);
         CFTTaskState taskState = extractTaskState(variables);
-        String executionTypeName = getVariableValue(variables.get(EXECUTION_TYPE.value()), String.class);
-        String securityClassification = getVariableValue(variables.get(SECURITY_CLASSIFICATION.value()), String.class);
-        String taskTitle = getVariableValue(variables.get(TITLE.value()), String.class);
+        String executionTypeName = getVariableValue(variables.get(EXECUTION_TYPE.value()),
+            String.class,
+            null);
+        String securityClassification = getVariableValue(variables.get(SECURITY_CLASSIFICATION.value()),
+            String.class,
+            null);
+        String taskTitle = getVariableValue(variables.get(TITLE.value()), String.class,null);
 
-        boolean autoAssigned = getVariableValue(variables.get(AUTO_ASSIGNED.value()), Boolean.class);
-        String taskSystem = getVariableValue(variables.get(TASK_SYSTEM.value()), String.class);
-        String jurisdiction = getVariableValue(variables.get(JURISDICTION.value()), String.class);
-        String region = getVariableValue(variables.get(REGION.value()), String.class);
-        String location = getVariableValue(variables.get(LOCATION.value()), String.class);
-        String locationName = getVariableValue(variables.get(LOCATION_NAME.value()), String.class);
-        String caseTypeId = getVariableValue(variables.get(CASE_TYPE_ID.value()), String.class);
-        String caseId = getVariableValue(variables.get(CASE_ID.value()), String.class);
-        String caseName = getVariableValue(variables.get(CASE_NAME.value()), String.class);
-        Boolean hasWarnings = getVariableValue(variables.get(HAS_WARNINGS.value()), Boolean.class);
-        String warningList = getVariableValue(variables.get(WARNING_LIST.value()), String.class);
-        String caseManagementCategory = getVariableValue(variables.get(CASE_MANAGEMENT_CATEGORY.value()), String.class);
+        boolean autoAssigned = getVariableValue(variables.get(AUTO_ASSIGNED.value()), Boolean.class, false);
+        String taskSystem = getVariableValue(variables.get(TASK_SYSTEM.value()), String.class, null);
+        String jurisdiction = getVariableValue(variables.get(JURISDICTION.value()), String.class, null);
+        String region = getVariableValue(variables.get(REGION.value()), String.class, null);
+        String location = getVariableValue(variables.get(LOCATION.value()), String.class, null);
+        String locationName = getVariableValue(variables.get(LOCATION_NAME.value()), String.class, null);
+        String caseTypeId = getVariableValue(variables.get(CASE_TYPE_ID.value()), String.class, null);
+        String caseId = getVariableValue(variables.get(CASE_ID.value()), String.class, null);
+        String caseName = getVariableValue(variables.get(CASE_NAME.value()), String.class, null);
+        Boolean hasWarnings = getVariableValue(variables.get(HAS_WARNINGS.value()), Boolean.class, null);
+        String warningList = getVariableValue(variables.get(WARNING_LIST.value()), String.class, null);
+        String caseManagementCategory = getVariableValue(variables.get(CASE_MANAGEMENT_CATEGORY.value()),
+            String.class,
+            null);
 
         return asList(
             new TaskAttribute(TaskAttributeDefinition.TASK_ASSIGNEE, assignee),
@@ -109,12 +115,8 @@ public class InitiationTaskAttributesMapper {
         );
     }
 
-    public <T> Optional<T> read(CamundaVariable variable, Class<T> type) {
-        return map(variable, type);
-    }
-
     private CFTTaskState extractTaskState(Map<String, CamundaVariable> variables) {
-        String taskStateValue = getVariableValue(variables.get(TASK_STATE.value()), String.class);
+        String taskStateValue = getVariableValue(variables.get(TASK_STATE.value()), String.class, null);
         if (taskStateValue != null) {
             Optional<CFTTaskState> value = CFTTaskState.from(taskStateValue);
             if (value.isPresent()) {
@@ -129,13 +131,12 @@ public class InitiationTaskAttributesMapper {
         throw new IllegalStateException("taskState cannot be null");
     }
 
-    private <T> T getVariableValue(CamundaVariable variable, Class<T> type) {
-        Optional<T> value = read(variable, type);
-        return value.orElse(null);
+    private <T> T getVariableValue(CamundaVariable variable, Class<T> type, T defaultValue) {
+        Optional<T> value = map(variable, type);
+        return value.orElse(defaultValue);
     }
 
     private <T> Optional<T> map(CamundaVariable variable, Class<T> type) {
-
         if (variable == null) {
             return Optional.empty();
         }
