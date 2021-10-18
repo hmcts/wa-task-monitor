@@ -44,7 +44,6 @@ public final class InitiationHelpers {
     }
 
     public static Map<String, CamundaVariable> createMockCamundaVariables() {
-
         Map<String, CamundaVariable> variables = new HashMap<>();
         variables.put("caseId", new CamundaVariable("00000", "String"));
         variables.put("caseName", new CamundaVariable("someCaseName", "String"));

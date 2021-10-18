@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
@@ -10,16 +13,19 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskAttribute;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.CFTTaskState;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TaskAttributeDefinition;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.InitiationHelpers;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUNDA_DATA_TIME_FORMATTER;
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.InitiationHelpers.createMockCamundaVariables;
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.InitiationHelpers.createMockedCamundaTask;
 
+@Slf4j
 class InitiationTaskAttributesMapperTest extends UnitBaseTest {
 
     @InjectMocks
@@ -30,21 +36,32 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
         initiationTaskAttributesMapper = new InitiationTaskAttributesMapper(new ObjectMapper());
     }
 
-    @Test
-    void should_map_task_attributes() {
+    public static Stream<Arguments> scenarioProvider() {
+        Map<String, CamundaVariable> camundaVariables = createMockCamundaVariables();
 
+        Map<String, CamundaVariable> camundaVariablesWithNoAutoAssigned = createMockCamundaVariables();
+        camundaVariablesWithNoAutoAssigned.remove("autoAssigned");
+
+        return Stream.of(
+            Arguments.of("all vars are present", camundaVariables),
+            Arguments.of("autoAssigned is not present", camundaVariablesWithNoAutoAssigned)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("scenarioProvider")
+    void should_map_task_attributes(String scenarioName, Map<String, CamundaVariable> variables) {
+        log.info(scenarioName);
         ZonedDateTime createdDate = ZonedDateTime.now();
         ZonedDateTime dueDate = createdDate.plusDays(1);
 
-        CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(createdDate, dueDate);
-        Map<String, CamundaVariable> variables = InitiationHelpers.createMockCamundaVariables();
+        CamundaTask camundaTask = createMockedCamundaTask(createdDate, dueDate);
 
         List<TaskAttribute> actual = initiationTaskAttributesMapper.mapTaskAttributes(camundaTask, variables);
         List<TaskAttribute> expected = getExpectedTaskAttributes(createdDate, dueDate);
 
         assertEquals(expected, actual);
     }
-
 
     private List<TaskAttribute> getExpectedTaskAttributes(ZonedDateTime createdDate, ZonedDateTime dueDate) {
 
