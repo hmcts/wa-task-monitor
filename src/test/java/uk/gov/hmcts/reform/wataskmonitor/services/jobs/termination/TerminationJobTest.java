@@ -25,7 +25,7 @@ class TerminationJobTest extends UnitBaseTest {
         "CONFIGURATION, false",
         "AD_HOC_DELETE_PROCESS_INSTANCES, false"
     })
-    void canRun(JobName jobName, boolean expectedResult) {
+    void can_run(JobName jobName, boolean expectedResult) {
         assertThat(terminationJob.canRun(jobName)).isEqualTo(expectedResult);
     }
 

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.CANCELLED;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.COMPLETED;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.DELETED;
 import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION;
 
 @Slf4j
@@ -43,8 +44,13 @@ public class TerminationJobService {
             .filter(t -> t.getDeleteReason().equals("cancelled"))
             .collect(Collectors.toList());
 
+        List<HistoricCamundaTask> deletedTasks = tasks.stream()
+            .filter(t -> t.getDeleteReason().equals("deleted"))
+            .collect(Collectors.toList());
+
         terminateAllTasksWithReason(serviceAuthorizationToken, completedTasks, COMPLETED);
         terminateAllTasksWithReason(serviceAuthorizationToken, cancelledTasks, CANCELLED);
+        terminateAllTasksWithReason(serviceAuthorizationToken, deletedTasks, DELETED);
     }
 
     private List<HistoricCamundaTask> getTasksPendingTermination(String serviceToken) {
