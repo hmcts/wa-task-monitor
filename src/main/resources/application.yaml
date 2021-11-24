@@ -60,7 +60,7 @@ idam:
     secret: ${S2S_SECRET_TASK_MONITOR:AAAAAAAAAAAAAAAA}
     name: wa_task_monitor
   s2s-authorised:
-    services: ${WA_S2S_AUTHORIZED_SERVICES:wa_task_monitor}
+    services: ${WA_S2S_AUTHORIZED_SERVICES:wa_task_monitor,wa_task_management_api}
   system:
     username: ${WA_SYSTEM_USERNAME:some_user@hmcts.net}
     password: ${WA_SYSTEM_PASSWORD:password}

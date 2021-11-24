@@ -10,7 +10,6 @@
       ]
     }
   ],
-  "createdBefore": "CREATED_BEFORE_PLACEHOLDER",
   "taskDefinitionKey": "processTask",
   "processDefinitionKey": "wa-task-initiation-ia-asylum"
 }

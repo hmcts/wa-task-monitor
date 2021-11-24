@@ -13,8 +13,6 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.InitiateT
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskAttribute;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -111,14 +109,7 @@ public class InitiationJobService {
     }
 
     private String buildSearchQuery() {
-        return ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED)
-            .replace("CREATED_BEFORE_PLACEHOLDER", getCreatedBeforeDate());
-    }
-
-    private static String getCreatedBeforeDate() {
-        return ZonedDateTime.now()
-            .minusMinutes(5)
-            .format(DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN));
+        return ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED);
     }
 
 }
