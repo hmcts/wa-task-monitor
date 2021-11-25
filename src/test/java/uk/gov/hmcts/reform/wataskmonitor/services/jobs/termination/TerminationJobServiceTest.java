@@ -30,6 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.CANCELLED;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.COMPLETED;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.DELETED;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class TerminationJobServiceTest extends UnitBaseTest {
@@ -46,7 +47,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
     private ArgumentCaptor<String> actualQueryParametersCaptor;
 
     @Test
-    void shouldThrowExceptionWhenCamundaCallFails() {
+    void should_throw_exception_when_camunda_call_fails() {
 
         doThrow(FeignException.GatewayTimeout.class)
             .when(camundaClient)
@@ -64,7 +65,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
 
 
     @Test
-    void shouldSucceedWhenNoTasksReturned() throws JSONException {
+    void should_succeed_when_no_tasks_returned() throws JSONException {
 
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
@@ -78,14 +79,16 @@ class TerminationJobServiceTest extends UnitBaseTest {
         assertQuery();
         verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 0);
         verifyTerminateEndpointWasCalledWithTerminateReason(COMPLETED, 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason(DELETED, 0);
     }
 
 
     @Test
-    void shouldFetchTasksAndTerminateThem() throws JSONException {
+    void should_fetch_tasks_and_terminate_them() throws JSONException {
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "cancelled"),
-            new HistoricCamundaTask("2", "completed")
+            new HistoricCamundaTask("2", "completed"),
+            new HistoricCamundaTask("3", "deleted")
         );
 
         when(camundaClient.getTasksFromHistory(
@@ -100,11 +103,12 @@ class TerminationJobServiceTest extends UnitBaseTest {
         assertQuery();
         verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 1);
         verifyTerminateEndpointWasCalledWithTerminateReason(COMPLETED, 1);
+        verifyTerminateEndpointWasCalledWithTerminateReason(DELETED, 1);
     }
 
 
     @Test
-    void shouldFetchTasksAndCallTerminateForCancelledTaskOnly() throws JSONException {
+    void should_fetch_tasks_and_call_terminate_for_cancelled_task_only() throws JSONException {
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "cancelled")
         );
@@ -121,10 +125,11 @@ class TerminationJobServiceTest extends UnitBaseTest {
         assertQuery();
         verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 1);
         verifyTerminateEndpointWasCalledWithTerminateReason(COMPLETED, 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason(DELETED, 0);
     }
 
     @Test
-    void shouldFetchTasksAndCallTerminateForCompletedTaskOnly() throws JSONException {
+    void should_fetch_tasks_and_call_terminate_for_completed_task_only() throws JSONException {
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "completed")
         );
@@ -141,6 +146,28 @@ class TerminationJobServiceTest extends UnitBaseTest {
         assertQuery();
         verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 0);
         verifyTerminateEndpointWasCalledWithTerminateReason(COMPLETED, 1);
+        verifyTerminateEndpointWasCalledWithTerminateReason(DELETED, 0);
+    }
+
+    @Test
+    void should_fetch_tasks_and_call_terminate_for_deleted_task_only() throws JSONException {
+        List<HistoricCamundaTask> expectedCamundaTasks = List.of(
+            new HistoricCamundaTask("1", "deleted")
+        );
+
+        when(camundaClient.getTasksFromHistory(
+            eq(SOME_SERVICE_TOKEN),
+            eq("0"),
+            eq("1000"),
+            actualQueryParametersCaptor.capture()
+        )).thenReturn(expectedCamundaTasks);
+
+        terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
+
+        assertQuery();
+        verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason(COMPLETED, 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason(DELETED, 1);
     }
 
     private void verifyTerminateEndpointWasCalledWithTerminateReason(TerminateReason terminateReason,
@@ -167,6 +194,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
                + "      \"value\": \"pendingTermination\"\n"
                + "    }\n"
                + "  ],\n"
+               + "  \"taskDefinitionKey\": \"processTask\",\n"
                + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n"
                + "}";
     }
