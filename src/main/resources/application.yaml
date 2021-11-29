@@ -39,7 +39,7 @@ camunda:
   url: ${CAMUNDA_URL:http://camunda-local-bpm/engine-rest}
 
 task-configuration:
-  url: ${TASK_CONFIGURATION_SERVICE_URL:http://localhost:8091}
+  url: ${TASK_CONFIGURATION_SERVICE_URL:http://localhost:8087}
 
 task-management:
   url: ${TASK_MANAGEMENT_SERVICE_URL:http://localhost:8087}
