@@ -135,7 +135,13 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
                + "    }\n"
                + "  ],\n"
                + "  \"taskDefinitionKey\": \"processTask\",\n"
-               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n"
+               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
+               + "  \"sorting\": [\n"
+               + "    {\n"
+               + "      \"sortBy\": \"created\",\n"
+               + "      \"sortOrder\": \"desc\"\n"
+               + "    }\n"
+               + "  ]"
                + "}\n";
     }
 

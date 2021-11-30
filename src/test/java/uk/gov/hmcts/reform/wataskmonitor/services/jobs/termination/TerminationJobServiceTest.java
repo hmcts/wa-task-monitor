@@ -195,7 +195,13 @@ class TerminationJobServiceTest extends UnitBaseTest {
                + "    }\n"
                + "  ],\n"
                + "  \"taskDefinitionKey\": \"processTask\",\n"
-               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n"
+               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
+               + "  \"sorting\": [\n"
+               + "    {\n"
+               + "      \"sortBy\": \"startTime\",\n"
+               + "      \"sortOrder\": \"desc\"\n"
+               + "    }\n"
+               + "  ]"
                + "}";
     }
 }

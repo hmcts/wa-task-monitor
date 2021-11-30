@@ -1,4 +1,6 @@
 {
+  "taskDefinitionKey": "processTask",
+  "processDefinitionKey": "wa-task-initiation-ia-asylum",
   "orQueries": [
     {
       "taskVariables": [
@@ -11,6 +13,10 @@
     }
   ],
   "createdBefore": "CREATED_BEFORE_PLACEHOLDER",
-  "taskDefinitionKey": "processTask",
-  "processDefinitionKey": "wa-task-initiation-ia-asylum"
+  "sorting": [
+    {
+      "sortBy": "created",
+      "sortOrder": "desc"
+    }
+  ]
 }
