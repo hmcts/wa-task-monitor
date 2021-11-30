@@ -37,7 +37,11 @@ withNightlyPipeline(type, product, component) {
   env.Rules = params.SecurityRules
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   loadVaultSecrets(secrets)
-
+  enableFortifyScan()
   enableFullFunctionalTest()
   enableSlackNotifications('#wa-build')
+
+  after('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+  }
 }
