@@ -11,11 +11,11 @@ import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SER
 
 @FeignClient(
     name = "taskConfiguration",
-    url = "${task-configuration.url}"
+    url = "${task-management.url}"
 )
 public interface TaskConfigurationClient {
 
-    @PostMapping(value = "/task/{task-id}",
+    @PostMapping(value = "/task-configuration/{task-id}",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )

@@ -16,10 +16,10 @@ delayed Tasks which may be in the Unconfigured state but in the taskState variab
 ![wa-monitor-unconfigured-tasks-service](TaskMonitor.png)
 
 Once the Tasks are returned the Configuration process for each one would be triggered by invoking the
-wa-task-configuration-service using the following endpoint: POST /task/{task-id}.
+wa-task-management-service using the following endpoint: POST /task-configuration/{task-id}.
 
 However, this would require a different approach to the one above whereby it can be done by simply providing the
-appropriate TaskId. Task Configuration Service would then retrieve the Task from Camunda and update it over Rest. The
+appropriate TaskId. Task Management Service would then retrieve the Task from Camunda and update it over Rest. The
 following diagram shows the process:
 
 ![wa-monitor-unconfigured-tasks-service](TaskConfigurationOverRest.png)
