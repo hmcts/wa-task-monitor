@@ -10,7 +10,7 @@
   ],
   "sorting": [
     {
-      "sortBy": "startTime",
+      "sortBy": "endTime",
       "sortOrder": "desc"
     }
   ]
