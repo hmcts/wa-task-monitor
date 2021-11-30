@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(properties = {
-    "task-configuration.url=http://localhost:9562"
+    "task-management.url=http://localhost:9562"
 })
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(profiles = {"local"})

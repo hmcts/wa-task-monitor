@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SER
 
 @FeignClient(
     name = "taskConfiguration",
-    url = "${task-configuration.url}"
+    url = "${task-management.url}"
 )
 public interface TaskConfigurationClient {
 
