@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TerminateTaskRequest;
-import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options.TerminateInfo;
 
 import java.util.Collections;
@@ -28,9 +27,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.CANCELLED;
-import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.COMPLETED;
-import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.DELETED;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class TerminationJobServiceTest extends UnitBaseTest {
@@ -77,9 +73,9 @@ class TerminationJobServiceTest extends UnitBaseTest {
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
         assertQuery();
-        verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 0);
-        verifyTerminateEndpointWasCalledWithTerminateReason(COMPLETED, 0);
-        verifyTerminateEndpointWasCalledWithTerminateReason(DELETED, 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason("cancelled", 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason("completed", 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason("deleted", 0);
     }
 
 
@@ -101,11 +97,10 @@ class TerminationJobServiceTest extends UnitBaseTest {
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
         assertQuery();
-        verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 1);
-        verifyTerminateEndpointWasCalledWithTerminateReason(COMPLETED, 1);
-        verifyTerminateEndpointWasCalledWithTerminateReason(DELETED, 1);
+        verifyTerminateEndpointWasCalledWithTerminateReason("cancelled", 1);
+        verifyTerminateEndpointWasCalledWithTerminateReason("completed", 1);
+        verifyTerminateEndpointWasCalledWithTerminateReason("deleted", 1);
     }
-
 
     @Test
     void should_fetch_tasks_and_call_terminate_for_cancelled_task_only() throws JSONException {
@@ -123,9 +118,9 @@ class TerminationJobServiceTest extends UnitBaseTest {
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
         assertQuery();
-        verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 1);
-        verifyTerminateEndpointWasCalledWithTerminateReason(COMPLETED, 0);
-        verifyTerminateEndpointWasCalledWithTerminateReason(DELETED, 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason("cancelled", 1);
+        verifyTerminateEndpointWasCalledWithTerminateReason("completed", 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason("deleted", 0);
     }
 
     @Test
@@ -144,9 +139,9 @@ class TerminationJobServiceTest extends UnitBaseTest {
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
         assertQuery();
-        verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 0);
-        verifyTerminateEndpointWasCalledWithTerminateReason(COMPLETED, 1);
-        verifyTerminateEndpointWasCalledWithTerminateReason(DELETED, 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason("cancelled", 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason("completed", 1);
+        verifyTerminateEndpointWasCalledWithTerminateReason("deleted", 0);
     }
 
     @Test
@@ -165,12 +160,12 @@ class TerminationJobServiceTest extends UnitBaseTest {
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
         assertQuery();
-        verifyTerminateEndpointWasCalledWithTerminateReason(CANCELLED, 0);
-        verifyTerminateEndpointWasCalledWithTerminateReason(COMPLETED, 0);
-        verifyTerminateEndpointWasCalledWithTerminateReason(DELETED, 1);
+        verifyTerminateEndpointWasCalledWithTerminateReason("cancelled", 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason("completed", 0);
+        verifyTerminateEndpointWasCalledWithTerminateReason("deleted", 1);
     }
 
-    private void verifyTerminateEndpointWasCalledWithTerminateReason(TerminateReason terminateReason,
+    private void verifyTerminateEndpointWasCalledWithTerminateReason(String terminateReason,
                                                                      int times) {
         TerminateTaskRequest request = new TerminateTaskRequest(new TerminateInfo(terminateReason));
         verify(taskManagementClient, times(times)).terminateTask(eq(SOME_SERVICE_TOKEN), any(), eq(request));

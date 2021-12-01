@@ -7,16 +7,11 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TerminateTaskRequest;
-import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options.TerminateInfo;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.CANCELLED;
-import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.COMPLETED;
-import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason.DELETED;
 import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION;
 
 @Slf4j
@@ -35,22 +30,7 @@ public class TerminationJobService {
 
     public void terminateTasks(String serviceAuthorizationToken) {
         List<HistoricCamundaTask> tasks = getTasksPendingTermination(serviceAuthorizationToken);
-
-        List<HistoricCamundaTask> completedTasks = tasks.stream()
-            .filter(t -> t.getDeleteReason().equals("completed"))
-            .collect(Collectors.toList());
-
-        List<HistoricCamundaTask> cancelledTasks = tasks.stream()
-            .filter(t -> t.getDeleteReason().equals("cancelled"))
-            .collect(Collectors.toList());
-
-        List<HistoricCamundaTask> deletedTasks = tasks.stream()
-            .filter(t -> t.getDeleteReason().equals("deleted"))
-            .collect(Collectors.toList());
-
-        terminateAllTasksWithReason(serviceAuthorizationToken, completedTasks, COMPLETED);
-        terminateAllTasksWithReason(serviceAuthorizationToken, cancelledTasks, CANCELLED);
-        terminateAllTasksWithReason(serviceAuthorizationToken, deletedTasks, DELETED);
+        terminateAllTasks(serviceAuthorizationToken, tasks);
     }
 
     private List<HistoricCamundaTask> getTasksPendingTermination(String serviceToken) {
@@ -65,22 +45,25 @@ public class TerminationJobService {
         return camundaTasks;
     }
 
-    private void terminateAllTasksWithReason(String serviceAuthorizationToken,
-                                             List<HistoricCamundaTask> tasks,
-                                             TerminateReason reason) {
+    private void terminateAllTasks(String serviceAuthorizationToken,
+                                   List<HistoricCamundaTask> tasks) {
 
         if (tasks.isEmpty()) {
-            log.info("There were no '{}' task(s) to terminate.", reason);
+            log.info("There were no task(s) to terminate.");
         } else {
-            log.info("Attempting to terminate {} task(s) with reason '{}'", tasks.size(), reason);
-            TerminateTaskRequest request = new TerminateTaskRequest(new TerminateInfo(reason));
+            log.info("Attempting to terminate {} task(s)", tasks.size());
             tasks.forEach(task -> {
+                TerminateTaskRequest request = new TerminateTaskRequest(new TerminateInfo(task.getDeleteReason()));
                 try {
-                    log.info("Attempting to terminate task with id: '{}' and reason '{}'", task.getId(), reason);
+                    log.info(
+                        "Attempting to terminate task with id: '{}' and reason '{}'",
+                        task.getId(), task.getDeleteReason());
                     taskManagementClient.terminateTask(serviceAuthorizationToken, task.getId(), request);
                     log.info("Task with id: '{}' terminated successfully.", task.getId());
                 } catch (Exception e) {
-                    log.error("Error while terminating task with id: '{}' and reason '{}'", task.getId(), reason);
+                    log.error(
+                        "Error while terminating task with id: '{}' and reason '{}'",
+                        task.getId(), task.getDeleteReason());
                 }
             });
         }
