@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 
-import com.microsoft.applicationinsights.core.dependencies.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -77,9 +76,6 @@ public class InitiationJobService {
                     serviceToken,
                     task.getId()
                 );
-                System.out.println("===================");
-                System.out.println(new Gson().toJson(task));
-                System.out.println(new Gson().toJson(variables));
                 List<TaskAttribute> taskAttributes = initiationTaskAttributesMapper.mapTaskAttributes(
                     task,
                     variables

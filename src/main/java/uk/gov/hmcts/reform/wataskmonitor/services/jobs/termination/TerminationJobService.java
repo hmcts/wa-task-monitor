@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_HI
 
 @Slf4j
 @Component
+@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 public class TerminationJobService {
 
     private final CamundaClient camundaClient;
