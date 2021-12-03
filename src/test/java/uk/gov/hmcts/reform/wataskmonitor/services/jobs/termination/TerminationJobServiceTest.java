@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -59,6 +60,33 @@ class TerminationJobServiceTest extends UnitBaseTest {
             .hasNoCause();
     }
 
+
+    @Test
+    void should_handle_exception_when_call_to_task_management_fails() throws JSONException {
+
+        doThrow(FeignException.GatewayTimeout.class)
+            .when(taskManagementClient)
+            .terminateTask(
+                eq(SOME_SERVICE_TOKEN),
+                any(),
+                any(TerminateTaskRequest.class)
+            );
+
+        List<HistoricCamundaTask> expectedCamundaTasks = List.of(
+            new HistoricCamundaTask("1", "cancelled"),
+            new HistoricCamundaTask("2", "completed"),
+            new HistoricCamundaTask("3", "deleted")
+        );
+
+        when(camundaClient.getTasksFromHistory(
+            eq(SOME_SERVICE_TOKEN),
+            eq("0"),
+            eq("1000"),
+            actualQueryParametersCaptor.capture()
+        )).thenReturn(expectedCamundaTasks);
+
+        assertDoesNotThrow(() -> terminationJobService.terminateTasks(SOME_SERVICE_TOKEN));
+    }
 
     @Test
     void should_succeed_when_no_tasks_returned() throws JSONException {
