@@ -3,20 +3,19 @@ package uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TerminateReason;
 
 @EqualsAndHashCode
 @ToString
 public class TerminateInfo {
 
-    private final TerminateReason terminateReason;
+    private final String terminateReason;
 
     @JsonCreator
-    public TerminateInfo(TerminateReason terminateReason) {
+    public TerminateInfo(String terminateReason) {
         this.terminateReason = terminateReason;
     }
 
-    public TerminateReason getTerminateReason() {
+    public String getTerminateReason() {
         return terminateReason;
     }
 }
