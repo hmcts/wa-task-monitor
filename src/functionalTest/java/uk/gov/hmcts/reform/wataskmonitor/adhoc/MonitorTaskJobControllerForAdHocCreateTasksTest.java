@@ -11,6 +11,7 @@ import static net.serenitybdd.rest.SerenityRest.given;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_CREATE_DELAYED_TASKS;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_CREATE_TASKS;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
@@ -27,6 +28,19 @@ public class MonitorTaskJobControllerForAdHocCreateTasksTest extends SpringBootF
             .then()
             .statusCode(HttpStatus.OK.value())
             .body(is(expectedResponse.apply(AD_HOC_CREATE_TASKS.name())));
+    }
+
+    @Test
+    public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse2() {
+        given()
+            .contentType(APPLICATION_JSON_VALUE)
+            .header("ServiceAuthorization", serviceToken)
+            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(AD_HOC_CREATE_DELAYED_TASKS))))
+            .when()
+            .post("/monitor/tasks/jobs")
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .body(is(expectedResponse.apply(AD_HOC_CREATE_DELAYED_TASKS.name())));
     }
 
 }
