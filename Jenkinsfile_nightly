@@ -37,7 +37,7 @@ withNightlyPipeline(type, product, component) {
   env.Rules = params.SecurityRules
   env.S2S_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   loadVaultSecrets(secrets)
-  enableFortifyScan()
+//  enableFortifyScan()
   enableFullFunctionalTest()
   enableSlackNotifications('#wa-build')
 
