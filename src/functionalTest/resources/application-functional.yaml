@@ -1,2 +1,23 @@
 targets:
   instance: ${TEST_URL:http://localhost:8077}
+  camunda: ${CAMUNDA_URL:http://camunda-bpm/engine-rest}
+
+idam:
+  api:
+    baseUrl: ${IDAM_URL:http://sidam-api}
+
+document_management:
+  url: ${DM_STORE_URL:http://local-dm-store}
+
+launchDarkly:
+  sdkKey: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
+  connectionTimeout: 5000
+  socketTimeout: 5000
+
+launch_darkly:
+  url: ${LAUNCH_DARKLY_URL:https://app.launchdarkly.com/api/v2/flags/Work-Allocation/}
+  accessToken: ${LAUNCH_DARKLY_ACCESS_TOKEN:token}
+
+
+role-assignment-service:
+  url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}

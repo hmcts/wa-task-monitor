@@ -78,14 +78,14 @@ class MonitorTaskJobControllerForInitiationJobTest extends SpringBootIntegration
         return new CamundaTask(
             CAMUNDA_TASK_ID,
             "someCamundaTaskName",
-            "someProcessInstanceId",
             "someAssignee",
             createdDate,
             dueDate,
             "someCamundaTaskDescription",
             "someCamundaTaskOwner",
-            "someCamundaTaskFormKey"
-        );
+            "someCamundaTaskFormKey",
+            "someProcessInstanceId"
+            );
     }
 
     private Map<String, CamundaVariable> createMockCamundaVariables() {

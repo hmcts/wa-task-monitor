@@ -33,14 +33,14 @@ public final class InitiationHelpers {
         return new CamundaTask(
             "someCamundaTaskId",
             "someCamundaTaskName",
-            "someProcessInstanceId",
             "someAssignee",
             createdDate,
             dueDate,
             "someCamundaTaskDescription",
             "someCamundaTaskOwner",
-            "someCamundaTaskFormKey"
-        );
+            "someCamundaTaskFormKey",
+            "someProcessInstanceId"
+            );
     }
 
     public static Map<String, CamundaVariable> createMockCamundaVariables() {

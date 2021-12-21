@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.wataskmonitor.domain.camunda;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -13,39 +12,37 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUN
 
 @ToString
 @EqualsAndHashCode
-@Getter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CamundaTask {
 
-    private final String id;
-    private final String name;
-    private final String processInstanceId;
-    private final String assignee;
+    private String id;
+    private String name;
+    private String assignee;
     @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     @JsonFormat(pattern = CAMUNDA_DATA_TIME_FORMAT)
-    private final ZonedDateTime created;
+    private ZonedDateTime created;
     @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     @JsonFormat(pattern = CAMUNDA_DATA_TIME_FORMAT)
-    private final ZonedDateTime due;
-    private final String description;
-    private final String owner;
-    private final String formKey;
+    private ZonedDateTime due;
+    private String description;
+    private String owner;
+    private String formKey;
+    private String processInstanceId;
+
+    private CamundaTask() {
+        //Hidden constructor
+        super();
+    }
 
     public CamundaTask(String id,
                        String name,
-                       String processInstanceId) {
-
-        this(id, name, processInstanceId, null, null, null, null, null, null);
-    }
-
-    public CamundaTask(@JsonProperty("id") String id,
-                       @JsonProperty("name") String name,
-                       @JsonProperty("processInstanceId") String processInstanceId,
-                       @JsonProperty("assignee") String assignee,
-                       @JsonProperty("created") ZonedDateTime created,
-                       @JsonProperty("due") ZonedDateTime due,
-                       @JsonProperty("description") String description,
-                       @JsonProperty("owner") String owner,
-                       @JsonProperty("formKey") String formKey
+                       String assignee,
+                       ZonedDateTime created,
+                       ZonedDateTime due,
+                       String description,
+                       String owner,
+                       String formKey,
+                       String processInstanceId
     ) {
         this.id = id;
         this.name = name;
@@ -57,6 +54,16 @@ public class CamundaTask {
         this.formKey = formKey;
         this.processInstanceId = processInstanceId;
     }
+
+    public CamundaTask(String id,
+                       String name,
+                       String processInstanceId
+    ) {
+        this.id = id;
+        this.name = name;
+        this.processInstanceId = processInstanceId;
+    }
+
 
     public String getId() {
         return id;
@@ -93,5 +100,4 @@ public class CamundaTask {
     public String getProcessInstanceId() {
         return processInstanceId;
     }
-
 }
