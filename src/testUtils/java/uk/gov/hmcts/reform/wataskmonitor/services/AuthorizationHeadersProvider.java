@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.wataskmonitor.clients.IdamWebApi2;
+import uk.gov.hmcts.reform.wataskmonitor.clients.IdamWebApi;
 import uk.gov.hmcts.reform.wataskmonitor.domain.idam.UserInfo;
 import uk.gov.hmcts.reform.wataskmonitor.entities.RoleCode;
 import uk.gov.hmcts.reform.wataskmonitor.entities.TestAccount;
@@ -43,7 +43,7 @@ public class AuthorizationHeadersProvider {
     protected String idamClientSecret;
 
     @Autowired
-    private IdamWebApi2 idamWebApi2;
+    private IdamWebApi idamWebApi;
 
     @Autowired
     private IdamServiceApi idamServiceApi;
@@ -115,7 +115,7 @@ public class AuthorizationHeadersProvider {
     public UserInfo getUserInfo(String userToken) {
         return userInfo.computeIfAbsent(
             userToken,
-            user -> idamWebApi2.userInfo(userToken)
+            user -> idamWebApi.userInfo(userToken)
         );
 
     }
@@ -130,7 +130,7 @@ public class AuthorizationHeadersProvider {
 
         String accessToken = tokens.computeIfAbsent(
             username,
-            user -> "Bearer " + idamWebApi2.token(body).getAccessToken()
+            user -> "Bearer " + idamWebApi.token(body).getAccessToken()
         );
         return new Header(AUTHORIZATION, accessToken);
     }

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.wataskmonitor.clients.IdamWebApi2;
+import uk.gov.hmcts.reform.wataskmonitor.clients.IdamWebApi;
 import uk.gov.hmcts.reform.wataskmonitor.domain.idam.UserInfo;
 
 import static java.util.Objects.requireNonNull;
@@ -13,10 +13,10 @@ import static java.util.Objects.requireNonNull;
 @Component
 public class IdamService {
 
-    private final IdamWebApi2 idamWebApi;
+    private final IdamWebApi idamWebApi;
 
     @Autowired
-    public IdamService(IdamWebApi2 idamWebApi) {
+    public IdamService(IdamWebApi idamWebApi) {
         this.idamWebApi = idamWebApi;
     }
 
