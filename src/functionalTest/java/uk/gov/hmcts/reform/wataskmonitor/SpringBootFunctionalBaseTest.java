@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
+import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.config.DocumentManagementFiles;
 import uk.gov.hmcts.reform.wataskmonitor.config.GivensBuilder;
 import uk.gov.hmcts.reform.wataskmonitor.config.RestApiActions;
@@ -56,9 +57,9 @@ public class SpringBootFunctionalBaseTest {
     private IdamTokenGenerator systemUserIdamToken;
     @Autowired
     private IdamTokenGenerator waTestLawFirmIdamToken;
+    @Autowired
+    private CamundaClient camundaClient;
 
-    //@Autowired
-    //protected CFTTaskDatabaseService cftTaskDatabaseService;
     @Value("${targets.camunda}")
     private String camundaUrl;
     @Value("${targets.instance}")
@@ -96,7 +97,8 @@ public class SpringBootFunctionalBaseTest {
             camundaApiActions,
             authorizationHeadersProvider,
             idamService,
-            roleAssignmentServiceApi
+            roleAssignmentServiceApi,
+            camundaClient
         );
     }
 

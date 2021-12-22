@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor.clients;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import uk.gov.hmcts.reform.wataskmonitor.clients.model.ProcessVariables;
+import uk.gov.hmcts.reform.wataskmonitor.clients.model.ProcessVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
@@ -78,5 +81,25 @@ public interface CamundaClient {
     Map<String, CamundaVariable> getVariables(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
                                               @PathVariable("task-id") String id);
 
+    @PostMapping(value = "/process-instance",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    List<ProcessVariables> getProcessInstancesByVariables(
+        @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+        @RequestParam("variables") String variables,
+        @RequestParam("activityIdIn") List<String> activityId
+    );
+
+    @GetMapping(value = "/process-instance/{id}/variables",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    Map<String, ProcessVariable> getProcessInstanceVariablesById(
+        @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+        @RequestParam("id") String id
+    );
 }
 

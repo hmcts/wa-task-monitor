@@ -8,9 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ResourceUtils;
+import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
+import uk.gov.hmcts.reform.wataskmonitor.clients.model.ProcessVariable;
+import uk.gov.hmcts.reform.wataskmonitor.clients.model.ProcessVariables;
 import uk.gov.hmcts.reform.wataskmonitor.config.GivensBuilder;
 import uk.gov.hmcts.reform.wataskmonitor.config.RestApiActions;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.idam.UserInfo;
 import uk.gov.hmcts.reform.wataskmonitor.entities.RoleAssignment;
 import uk.gov.hmcts.reform.wataskmonitor.entities.RoleAssignmentResource;
@@ -21,8 +25,10 @@ import uk.gov.hmcts.reform.wataskmonitor.services.RoleAssignmentServiceApi;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.stream.Collectors.toList;
@@ -36,6 +42,16 @@ import static uk.gov.hmcts.reform.wataskmonitor.entities.enums.RoleType.ORGANISA
 public class Common {
 
     public static final DateTimeFormatter CAMUNDA_DATA_TIME_FORMATTER = ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    private static String DELETE_REQUEST = "{\n"
+                                           + "    \"deleteReason\": \"clean up running process instances\",\n"
+                                           + "    \"processInstanceIds\": [\n"
+                                           + "    \"{PROCESS_ID}\"\n"
+                                           + "    ],\n"
+                                           + "    \"skipCustomListeners\": true,\n"
+                                           + "    \"skipSubprocesses\": true,\n"
+                                           + "    \"failIfNotExists\": false\n"
+                                           + "    }";
+
     private final GivensBuilder given;
     private final RestApiActions restApiActions;
     private final RestApiActions camundaApiActions;
@@ -43,6 +59,7 @@ public class Common {
 
     private final IdamService idamService;
     private final RoleAssignmentServiceApi roleAssignmentServiceApi;
+    private final CamundaClient camundaClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public Common(GivensBuilder given,
@@ -50,13 +67,15 @@ public class Common {
                   RestApiActions camundaApiActions,
                   AuthorizationHeadersProvider authorizationHeadersProvider,
                   IdamService idamService,
-                  RoleAssignmentServiceApi roleAssignmentServiceApi) {
+                  RoleAssignmentServiceApi roleAssignmentServiceApi,
+                  CamundaClient camundaClient) {
         this.given = given;
         this.restApiActions = restApiActions;
         this.camundaApiActions = camundaApiActions;
         this.authorizationHeadersProvider = authorizationHeadersProvider;
         this.idamService = idamService;
         this.roleAssignmentServiceApi = roleAssignmentServiceApi;
+        this.camundaClient = camundaClient;
     }
 
 
@@ -139,12 +158,30 @@ public class Common {
         clearAllRoleAssignmentsForUser(userInfo.getUid(), headers);
     }
 
-    public void cleanUpTask(String taskId) {
-        log.info("Cleaning task {}", taskId);
-        /*camundaApiActions.post(ENDPOINT_COMPLETE_TASK, taskId,
-            authorizationHeadersProvider.getServiceAuthorizationHeadersOnly());*/
+    public void cleanUpTask(Headers headers, List<String> caseIds) {
+
+        String serviceToken = headers.getValue(SERVICE_AUTHORIZATION);
+        Set<ProcessVariables> camundaProcessVariables = new HashSet<>();
+
+        caseIds
+            .forEach(caseId -> camundaProcessVariables.addAll(getProcesses(caseId, serviceToken)));
+
+        camundaProcessVariables
+            .forEach(processInstance -> getProcessesVariables(processInstance.getId(), serviceToken));
+
+        camundaProcessVariables
+            .forEach(processInstance -> deleteProcessInstance(processInstance.getId(), serviceToken));
+
     }
 
+    public Map<String, CamundaVariable> getTaskVariables(Headers headers, String taskId) {
+        String serviceToken = headers.getValue(SERVICE_AUTHORIZATION);
+
+        return camundaClient.getVariables(
+            serviceToken,
+            taskId
+        );
+    }
     //PRIVATE
 
     private void clearAllRoleAssignmentsForUser(String userId, Headers headers) {
@@ -253,5 +290,32 @@ public class Common {
 
         return json;
     }
+
+    private Set<ProcessVariables> getProcesses(String caseId, String serviceToken) {
+        List<ProcessVariables> camundaProcessVariables = camundaClient.getProcessInstancesByVariables(
+            serviceToken,
+            "caseId_eq_" + caseId,
+            List.of("processStartTimer")
+        );
+
+        return Set.copyOf(camundaProcessVariables);
+    }
+
+    private Map<String, ProcessVariable> getProcessesVariables(String processId, String serviceToken) {
+        Map<String, ProcessVariable> processVariableMap = camundaClient.getProcessInstanceVariablesById(
+            serviceToken,
+            processId
+        );
+
+        System.out.println(processVariableMap.toString());
+
+        return processVariableMap;
+    }
+
+    private void deleteProcessInstance(String processId, String serviceToken) {
+        String deleteRequest = DELETE_REQUEST.replace("{PROCESS_ID}", processId);
+        camundaClient.deleteProcessInstance(serviceToken, deleteRequest);
+    }
+
 
 }
