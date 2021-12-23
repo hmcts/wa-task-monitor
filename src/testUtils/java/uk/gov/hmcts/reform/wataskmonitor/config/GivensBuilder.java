@@ -251,11 +251,9 @@ public class GivensBuilder {
         return processVariables.getProcessVariablesMap();
     }
 
-    ///PRIVATE
     private Map<String, CamundaValue<?>> initiateProcessVariables(String caseId) {
         return createDefaultTaskVariables(caseId);
     }
-
 
 }
 

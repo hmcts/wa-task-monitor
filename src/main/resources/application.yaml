@@ -63,6 +63,8 @@ idam:
     password: ${WA_SYSTEM_PASSWORD:password}
   redirectUrl: ${IA_IDAM_REDIRECT_URI:http://xui-webapp/oauth2/callback}
   scope: "openid profile roles"
+  api:
+    baseUrl: ${IDAM_URL:http://sidam-api}
 
 security:
   anonymousPaths:
@@ -91,4 +93,5 @@ job:
   configuration:
     camunda-max-results: ${CONFIGURATION_CAMUNDA_MAX_RESULTS:10}
 
-
+role-assignment-service:
+  url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}

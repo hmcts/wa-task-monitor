@@ -42,7 +42,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
     }
 
     @Test
-    public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() {
+    public void task_initiation_job_should_initiate_task_and_taskState_should_be_unassigned() {
 
         TestVariables taskVariables = common.setupTaskAndRetrieveIds();
 

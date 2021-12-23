@@ -182,7 +182,6 @@ public class Common {
             taskId
         );
     }
-    //PRIVATE
 
     private void clearAllRoleAssignmentsForUser(String userId, Headers headers) {
         String userToken = headers.getValue(AUTHORIZATION);
@@ -196,7 +195,7 @@ public class Common {
 
         } catch (FeignException ex) {
             if (ex.status() == HttpStatus.NOT_FOUND.value()) {
-                System.out.println("No roles found, nothing to delete.");
+                log.info("No roles found, nothing to delete.");
             } else {
                 ex.printStackTrace();
             }
@@ -302,14 +301,12 @@ public class Common {
     }
 
     private Map<String, ProcessVariable> getProcessesVariables(String processId, String serviceToken) {
-        Map<String, ProcessVariable> processVariableMap = camundaClient.getProcessInstanceVariablesById(
+
+        return camundaClient.getProcessInstanceVariablesById(
             serviceToken,
             processId
         );
 
-        System.out.println(processVariableMap.toString());
-
-        return processVariableMap;
     }
 
     private void deleteProcessInstance(String processId, String serviceToken) {

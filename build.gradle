@@ -310,8 +310,6 @@ dependencies {
 
   implementation group: 'org.awaitility', name: 'awaitility', version: '4.1.0'
 
-//  compile group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.2.2'
-
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
     exclude group: 'junit', module: 'junit'
