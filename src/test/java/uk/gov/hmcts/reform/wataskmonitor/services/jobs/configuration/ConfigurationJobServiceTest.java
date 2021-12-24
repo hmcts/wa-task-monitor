@@ -132,7 +132,8 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
     void should_return_empty_list_when_camundaTasks_empty() {
         List<CamundaTask> emptyCamundaTasks = new ArrayList<>();
 
-        GenericJobReport genericJobReport = configurationJobService.configureTasks(emptyCamundaTasks, SOME_SERVICE_TOKEN);
+        GenericJobReport genericJobReport =
+            configurationJobService.configureTasks(emptyCamundaTasks, SOME_SERVICE_TOKEN);
         assertEquals(0, genericJobReport.getTotalTasks());
         assertEquals(emptyList(), genericJobReport.getOutcomeList());
         assertEquals(0, genericJobReport.getOutcomeList().size());
