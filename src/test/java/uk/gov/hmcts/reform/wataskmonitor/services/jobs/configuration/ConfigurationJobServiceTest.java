@@ -126,6 +126,11 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
         GenericJobReport genericJobReport = configurationJobService.configureTasks(camundaTasks, SOME_SERVICE_TOKEN);
         assertEquals(2, genericJobReport.getTotalTasks());
         assertEquals(2, genericJobReport.getOutcomeList().size());
+
+        assertEquals(2, genericJobReport.getTotalNumberOfSuccesses());
+        assertEquals(0, genericJobReport.getTotalNumberOfFailures());
+        assertEquals(2, genericJobReport.getTotalNumberOfTasksProcessed());
+
     }
 
     @Test
