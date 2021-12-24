@@ -15,11 +15,15 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
 import uk.gov.hmcts.reform.wataskmonitor.config.job.ConfigurationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -110,6 +114,28 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
         configurationJobService.configureTasks(Collections.emptyList(), SOME_SERVICE_TOKEN);
 
         verifyNoInteractions(taskConfigurationClient);
+    }
+
+    @Test
+    void should_return_values_when_camundaTasks_has_values() {
+        when(taskConfigurationClient.configureTask(
+            eq(SOME_SERVICE_TOKEN),
+            taskIdCaptor.capture()
+        )).thenReturn("OK");
+
+        GenericJobReport genericJobReport = configurationJobService.configureTasks(camundaTasks, SOME_SERVICE_TOKEN);
+        assertEquals(2, genericJobReport.getTotalTasks());
+        assertEquals(2, genericJobReport.getOutcomeList().size());
+    }
+
+    @Test
+    void should_return_empty_list_when_camundaTasks_empty() {
+        List<CamundaTask> emptyCamundaTasks = new ArrayList<>();
+
+        GenericJobReport genericJobReport = configurationJobService.configureTasks(emptyCamundaTasks, SOME_SERVICE_TOKEN);
+        assertEquals(0, genericJobReport.getTotalTasks());
+        assertEquals(emptyList(), genericJobReport.getOutcomeList());
+        assertEquals(0, genericJobReport.getOutcomeList().size());
     }
 
     private void assertQueryTargetsUserTasksAndNotDelayedTasks(String expected) throws JSONException {
