@@ -48,7 +48,8 @@ ia_case.service.url: ${IA_CASE_SERVICE_URL:http://localhost:8090}
 core_case_data:
   api:
     search.url: ${CCD_SEARCH_URL:http://wiremock}
-    url: ${CCD_URL:http://ccd-data-store-api}
+    url: ${CCD_URL:"http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"}
+#    url: ${CCD_URL:http://ccd-data-store-api}
 
 idam:
   url: ${OPEN_ID_IDAM_URL:http://sidam-api}
