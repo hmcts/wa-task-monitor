@@ -16,10 +16,8 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.config.DocumentManagementFiles;
 import uk.gov.hmcts.reform.wataskmonitor.config.GivensBuilder;
 import uk.gov.hmcts.reform.wataskmonitor.config.RestApiActions;
-import uk.gov.hmcts.reform.wataskmonitor.config.idam.IdamTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.services.AuthorizationHeadersProvider;
 import uk.gov.hmcts.reform.wataskmonitor.services.IdamService;
-import uk.gov.hmcts.reform.wataskmonitor.services.RoleAssignmentHelper;
 import uk.gov.hmcts.reform.wataskmonitor.services.RoleAssignmentServiceApi;
 import uk.gov.hmcts.reform.wataskmonitor.utils.Common;
 
@@ -36,11 +34,18 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
 public class SpringBootFunctionalBaseTest {
 
+    @Value("${targets.camunda}")
+    private String camundaUrl;
+    @Value("${targets.instance}")
+    private String testUrl;
+
+    public String serviceToken;
+
     protected GivensBuilder given;
     protected Common common;
     protected RestApiActions restApiActions;
     protected RestApiActions camundaApiActions;
-    protected RestApiActions launchDarklyActions;
+
     @Autowired
     protected AuthorizationHeadersProvider authorizationHeadersProvider;
     @Autowired
@@ -48,27 +53,13 @@ public class SpringBootFunctionalBaseTest {
     @Autowired
     protected DocumentManagementFiles documentManagementFiles;
     @Autowired
-    protected RoleAssignmentHelper roleAssignmentHelper;
-    @Autowired
     protected IdamService idamService;
     @Autowired
     protected RoleAssignmentServiceApi roleAssignmentServiceApi;
     @Autowired
-    private IdamTokenGenerator systemUserIdamToken;
-    @Autowired
-    private IdamTokenGenerator waTestLawFirmIdamToken;
-    @Autowired
     private CamundaClient camundaClient;
-
-    @Value("${targets.camunda}")
-    private String camundaUrl;
-    @Value("${targets.instance}")
-    private String testUrl;
-    @Value("${launch_darkly.url}")
-    private String launchDarklyUrl;
     @Autowired
     private AuthTokenGenerator authTokenGenerator;
-    public String serviceToken;
 
     @Before
     public void setUpGivens() throws IOException {
@@ -80,7 +71,6 @@ public class SpringBootFunctionalBaseTest {
         restApiActions = new RestApiActions(testUrl, SNAKE_CASE).setUp();
         camundaApiActions = new RestApiActions(camundaUrl, LOWER_CAMEL_CASE).setUp();
 
-        launchDarklyActions = new RestApiActions(launchDarklyUrl, LOWER_CAMEL_CASE).setUp();
         documentManagementFiles.prepare();
 
         given = new GivensBuilder(

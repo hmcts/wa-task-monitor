@@ -20,13 +20,13 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
 public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunctionalBaseTest {
 
     private List<String> caseIds = new ArrayList<>();
-
 
     private Headers authenticationHeaders;
 
@@ -54,7 +54,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
 
         given()
             .contentType(APPLICATION_JSON_VALUE)
-            .header("ServiceAuthorization", serviceToken)
+            .header(SERVICE_AUTHORIZATION, serviceToken)
             .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(JobName.INITIATION))))
             .when()
             .post("/monitor/tasks/jobs")
@@ -64,7 +64,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
 
         Map<String, CamundaVariable> camundaVariableMap =
             common.getTaskVariables(authenticationHeaders, taskVariables.getTaskId());
-        assertEquals("unassigned",camundaVariableMap.get("taskState").getValue());
+        assertEquals("unassigned", camundaVariableMap.get("taskState").getValue());
     }
 
 }

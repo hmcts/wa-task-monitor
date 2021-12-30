@@ -17,6 +17,8 @@ import java.nio.charset.StandardCharsets;
 
 import static net.serenitybdd.rest.SerenityRest.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.AUTHORIZATION;
+import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
 
 @Service
 @Slf4j
@@ -72,8 +74,8 @@ public class RoleAssignmentHelper {
         given()
             .relaxedHTTPSValidation()
             .contentType(APPLICATION_JSON_VALUE)
-            .header("ServiceAuthorization", s2sToken)
-            .header("Authorization", bearerUserToken)
+            .header(SERVICE_AUTHORIZATION, s2sToken)
+            .header(AUTHORIZATION, bearerUserToken)
             .baseUri(roleAssignmentUrl)
             .basePath("/am/role-assignments")
             .body(getBody(caseId, userInfo, resourceFilename))
