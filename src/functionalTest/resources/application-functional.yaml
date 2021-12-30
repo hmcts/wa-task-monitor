@@ -14,15 +14,9 @@ idam:
 document_management:
   url: ${DM_STORE_URL:http://local-dm-store}
 
-launchDarkly:
-  sdkKey: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
-  connectionTimeout: 5000
-  socketTimeout: 5000
-
-launch_darkly:
-  url: ${LAUNCH_DARKLY_URL:https://app.launchdarkly.com/api/v2/flags/Work-Allocation/}
-  accessToken: ${LAUNCH_DARKLY_ACCESS_TOKEN:token}
-
+core_case_data:
+  api:
+    url: ${CCD_URL:http://ccd-data-store-api}
 
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}

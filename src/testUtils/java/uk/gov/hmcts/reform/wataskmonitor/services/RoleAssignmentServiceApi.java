@@ -21,11 +21,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SER
 )
 @SuppressWarnings("checkstyle:LineLength")
 public interface RoleAssignmentServiceApi {
-
-    String V2_MEDIA_TYPE_POST_ASSIGNMENTS =
-        "application/vnd.uk.gov.hmcts.role-assignment-service"
-        + ".post-assignment-query-request+json;charset=UTF-8;version=2.0";
-
+    
     @GetMapping(
         value = "/am/role-assignments/actors/{user-id}",
         produces = "application/vnd.uk.gov.hmcts.role-assignment-service.get-assignments+json;charset=UTF-8;version=1.0"
@@ -51,13 +47,5 @@ public interface RoleAssignmentServiceApi {
                               @RequestHeader(AUTHORIZATION) String userToken,
                               @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthToken);
 
-    //@PostMapping(
-    //    value = "/am/role-assignments/query",
-    //    consumes = V2_MEDIA_TYPE_POST_ASSIGNMENTS,
-    //    produces = V2_MEDIA_TYPE_POST_ASSIGNMENTS)
-    //RoleAssignmentResource queryRoleAssignments(
-    //    @RequestHeader(AUTHORIZATION) String userToken,
-    //    @RequestHeader(SERVICE_AUTHORIZATION) String s2sToken,
-    //    @RequestBody MultipleQueryRequest queryRequest
-    //);
+
 }

@@ -28,7 +28,7 @@ class TaskAttributeTest {
         TaskAttribute taskAttribute = new TaskAttribute(TaskAttributeDefinition.TASK_ASSIGNEE, "someAssignee");
         assertEquals("someAssignee", taskAttribute.getValue());
         assertEquals(TaskAttributeDefinition.TASK_ASSIGNEE, taskAttribute.getName());
-        assertEquals("task_assignee",TaskAttributeDefinition.TASK_ASSIGNEE.value());
+        assertEquals("task_assignee", TaskAttributeDefinition.TASK_ASSIGNEE.value());
 
     }
 

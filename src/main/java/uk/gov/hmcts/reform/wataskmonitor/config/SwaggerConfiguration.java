@@ -13,6 +13,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import uk.gov.hmcts.reform.wataskmonitor.Application;
 
 import static java.util.Collections.singletonList;
+import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
 
 @Configuration
 @EnableSwagger2
@@ -34,7 +35,7 @@ public class SwaggerConfiguration {
 
     private RequestParameter headerServiceAuthorization() {
         return new RequestParameterBuilder()
-            .name("ServiceAuthorization")
+            .name(SERVICE_AUTHORIZATION)
             .description("Keyword `Bearer` followed by a service-to-service token for a whitelisted micro-service")
             .in(ParameterType.HEADER)
             .required(true)
