@@ -1,9 +1,5 @@
 package uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums;
 
-import java.util.Optional;
-
-import static java.util.Arrays.stream;
-
 public enum CamundaVariableDefinition {
     APPEAL_TYPE("appealType"),
     AUTO_ASSIGNED("autoAssigned"),
@@ -27,21 +23,13 @@ public enum CamundaVariableDefinition {
     HAS_WARNINGS("hasWarnings"),
     WARNING_LIST("warningList"),
     CFT_TASK_STATE("cftTaskState"),
-    WORK_TYPE("workType"),
-    CASE_MANAGEMENT_CATEGORY("caseManagementCategory"),
-    ROLE_CATEGORY("roleCategory"),
-    DESCRIPTION("description");
+    CASE_MANAGEMENT_CATEGORY("caseManagementCategory");
+
 
     private final String value;
 
     CamundaVariableDefinition(String value) {
         this.value = value;
-    }
-
-    public static Optional<CamundaVariableDefinition> from(String value) {
-        return stream(values())
-            .filter(v -> v.value.equals(value))
-            .findFirst();
     }
 
     public String value() {
