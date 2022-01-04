@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
+
+//todo: revert this class
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @Builder
 @EqualsAndHashCode

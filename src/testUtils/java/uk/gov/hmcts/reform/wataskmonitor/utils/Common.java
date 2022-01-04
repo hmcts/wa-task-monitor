@@ -9,8 +9,6 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ResourceUtils;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
-import uk.gov.hmcts.reform.wataskmonitor.clients.model.ProcessVariable;
-import uk.gov.hmcts.reform.wataskmonitor.clients.model.ProcessVariables;
 import uk.gov.hmcts.reform.wataskmonitor.config.GivensBuilder;
 import uk.gov.hmcts.reform.wataskmonitor.config.RestApiActions;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
@@ -95,35 +93,6 @@ public class Common {
         return new TestVariables(caseId, response.get(0).getId(), response.get(0).getProcessInstanceId());
     }
 
-    public void setupCftOrganisationalRoleAssignment(Headers headers) {
-
-        UserInfo userInfo = authorizationHeadersProvider.getUserInfo(headers.getValue(AUTHORIZATION));
-
-        Map<String, String> attributes = Map.of(
-            "primaryLocation", "765324",
-            "region", "1",
-            //This value must match the camunda task location variable for the permission check to pass
-            "baseLocation", "765324",
-            "jurisdiction", "IA"
-        );
-
-        //Clean/Reset user
-        clearAllRoleAssignmentsForUser(userInfo.getUid(), headers);
-
-        //Creates an organizational role for jurisdiction IA
-        log.info("Creating Organizational Role");
-        postRoleAssignment(
-            null,
-            headers.getValue(AUTHORIZATION),
-            headers.getValue(SERVICE_AUTHORIZATION),
-            userInfo,
-            "tribunal-caseworker",
-            toJsonString(attributes),
-            "requests/roleAssignment/r2/set-organisational-role-assignment-request.json"
-        );
-
-    }
-
     public void setupOrganisationalRoleAssignment(Headers headers) {
 
         UserInfo userInfo = authorizationHeadersProvider.getUserInfo(headers.getValue(AUTHORIZATION));
@@ -158,19 +127,15 @@ public class Common {
         clearAllRoleAssignmentsForUser(userInfo.getUid(), headers);
     }
 
-    public void cleanUpTask(Headers headers, List<String> caseIds) {
+    public void cleanUpTask(Headers authenticationHeaders, List<String> caseIds) {
 
-        String serviceToken = headers.getValue(SERVICE_AUTHORIZATION);
-        Set<ProcessVariables> camundaProcessVariables = new HashSet<>();
+        Set<String> processIds = new HashSet<>();
 
         caseIds
-            .forEach(caseId -> camundaProcessVariables.addAll(getProcesses(caseId, serviceToken)));
+            .forEach(caseId -> processIds.addAll(getProcesses(authenticationHeaders, caseId)));
 
-        camundaProcessVariables
-            .forEach(processInstance -> getProcessesVariables(processInstance.getId(), serviceToken));
-
-        camundaProcessVariables
-            .forEach(processInstance -> deleteProcessInstance(processInstance.getId(), serviceToken));
+        processIds
+            .forEach(processId -> deleteProcessInstance(authenticationHeaders, processId));
 
     }
 
@@ -290,29 +255,19 @@ public class Common {
         return json;
     }
 
-    private Set<ProcessVariables> getProcesses(String caseId, String serviceToken) {
-        List<ProcessVariables> camundaProcessVariables = camundaClient.getProcessInstancesByVariables(
-            serviceToken,
-            "caseId_eq_" + caseId,
-            List.of("processStartTimer")
-        );
+    private Set<String> getProcesses(Headers authenticationHeaders, String caseId) {
 
-        return Set.copyOf(camundaProcessVariables);
+        List<String> processIds = camundaApiActions.get(
+            "process-instance" + "/?variables=caseId_eq_" + caseId,
+            authenticationHeaders
+        ).then().extract().body().path("id");
+
+        return Set.copyOf(processIds);
     }
 
-    private Map<String, ProcessVariable> getProcessesVariables(String processId, String serviceToken) {
-
-        return camundaClient.getProcessInstanceVariablesById(
-            serviceToken,
-            processId
-        );
-
-    }
-
-    private void deleteProcessInstance(String processId, String serviceToken) {
+    private void deleteProcessInstance(Headers authenticationHeaders, String processId) {
         String deleteRequest = DELETE_REQUEST.replace("{PROCESS_ID}", processId);
-        camundaClient.deleteProcessInstance(serviceToken, deleteRequest);
+        camundaClient.deleteProcessInstance(authenticationHeaders.getValue(SERVICE_AUTHORIZATION), deleteRequest);
     }
-
 
 }

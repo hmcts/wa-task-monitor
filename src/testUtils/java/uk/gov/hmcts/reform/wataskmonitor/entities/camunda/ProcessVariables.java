@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.clients.model;
+package uk.gov.hmcts.reform.wataskmonitor.entities.camunda;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
