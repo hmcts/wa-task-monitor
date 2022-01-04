@@ -1,20 +1,17 @@
 package uk.gov.hmcts.reform.wataskmonitor.domain.idam;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.List;
 
-
-//todo: revert this class
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @Builder
 @EqualsAndHashCode
-@JsonIgnoreProperties(ignoreUnknown = true)
+@ToString
+@Getter
 public class UserInfo {
 
     @JsonProperty("sub")
@@ -38,39 +35,4 @@ public class UserInfo {
         this.familyName = familyName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getGivenName() {
-        return givenName;
-    }
-
-    public String getFamilyName() {
-        return familyName;
-    }
-
-    @Override
-    public String toString() {
-        return "UserInfo{"
-               + "email='" + email + '\''
-               + ", uid='" + uid + '\''
-               + ", roles=" + roles
-               + ", name='" + name + '\''
-               + ", givenName='" + givenName + '\''
-               + ", familyName='" + familyName + '\''
-               + '}';
-    }
 }
