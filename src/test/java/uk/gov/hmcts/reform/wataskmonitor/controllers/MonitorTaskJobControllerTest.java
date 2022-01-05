@@ -23,7 +23,7 @@ class MonitorTaskJobControllerTest {
     private MonitorTaskJobController monitorTaskJobController;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         monitorTaskJobController = new MonitorTaskJobController(monitorTaskJobService);
     }
 

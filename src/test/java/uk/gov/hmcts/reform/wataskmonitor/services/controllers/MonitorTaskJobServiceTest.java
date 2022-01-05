@@ -32,7 +32,7 @@ class MonitorTaskJobServiceTest {
     MonitorTaskJobService monitorTaskJobService;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
 
         jobServices = List.of(initiationJob);
 
