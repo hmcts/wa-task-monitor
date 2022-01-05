@@ -27,7 +27,11 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class InitiationJobServiceTest extends UnitBaseTest {
@@ -95,6 +99,9 @@ class InitiationJobServiceTest extends UnitBaseTest {
         )).thenReturn(mockedVariables);
 
         GenericJobReport actual = initiationJobService.initiateTasks(tasks, SOME_SERVICE_TOKEN);
+
+        verify(taskManagementClient, times(1))
+            .initiateTask(anyString(), anyString(), any());
 
         GenericJobOutcome outcome = GenericJobOutcome.builder()
             .taskId(camundaTask.getId())
