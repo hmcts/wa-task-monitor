@@ -228,7 +228,6 @@ public class GivensBuilder {
             .withProcessVariable("locationName", "Taylor House")
             .withProcessVariable("staffLocation", "Taylor House")
             .withProcessVariable("securityClassification", "PUBLIC")
-            .withProcessVariable("group", "TCW")
             .withProcessVariable("name", "task name")
             .withProcessVariable("taskId", "reviewTheAppeal")
             .withProcessVariable("taskAttributes", "")
