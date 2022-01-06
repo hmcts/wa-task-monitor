@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJ
 import static net.serenitybdd.rest.SerenityRest.given;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.AD_HOC_DELETE_PROCESS_INSTANCES;
 
@@ -20,7 +21,7 @@ public class MonitorTaskJobControllerForAdHocDeleteProcessInstanceTest extends S
     public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() {
         given()
             .contentType(APPLICATION_JSON_VALUE)
-            .header("ServiceAuthorization", serviceToken)
+            .header(SERVICE_AUTHORIZATION, serviceToken)
             .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(AD_HOC_DELETE_PROCESS_INSTANCES))))
             .when()
             .post("/monitor/tasks/jobs")

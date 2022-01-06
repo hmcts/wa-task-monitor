@@ -1,21 +1,19 @@
-package uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagment.request.options;
+package uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request;
 
 import org.junit.jupiter.api.Test;
 import pl.pojo.tester.api.assertion.Method;
-import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options.TerminateInfo;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TerminateTaskRequest;
 
 import static pl.pojo.tester.api.assertion.Assertions.assertPojoMethodsFor;
 
-class TerminateInfoTest {
+class TerminateTaskRequestTest {
 
     @Test
     void isWellImplemented() {
-        final Class<?> classUnderTest = TerminateInfo.class;
+        final Class<?> classUnderTest = TerminateTaskRequest.class;
         assertPojoMethodsFor(classUnderTest)
             .testing(Method.GETTER)
             .testing(Method.CONSTRUCTOR)
-            .testing(Method.EQUALS)
-            .testing(Method.HASH_CODE)
             .testing(Method.TO_STRING)
             .areWellImplemented();
     }

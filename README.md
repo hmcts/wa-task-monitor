@@ -49,6 +49,9 @@ To build the project execute the following command:
 
 #### Run Functional tests
 
+Make sure, ia-ccd-definitions, ia-case-documents-api, ia-case-notifications-api, ia-case-api, wa-workflow-api,
+wa_task_management_api services should be running
+
 ````shell
 ./gradlew functional
 ````

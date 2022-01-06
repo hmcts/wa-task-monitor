@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor.domain.camunda;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUN
 @ToString
 @EqualsAndHashCode
 @Getter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CamundaTask {
 
     private final String id;
