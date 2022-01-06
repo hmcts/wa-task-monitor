@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import io.restassured.http.Headers;
 import lombok.extern.slf4j.Slf4j;
+import net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ResourceUtils;
@@ -93,6 +94,22 @@ public class Common {
         return new TestVariables(caseId, response.get(0).getId(), response.get(0).getProcessInstanceId());
     }
 
+    public TestVariables setupDelayedTaskAndRetrieveIds() {
+
+        String caseId = given.createCcdCase();
+
+        List<CamundaTask> camundaTasks = given
+            .createDelayedTaskWithCaseId(caseId)
+            .and()
+            .retrieveDelayedTaskWithProcessVariableFilter("caseId", caseId);
+
+        if (camundaTasks.size() > 1) {
+            fail("Search was not an exact match and returned more than one task used: " + caseId);
+        }
+
+        return new TestVariables(caseId, camundaTasks.get(0).getId(), StringUtils.EMPTY);
+    }
+
     public void setupOrganisationalRoleAssignment(Headers headers) {
 
         UserInfo userInfo = authorizationHeadersProvider.getUserInfo(headers.getValue(AUTHORIZATION));
@@ -127,12 +144,13 @@ public class Common {
         clearAllRoleAssignmentsForUser(userInfo.getUid(), headers);
     }
 
-    public void cleanUpTask(Headers authenticationHeaders, List<String> caseIds) {
+
+    public void cleanUpTask(Headers authenticationHeaders, List<String> values) {
 
         Set<String> processIds = new HashSet<>();
 
-        caseIds
-            .forEach(caseId -> processIds.addAll(getProcesses(authenticationHeaders, caseId)));
+        values
+            .forEach(value -> processIds.addAll(getProcesses(authenticationHeaders, value)));
 
         processIds
             .forEach(processId -> deleteProcessInstance(authenticationHeaders, processId));
@@ -146,6 +164,19 @@ public class Common {
             serviceToken,
             taskId
         );
+    }
+
+    public Map<String, CamundaVariable> getTaskVariablesFromCamunda(Headers authenticationHeaders, String value) {
+
+        return camundaApiActions.get(
+                "process-instance/" + value + "/variables",
+                authenticationHeaders
+            ).then()
+            .extract()
+            .body()
+            .jsonPath()
+            .getMap("");
+
     }
 
     private void clearAllRoleAssignmentsForUser(String userId, Headers headers) {
@@ -255,10 +286,10 @@ public class Common {
         return json;
     }
 
-    private Set<String> getProcesses(Headers authenticationHeaders, String caseId) {
-
+    private Set<String> getProcesses(Headers authenticationHeaders, String value) {
+        String filter = "/?variables=" + "caseId" + "_eq_" + value;
         List<String> processIds = camundaApiActions.get(
-            "process-instance" + "/?variables=caseId_eq_" + caseId,
+            "process-instance" + filter,
             authenticationHeaders
         ).then().extract().body().path("id");
 
