@@ -172,6 +172,7 @@ public class Common {
                 "process-instance/" + value + "/variables",
                 authenticationHeaders
             ).then()
+            .statusCode(200)
             .extract()
             .body()
             .jsonPath()

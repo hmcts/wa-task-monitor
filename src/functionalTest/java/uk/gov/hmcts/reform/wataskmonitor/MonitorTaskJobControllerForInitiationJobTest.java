@@ -28,12 +28,13 @@ import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobContro
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
 public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunctionalBaseTest {
 
-    private List<String> caseIds = new ArrayList<>();
+    private List<String> caseIds;
 
     private Headers authenticationHeaders;
 
     @Before
     public void setUp() {
+        caseIds = new ArrayList<>();
         authenticationHeaders = authorizationHeadersProvider
             .getTribunalCaseworkerAAuthorization("wa-mvp-ft-test-");
     }
