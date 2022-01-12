@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.termination;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.Terminate
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options.TerminateInfo;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION;
@@ -18,15 +20,25 @@ import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_HI
 @Component
 @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
 public class TerminationJobService {
+    public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN);
 
     private final CamundaClient camundaClient;
     private final TaskManagementClient taskManagementClient;
 
+    private final  boolean terminationTimeLimitFlag;
+    private final long terminationTimeLimit;
 
-    @Autowired
-    public TerminationJobService(CamundaClient camundaClient, TaskManagementClient taskManagementClient) {
+    public TerminationJobService(CamundaClient camundaClient,
+                                 TaskManagementClient taskManagementClient,
+                                 @Value("${job.configuration.camunda-termination-time-limit-flag}")
+                                 boolean terminationTimeLimitFlag,
+                                 @Value("${job.configuration.camunda-termination-time-limit}")
+                                 long terminationTimeLimit) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;
+        this.terminationTimeLimitFlag = terminationTimeLimitFlag;
+        this.terminationTimeLimit = terminationTimeLimit;
     }
 
     public void terminateTasks(String serviceAuthorizationToken) {
@@ -71,7 +83,21 @@ public class TerminationJobService {
     }
 
     private String buildHistoricTasksPendingTerminationRequest() {
-        return ResourceUtility.getResource(CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION);
+
+        String query = ResourceUtility.getResource(CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION);
+        if (terminationTimeLimitFlag) {
+            ZonedDateTime endTime =  ZonedDateTime.now().minusMinutes(terminationTimeLimit);
+            String finishedAfter = endTime.format(formatter);
+            return query.replace("\"finishedAfter\": \"*\",", "\"finishedAfter\": \"" + finishedAfter + "\",");
+        }
+        return query;
     }
 
+    public boolean isTerminationTimeLimitFlag() {
+        return terminationTimeLimitFlag;
+    }
+
+    public long getTerminationTimeLimit() {
+        return terminationTimeLimit;
+    }
 }
