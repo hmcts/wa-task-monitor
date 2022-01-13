@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJ
 import uk.gov.hmcts.reform.wataskmonitor.entities.TestVariables;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,6 @@ import static net.serenitybdd.rest.SerenityRest.given;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
@@ -30,22 +28,23 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
 
     private List<String> caseIds;
 
-    private Headers authenticationHeaders;
+    private TestAuthenticationCredentials caseworkerCredentials;
 
     @Before
     public void setUp() {
+        caseworkerCredentials = authorizationProvider.getNewTribunalCaseworker("wa-ft-test-r2-");
         caseIds = new ArrayList<>();
-        authenticationHeaders = authorizationHeadersProvider
-            .getTribunalCaseworkerAAuthorization("wa-ft-test-r2-");
     }
 
     @After
-    public void tearDown() {
-        common.cleanUpTask(authenticationHeaders, caseIds);
+    public void cleanUp() {
+        authorizationProvider.deleteAccount(caseworkerCredentials.getAccount().getUsername());
+        common.cleanUpTask(caseworkerCredentials.getHeaders(), caseIds);
     }
 
     @Test
     public void task_initiation_job_should_initiate_task_and_taskState_should_be_unassigned() {
+
         TestVariables taskVariables = common.setupTaskAndRetrieveIds();
 
         assertNotNull(taskVariables);
@@ -64,13 +63,14 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
             .statusCode(HttpStatus.OK.value())
             .body(is(expectedResponse.apply(JobName.INITIATION.name())));
 
-        Map<String, CamundaVariable> camundaVariables =
-            common.getTaskVariables(authenticationHeaders, taskVariables.getTaskId());
+        Map<String, CamundaVariable> camundaVariableMap =
+            common.getTaskVariables(caseworkerCredentials.getHeaders(), taskVariables.getTaskId());
 
         assertEquals(taskVariables.getCaseId(), camundaVariables.get("caseId").getValue());
         assertEquals("unassigned", camundaVariables.get("taskState").getValue());
 
     }
+
 
     @Test
     public void task_initiation_job_should_not_initiate_delayed_task_and_taskState_should_be_unconfigured() {
