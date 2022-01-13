@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUNDA_DATA_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.InitiationHelpers.createMockCamundaVariables;
 import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.InitiationHelpers.createMockedCamundaTask;
@@ -33,6 +32,11 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
 
     @InjectMocks
     InitiationTaskAttributesMapper initiationTaskAttributesMapper;
+
+    @BeforeEach
+    void setUp() {
+        initiationTaskAttributesMapper = new InitiationTaskAttributesMapper(new ObjectMapper());
+    }
 
     public static Stream<Arguments> scenarioProvider() {
         Map<String, CamundaVariable> camundaVariables = createMockCamundaVariables();
@@ -45,11 +49,6 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
             Arguments.of("all vars are present", camundaVariables),
             Arguments.of("autoAssigned is not present", camundaVariablesWithNoAutoAssigned)
         );
-    }
-
-    @BeforeEach
-    void setUp() {
-        initiationTaskAttributesMapper = new InitiationTaskAttributesMapper(new ObjectMapper());
     }
 
     @ParameterizedTest
