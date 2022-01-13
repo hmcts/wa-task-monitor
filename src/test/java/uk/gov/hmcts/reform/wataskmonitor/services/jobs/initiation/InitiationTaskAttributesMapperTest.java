@@ -33,22 +33,21 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
     @InjectMocks
     InitiationTaskAttributesMapper initiationTaskAttributesMapper;
 
-    @BeforeEach
-    void setUp() {
-        initiationTaskAttributesMapper = new InitiationTaskAttributesMapper(new ObjectMapper());
-    }
-
     public static Stream<Arguments> scenarioProvider() {
         Map<String, CamundaVariable> camundaVariables = createMockCamundaVariables();
 
         Map<String, CamundaVariable> camundaVariablesWithNoAutoAssigned = createMockCamundaVariables();
         camundaVariablesWithNoAutoAssigned.remove("autoAssigned");
 
-
         return Stream.of(
             Arguments.of("all vars are present", camundaVariables),
             Arguments.of("autoAssigned is not present", camundaVariablesWithNoAutoAssigned)
         );
+    }
+
+    @BeforeEach
+    void setUp() {
+        initiationTaskAttributesMapper = new InitiationTaskAttributesMapper(new ObjectMapper());
     }
 
     @ParameterizedTest
@@ -76,7 +75,10 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
 
         CamundaTask camundaTask = createMockedCamundaTask(createdDate, dueDate);
 
-        List<TaskAttribute> actual = initiationTaskAttributesMapper.mapTaskAttributes(camundaTask, camundaVariablesWithNoTaskType);
+        List<TaskAttribute> actual = initiationTaskAttributesMapper.mapTaskAttributes(
+            camundaTask,
+            camundaVariablesWithNoTaskType
+        );
         List<TaskAttribute> expected = getExpectedTaskAttributes(createdDate, dueDate, "someTaskId");
         assertThat(actual).hasSameElementsAs(expected);
     }
