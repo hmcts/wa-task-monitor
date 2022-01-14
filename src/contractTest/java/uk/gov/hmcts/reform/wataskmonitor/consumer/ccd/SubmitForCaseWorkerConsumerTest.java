@@ -35,7 +35,7 @@ public class SubmitForCaseWorkerConsumerTest extends CcdConsumerTestBase {
         return caseDataContentMap;
     }
 
-    @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "wa_task_management_api")
+    @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "wa_task_monitor")
     public RequestResponsePact submitCaseWorkerDetails(PactDslWithProvider builder) throws Exception {
         return builder
             .given("A Submit for a Caseworker is requested",
@@ -113,5 +113,5 @@ public class SubmitForCaseWorkerConsumerTest extends CcdConsumerTestBase {
             .append("/cases")
             .toString();
     }
-    
+
 }
