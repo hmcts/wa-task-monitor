@@ -32,7 +32,7 @@ public class StartForCaseWorkerConsumerTest extends CcdConsumerTestBase {
         return caseDataContentMap;
     }
 
-    @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "wa_task_management_api")
+    @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "wa_task_monitor")
     public RequestResponsePact startForCaseWorker(PactDslWithProvider builder) {
         return builder
             .given("A Start for a Caseworker is requested", setUpStateMapForProviderWithoutCaseData())

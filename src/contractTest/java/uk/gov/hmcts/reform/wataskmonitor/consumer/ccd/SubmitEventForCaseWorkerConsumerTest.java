@@ -23,7 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.consumer.ccd.util.PactDslBuilderForCaseDetailsList.buildSubmitForCaseWorkedPactDsl;
 
 public class SubmitEventForCaseWorkerConsumerTest extends CcdConsumerTestBase {
-    
+
     @Override
     public Map<String, Object> setUpStateMapForProviderWithCaseData(CaseDataContent caseDataContent)
         throws JSONException {
@@ -32,7 +32,7 @@ public class SubmitEventForCaseWorkerConsumerTest extends CcdConsumerTestBase {
         return caseDataContentMap;
     }
 
-    @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "wa_task_management_api")
+    @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "wa_task_monitor")
     public RequestResponsePact submitEventForCaseWorker(PactDslWithProvider builder) throws JSONException {
         return builder
             .given("A Submit Event for a Caseworker is requested",
