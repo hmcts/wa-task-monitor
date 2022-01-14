@@ -32,6 +32,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
    envVariable: envVar
   ]
 }
+
 def branchesToSync = ['demo', 'ithc', 'perftest']
 
 withPipeline(type, product, component) {
@@ -64,6 +65,10 @@ withPipeline(type, product, component) {
   after('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
+  }
+
+  after('pact-provider-verification') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
   }
 
   onMaster() {
