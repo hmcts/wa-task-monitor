@@ -36,6 +36,10 @@ public class SpringBootFunctionalBaseTest {
 
     @Value("${targets.camunda}")
     private String camundaUrl;
+
+    @Value("${targets.task-management.url}")
+    private String taskmanagementUrl;
+
     @Value("${targets.instance}")
     private String testUrl;
 
@@ -45,6 +49,7 @@ public class SpringBootFunctionalBaseTest {
     protected Common common;
     protected RestApiActions restApiActions;
     protected RestApiActions camundaApiActions;
+    protected RestApiActions taskManagementApiActions;
 
     @Autowired
     protected AuthorizationHeadersProvider authorizationHeadersProvider;
@@ -70,6 +75,7 @@ public class SpringBootFunctionalBaseTest {
 
         restApiActions = new RestApiActions(testUrl, SNAKE_CASE).setUp();
         camundaApiActions = new RestApiActions(camundaUrl, LOWER_CAMEL_CASE).setUp();
+        taskManagementApiActions = new RestApiActions(taskmanagementUrl, SNAKE_CASE).setUp();
 
         documentManagementFiles.prepare();
 
@@ -88,7 +94,8 @@ public class SpringBootFunctionalBaseTest {
             authorizationHeadersProvider,
             idamService,
             roleAssignmentServiceApi,
-            camundaClient
+            camundaClient,
+            taskManagementApiActions
         );
     }
 

@@ -54,6 +54,7 @@ public class Common {
     private final GivensBuilder given;
     private final RestApiActions restApiActions;
     private final RestApiActions camundaApiActions;
+    private final RestApiActions taskManagementApiActions;
     private final AuthorizationHeadersProvider authorizationHeadersProvider;
 
     private final IdamService idamService;
@@ -67,7 +68,8 @@ public class Common {
                   AuthorizationHeadersProvider authorizationHeadersProvider,
                   IdamService idamService,
                   RoleAssignmentServiceApi roleAssignmentServiceApi,
-                  CamundaClient camundaClient) {
+                  CamundaClient camundaClient,
+                  RestApiActions taskManagementApiActions) {
         this.given = given;
         this.restApiActions = restApiActions;
         this.camundaApiActions = camundaApiActions;
@@ -75,6 +77,7 @@ public class Common {
         this.idamService = idamService;
         this.roleAssignmentServiceApi = roleAssignmentServiceApi;
         this.camundaClient = camundaClient;
+        this.taskManagementApiActions = taskManagementApiActions;
     }
 
 
@@ -139,6 +142,35 @@ public class Common {
 
     }
 
+    public void setupCftOrganisationalRoleAssignment(Headers headers) {
+
+        UserInfo userInfo = authorizationHeadersProvider.getUserInfo(headers.getValue(AUTHORIZATION));
+
+        Map<String, String> attributes = Map.of(
+            "primaryLocation", "765324",
+            "region", "1",
+            //This value must match the camunda task location variable for the permission check to pass
+            "baseLocation", "765324",
+            "jurisdiction", "IA"
+        );
+
+        //Clean/Reset user
+        clearAllRoleAssignmentsForUser(userInfo.getUid(), headers);
+
+        //Creates an organizational role for jurisdiction IA
+        log.info("Creating Organizational Role");
+        postRoleAssignment(
+            null,
+            headers.getValue(AUTHORIZATION),
+            headers.getValue(SERVICE_AUTHORIZATION),
+            userInfo,
+            "tribunal-caseworker",
+            toJsonString(attributes),
+            "requests/roleAssignment/r2/set-organisational-role-assignment-request.json"
+        );
+
+    }
+
     public void clearAllRoleAssignments(Headers headers) {
         UserInfo userInfo = idamService.getUserInfo(headers.getValue(AUTHORIZATION));
         clearAllRoleAssignmentsForUser(userInfo.getUid(), headers);
@@ -173,6 +205,18 @@ public class Common {
                 authenticationHeaders
             ).then()
             .statusCode(200)
+            .extract()
+            .body()
+            .jsonPath()
+            .getMap("");
+
+    }
+
+    public Map<String, CamundaVariable> getTaskFromTaskManagementApi(Headers authenticationHeaders, String value) {
+        return taskManagementApiActions.get(
+                "/task/" + value,
+                authenticationHeaders
+            ).then()
             .extract()
             .body()
             .jsonPath()

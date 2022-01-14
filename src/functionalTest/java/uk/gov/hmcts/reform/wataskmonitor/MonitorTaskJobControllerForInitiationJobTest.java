@@ -36,7 +36,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
     public void setUp() {
         caseIds = new ArrayList<>();
         authenticationHeaders = authorizationHeadersProvider
-            .getTribunalCaseworkerAAuthorization("wa-mvp-ft-test-");
+            .getTribunalCaseworkerAAuthorization("wa-ft-test-r2-");
     }
 
     @After
@@ -108,8 +108,10 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
     }
 
     @Test
-    public void task_initiation_job_should_initiate_default_task_and_not_initiate_delayed_task() {
+    public void task_initiation_job_should_initiate_only_default_task_and_not_initiate_delayed_task() {
         TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
+        common.setupCftOrganisationalRoleAssignment(authenticationHeaders);
+
 
         assertNotNull(defaultTaskVariables);
         assertNotNull(defaultTaskVariables.getCaseId());
@@ -135,6 +137,11 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
             .statusCode(HttpStatus.OK.value())
             .body(is(expectedResponse.apply(JobName.INITIATION.name())));
 
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         Map<String, CamundaVariable> defaultTaskCamundaVariables =
             common.getTaskVariables(authenticationHeaders, defaultTaskVariables.getTaskId());
@@ -142,14 +149,25 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         Map<String, CamundaVariable> delayedTaskCamundaVariables =
             common.getTaskVariablesFromCamunda(authenticationHeaders, delayedTaskVariables.getTaskId());
 
-        String actualDefaultTaskTaskState = defaultTaskCamundaVariables.get("taskState").getValue().toString();
+        Map<String, CamundaVariable> delayedTaskCftResponse =
+            common.getTaskFromTaskManagementApi(authenticationHeaders, delayedTaskVariables.getTaskId());
 
+        Map<String, CamundaVariable> defaultTaskCftResponse =
+            common.getTaskFromTaskManagementApi(authenticationHeaders, defaultTaskVariables.getTaskId());
+
+        String actualDefaultTaskCftTaskState = ((HashMap) (((HashMap) defaultTaskCftResponse)
+            .get("task"))).get("task_state").toString();
+        String actualDelayedTaskCftTaskState = String.valueOf(delayedTaskCftResponse.get("status"));
+
+        assertEquals("unassigned", actualDefaultTaskCftTaskState);
+        assertEquals(String.valueOf(HttpStatus.NOT_FOUND.value()), actualDelayedTaskCftTaskState);
+
+        String actualDefaultTaskTaskState = defaultTaskCamundaVariables.get("taskState").getValue().toString();
         String actualDelayedTaskTaskState = ((HashMap) (((HashMap) delayedTaskCamundaVariables)
             .get("taskState"))).get("value").toString();
 
-        assertEquals("unconfigured", actualDelayedTaskTaskState);
-
         assertEquals("unassigned", actualDefaultTaskTaskState);
+        assertEquals("unconfigured", actualDelayedTaskTaskState);
 
     }
 
