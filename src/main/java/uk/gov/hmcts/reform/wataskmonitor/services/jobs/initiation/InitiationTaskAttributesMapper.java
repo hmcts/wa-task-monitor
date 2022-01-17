@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVari
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.LOCATION_NAME;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.REGION;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.SECURITY_CLASSIFICATION;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.TASK_ID;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.TASK_STATE;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.TASK_SYSTEM;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.TASK_TYPE;
@@ -54,6 +55,21 @@ public class InitiationTaskAttributesMapper {
         String description = camundaTask.getDescription();
         // Local Variables
         String type = getVariableValue(variables.get(TASK_TYPE.value()), String.class, null);
+
+        if (type == null) {
+            String taskId = getVariableValue(variables.get(TASK_ID.value()), String.class, null);
+            /*
+             * In some R1 tasks the taskType does not exist which will cause it to fail when attempting to initate
+             * a task to allow for R1 to R2 migration we attempt to use the taskId instead who's value should be
+             * the same as taskType.
+             */
+            log.info(
+                "Task '{}' did not have a 'taskType' defaulting to 'taskId' with value '{}'",
+                camundaTask.getId(), taskId
+            );
+            type = taskId;
+        }
+
         CFTTaskState taskState = extractTaskState(variables);
         String executionTypeName = getVariableValue(variables.get(EXECUTION_TYPE.value()),
             String.class,
@@ -61,7 +77,7 @@ public class InitiationTaskAttributesMapper {
         String securityClassification = getVariableValue(variables.get(SECURITY_CLASSIFICATION.value()),
             String.class,
             null);
-        String taskTitle = getVariableValue(variables.get(TITLE.value()), String.class,null);
+        String taskTitle = getVariableValue(variables.get(TITLE.value()), String.class, null);
 
         boolean autoAssigned = getVariableValue(variables.get(AUTO_ASSIGNED.value()), Boolean.class, false);
         String taskSystem = getVariableValue(variables.get(TASK_SYSTEM.value()), String.class, null);
