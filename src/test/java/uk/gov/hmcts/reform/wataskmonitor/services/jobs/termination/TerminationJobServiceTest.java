@@ -26,6 +26,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -211,7 +212,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
     void should_fetch_tasks_and_call_terminate_for_deleted_task_only(int timeFlag) throws JSONException {
         terminationJobService = new TerminationJobService(camundaClient,
                                                           taskManagementClient,
-                                                          timeFlag == 0 ? false : true,
+                                                          timeFlag == 1,
                                                           120);
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "deleted")
@@ -226,6 +227,10 @@ class TerminationJobServiceTest extends UnitBaseTest {
 
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
+        boolean expectedTimeFlag = timeFlag == 1;
+
+        assertEquals(expectedTimeFlag, terminationJobService.isTerminationTimeLimitFlag());
+        assertEquals(120, terminationJobService.getTerminationTimeLimit());
         assertQuery();
         verifyTerminateEndpointWasCalledWithTerminateReason("cancelled", 0);
         verifyTerminateEndpointWasCalledWithTerminateReason("completed", 0);

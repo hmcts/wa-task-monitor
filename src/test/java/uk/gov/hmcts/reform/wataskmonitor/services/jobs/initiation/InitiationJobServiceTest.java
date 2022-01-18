@@ -96,7 +96,7 @@ class InitiationJobServiceTest extends UnitBaseTest {
             camundaClient,
             taskManagementClient,
             initiationTaskAttributesMapper,
-            timeFlag == 0 ? false : true,
+            timeFlag == 1,
             120
         );
         ZonedDateTime createdDate = ZonedDateTime.now();
@@ -128,6 +128,11 @@ class InitiationJobServiceTest extends UnitBaseTest {
 
         GenericJobReport expectation = new GenericJobReport(1, singletonList(outcome));
         assertEquals(expectation, actual);
+
+        boolean expectedTimeFlag = timeFlag == 1;
+
+        assertEquals(expectedTimeFlag, initiationJobService.isInitiationTimeLimitFlag());
+        assertEquals(120, initiationJobService.getInitiationTimeLimit());
     }
 
 
