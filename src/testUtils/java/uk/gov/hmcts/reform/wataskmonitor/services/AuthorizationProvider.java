@@ -43,9 +43,17 @@ public class AuthorizationProvider {
     @Autowired
     private AuthTokenGenerator serviceAuthTokenGenerator;
 
+    @Value("${idam.test.userCleanupEnabled}")
+    private boolean testUserDeletionEnabled;
+
     public void deleteAccount(String username) {
-        log.info("Deleting test account '{}'", username);
-        idamServiceApi.deleteTestUser(username);
+
+        if (testUserDeletionEnabled) {
+            log.info("Deleting test account '{}'", username);
+            idamServiceApi.deleteTestUser(username);
+        } else {
+            log.info("Test User deletion feature flag was not enabled, user '{}' was not deleted", username);
+        }
     }
 
     public Header getServiceAuthorizationHeader() {

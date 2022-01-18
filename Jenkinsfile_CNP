@@ -59,11 +59,13 @@ withPipeline(type, product, component) {
   }
 
   after('functionalTest:preview') {
+    env.ENABLE_TEST_USER_DELETION = true
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
   }
 
   after('functionalTest:aat') {
+    env.ENABLE_TEST_USER_DELETION = true
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
   }
