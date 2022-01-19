@@ -75,7 +75,7 @@ class InitiationJobServiceTest extends UnitBaseTest {
 
         List<CamundaTask> actualCamundaTasks = initiationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN);
 
-        assertQueryTargetsUserTasksAndNotDelayedTasks("{taskDefinitionKey: processTask}");
+        assertQueryTargetsUserTasksAndNotDelayedTasks();
         assertQuery();
         assertThat(actualCamundaTasks).isEqualTo(tasks);
     }
@@ -147,9 +147,9 @@ class InitiationJobServiceTest extends UnitBaseTest {
         );
     }
 
-    private void assertQueryTargetsUserTasksAndNotDelayedTasks(String expected) throws JSONException {
+    private void assertQueryTargetsUserTasksAndNotDelayedTasks() throws JSONException {
         JSONAssert.assertEquals(
-            expected,
+            "{taskDefinitionKey: processTask}",
             actualQueryParametersCaptor.getValue(),
             JSONCompareMode.LENIENT
         );

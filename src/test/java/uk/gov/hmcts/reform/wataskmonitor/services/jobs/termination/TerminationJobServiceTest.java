@@ -45,7 +45,6 @@ class TerminationJobServiceTest extends UnitBaseTest {
     @Mock
     private TaskManagementClient taskManagementClient;
 
-    //@InjectMocks
     private TerminationJobService terminationJobService;
 
     @Captor

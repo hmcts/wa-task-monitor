@@ -125,7 +125,7 @@ public class InitiationJobService {
 
     private String buildSearchQuery() {
         String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED);
-        if (initiationTimeLimitFlag) {
+        if (isInitiationTimeLimitFlag()) {
             ZonedDateTime createdTime =  ZonedDateTime.now().minusMinutes(initiationTimeLimit);
             String createdAfter = createdTime.format(formatter);
 
