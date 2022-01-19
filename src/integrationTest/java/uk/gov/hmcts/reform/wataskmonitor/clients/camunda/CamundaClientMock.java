@@ -19,7 +19,7 @@ public final class CamundaClientMock {
 
     public static void setupPostTaskCamundaResponseMock(WireMockServer mockServer, String expectedResponse)
         throws IOException {
-        mockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/task?firstResult=0&maxResults=1000"))
+        mockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/task?firstResult=0&maxResults=100"))
             .withHeader(SERVICE_AUTHORIZATION, containing("Bearer"))
             .willReturn(WireMock.aResponse()
                 .withStatus(HttpStatus.OK_200)
