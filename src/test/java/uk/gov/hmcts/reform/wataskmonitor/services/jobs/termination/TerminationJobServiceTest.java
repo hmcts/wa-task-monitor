@@ -64,7 +64,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
             .getTasksFromHistory(
                 eq(SOME_SERVICE_TOKEN),
                 eq("0"),
-                eq("1000"),
+                eq("100"),
                 any()
             );
 
@@ -94,7 +94,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
@@ -107,7 +107,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(Collections.emptyList());
 
@@ -131,7 +131,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
@@ -152,7 +152,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
@@ -173,7 +173,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
@@ -194,7 +194,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 

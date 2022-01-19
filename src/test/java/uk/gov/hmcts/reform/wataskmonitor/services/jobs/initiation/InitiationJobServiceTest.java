@@ -66,7 +66,7 @@ class InitiationJobServiceTest extends UnitBaseTest {
         when(camundaClient.getTasks(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(tasks);
 
