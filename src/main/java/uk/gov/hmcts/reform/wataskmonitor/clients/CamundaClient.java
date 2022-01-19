@@ -33,7 +33,7 @@ public interface CamundaClient {
     List<CamundaTask> getTasks(
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
         @RequestParam(value = "firstResult", required = false, defaultValue = "0") String firstResult,
-        @RequestParam(value = "maxResults", required = false, defaultValue = "1000") String maxResults,
+        @RequestParam(value = "maxResults", required = false, defaultValue = "100") String maxResults,
         @RequestBody String body
     );
 
@@ -66,7 +66,7 @@ public interface CamundaClient {
     List<HistoricCamundaTask> getTasksFromHistory(
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
         @RequestParam(value = "firstResult", required = false, defaultValue = "0") String firstResult,
-        @RequestParam(value = "maxResults", required = false, defaultValue = "1000") String maxResults,
+        @RequestParam(value = "maxResults", required = false, defaultValue = "100") String maxResults,
         @RequestBody String body
     );
 

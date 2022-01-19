@@ -45,7 +45,7 @@ public class InitiationJobService {
         List<CamundaTask> camundaTasks = camundaClient.getTasks(
             serviceToken,
             "0",
-            "1000",
+            "100",
             buildSearchQuery()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());

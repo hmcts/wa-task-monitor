@@ -39,7 +39,7 @@ public class TerminationJobService {
         List<HistoricCamundaTask> camundaTasks = camundaClient.getTasksFromHistory(
             serviceToken,
             "0",
-            "1000",
+            "100",
             buildHistoricTasksPendingTerminationRequest()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());
