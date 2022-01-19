@@ -3,16 +3,17 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.termination;
 import feign.FeignException;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.job.TerminationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TerminateTaskRequest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options.TerminateInfo;
@@ -38,10 +39,22 @@ class TerminationJobServiceTest extends UnitBaseTest {
     @Mock
     private TaskManagementClient taskManagementClient;
 
-    @InjectMocks
     private TerminationJobService terminationJobService;
     @Captor
     private ArgumentCaptor<String> actualQueryParametersCaptor;
+
+    @Mock
+    private TerminationJobConfig terminationJobConfig;
+
+    @BeforeEach
+    void setUp() {
+        terminationJobService = new TerminationJobService(
+            camundaClient,
+            taskManagementClient,
+            terminationJobConfig
+        );
+        when(terminationJobConfig.getCamundaMaxResults()).thenReturn("100");
+    }
 
     @Test
     void should_throw_exception_when_camunda_call_fails() {

@@ -13,6 +13,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
@@ -40,19 +41,23 @@ class InitiationJobServiceTest extends UnitBaseTest {
     private CamundaClient camundaClient;
     @Mock
     private TaskManagementClient taskManagementClient;
-    private InitiationTaskAttributesMapper initiationTaskAttributesMapper;
+    @Mock
+    private InitiationJobConfig initiationJobConfig;
     private InitiationJobService initiationJobService;
     @Captor
     private ArgumentCaptor<String> actualQueryParametersCaptor;
 
     @BeforeEach
     void setUp() {
-        initiationTaskAttributesMapper = new InitiationTaskAttributesMapper(new ObjectMapper());
+        InitiationTaskAttributesMapper initiationTaskAttributesMapper =
+            new InitiationTaskAttributesMapper(new ObjectMapper());
         initiationJobService = new InitiationJobService(
             camundaClient,
             taskManagementClient,
-            initiationTaskAttributesMapper
+            initiationTaskAttributesMapper,
+            initiationJobConfig
         );
+        when(initiationJobConfig.getCamundaMaxResults()).thenReturn("100");
     }
 
     @Test
