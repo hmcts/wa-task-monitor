@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.job.TerminationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TerminateTaskRequest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options.TerminateInfo;
@@ -21,12 +22,16 @@ public class TerminationJobService {
 
     private final CamundaClient camundaClient;
     private final TaskManagementClient taskManagementClient;
+    private final TerminationJobConfig terminationJobConfig;
 
 
     @Autowired
-    public TerminationJobService(CamundaClient camundaClient, TaskManagementClient taskManagementClient) {
+    public TerminationJobService(CamundaClient camundaClient,
+                                 TaskManagementClient taskManagementClient,
+                                 TerminationJobConfig terminationJobConfig) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;
+        this.terminationJobConfig = terminationJobConfig;
     }
 
     public void terminateTasks(String serviceAuthorizationToken) {
@@ -39,7 +44,7 @@ public class TerminationJobService {
         List<HistoricCamundaTask> camundaTasks = camundaClient.getTasksFromHistory(
             serviceToken,
             "0",
-            "1000",
+            terminationJobConfig.getCamundaMaxResults(),
             buildHistoricTasksPendingTerminationRequest()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());

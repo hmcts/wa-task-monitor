@@ -58,7 +58,7 @@ class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootIntegrat
         verify(camundaClient).getTasks(
             eq(SERVICE_TOKEN),
             eq("0"),
-            eq("10"),
+            eq("100"),
             argThat(new CamundaQueryParametersMatcher(TestUtility.getExpectedRequestForUnconfiguredTasks()))
         );
         verify(taskConfigurationClient).configureTask(eq(SERVICE_TOKEN), eq(CAMUNDA_TASK_ID));
@@ -70,7 +70,7 @@ class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootIntegrat
         when(camundaClient.getTasks(
             eq(SERVICE_TOKEN),
             eq("0"),
-            eq("10"),
+            eq("100"),
             argThat(new CamundaQueryParametersMatcher(TestUtility.getExpectedRequestForUnconfiguredTasks()))
         )).thenReturn(List.of(new CamundaTask(
             CAMUNDA_TASK_ID,

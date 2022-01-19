@@ -62,7 +62,7 @@ class MonitorTaskJobControllerForInitiationJobTest extends SpringBootIntegration
         verify(camundaClient).getTasks(
             eq(SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             any()
         );
 
@@ -123,7 +123,7 @@ class MonitorTaskJobControllerForInitiationJobTest extends SpringBootIntegration
         when(camundaClient.getTasks(
             eq(SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             any()
         )).thenReturn(
             List.of(camundaTask)
