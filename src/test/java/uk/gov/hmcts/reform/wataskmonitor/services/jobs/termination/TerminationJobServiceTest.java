@@ -16,6 +16,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.job.TerminationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TerminateTaskRequest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options.TerminateInfo;
@@ -50,12 +51,19 @@ class TerminationJobServiceTest extends UnitBaseTest {
     @Captor
     private ArgumentCaptor<String> actualQueryParametersCaptor;
 
+    @Mock
+    private TerminationJobConfig terminationJobConfig;
+
     @BeforeEach
     void setUp() {
-        terminationJobService = new TerminationJobService(camundaClient,
-                                                          taskManagementClient,
-                                                          false,
-                                                          120);
+        terminationJobService = new TerminationJobService(
+            camundaClient,
+            taskManagementClient,
+            terminationJobConfig,
+            false,
+            120
+        );
+        when(terminationJobConfig.getCamundaMaxResults()).thenReturn("100");
     }
 
     @Test
@@ -66,7 +74,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
             .getTasksFromHistory(
                 eq(SOME_SERVICE_TOKEN),
                 eq("0"),
-                eq("1000"),
+                eq("100"),
                 any()
             );
 
@@ -96,7 +104,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
@@ -108,12 +116,13 @@ class TerminationJobServiceTest extends UnitBaseTest {
     void should_succeed_when_no_tasks_returned(int timeFlag) throws JSONException {
         terminationJobService = new TerminationJobService(camundaClient,
                                                           taskManagementClient,
+                                                          terminationJobConfig,
                                                           timeFlag == 0 ? false : true,
                                                           120);
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(Collections.emptyList());
 
@@ -131,6 +140,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
     void should_fetch_tasks_and_terminate_them(int timeFlag) throws JSONException {
         terminationJobService = new TerminationJobService(camundaClient,
                                                           taskManagementClient,
+                                                          terminationJobConfig,
                                                           timeFlag == 0 ? false : true,
                                                           120);
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
@@ -142,7 +152,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
@@ -159,6 +169,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
     void should_fetch_tasks_and_call_terminate_for_cancelled_task_only(int timeFlag) throws JSONException {
         terminationJobService = new TerminationJobService(camundaClient,
                                                           taskManagementClient,
+                                                          terminationJobConfig,
                                                           timeFlag == 0 ? false : true,
                                                           120);
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
@@ -168,7 +179,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
@@ -185,6 +196,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
     void should_fetch_tasks_and_call_terminate_for_completed_task_only(int timeFlag) throws JSONException {
         terminationJobService = new TerminationJobService(camundaClient,
                                                           taskManagementClient,
+                                                          terminationJobConfig,
                                                           timeFlag == 0 ? false : true,
                                                           120);
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
@@ -194,7 +206,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
@@ -211,6 +223,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
     void should_fetch_tasks_and_call_terminate_for_deleted_task_only(int timeFlag) throws JSONException {
         terminationJobService = new TerminationJobService(camundaClient,
                                                           taskManagementClient,
+                                                          terminationJobConfig,
                                                           timeFlag == 1,
                                                           120);
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
@@ -220,7 +233,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 

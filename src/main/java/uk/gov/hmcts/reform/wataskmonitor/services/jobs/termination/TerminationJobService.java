@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.job.TerminationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TerminateTaskRequest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options.TerminateInfo;
@@ -25,18 +26,21 @@ public class TerminationJobService {
 
     private final CamundaClient camundaClient;
     private final TaskManagementClient taskManagementClient;
+    private final TerminationJobConfig terminationJobConfig;
 
     private final  boolean terminationTimeLimitFlag;
     private final long terminationTimeLimit;
 
     public TerminationJobService(CamundaClient camundaClient,
                                  TaskManagementClient taskManagementClient,
-                                 @Value("${job.configuration.camunda-termination-time-limit-flag}")
+                                 TerminationJobConfig terminationJobConfig,
+                                 @Value("${job.configuration.termination.camunda-termination-time-limit-flag}")
                                  boolean terminationTimeLimitFlag,
-                                 @Value("${job.configuration.camunda-termination-time-limit}")
+                                 @Value("${job.configuration.termination.camunda-termination-time-limit}")
                                  long terminationTimeLimit) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;
+        this.terminationJobConfig = terminationJobConfig;
         this.terminationTimeLimitFlag = terminationTimeLimitFlag;
         this.terminationTimeLimit = terminationTimeLimit;
     }
@@ -51,7 +55,7 @@ public class TerminationJobService {
         List<HistoricCamundaTask> camundaTasks = camundaClient.getTasksFromHistory(
             serviceToken,
             "0",
-            "1000",
+            terminationJobConfig.getCamundaMaxResults(),
             buildHistoricTasksPendingTerminationRequest()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());

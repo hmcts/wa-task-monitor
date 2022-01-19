@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
@@ -38,11 +39,13 @@ public class InitiationJobService {
     private final CamundaClient camundaClient;
     private final TaskManagementClient taskManagementClient;
     private final InitiationTaskAttributesMapper initiationTaskAttributesMapper;
+    private final InitiationJobConfig initiationJobConfig;
 
     @Autowired
     public InitiationJobService(CamundaClient camundaClient,
                                 TaskManagementClient taskManagementClient,
                                 InitiationTaskAttributesMapper initiationTaskAttributesMapper,
+                                InitiationJobConfig initiationJobConfig,
                                 @Value("${job.configuration.camunda-initiation-time-limit-flag}")
                                 boolean initiationTimeLimitFlag,
                                 @Value("${job.configuration.camunda-initiation-time-limit}")
@@ -50,6 +53,7 @@ public class InitiationJobService {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;
         this.initiationTaskAttributesMapper = initiationTaskAttributesMapper;
+        this.initiationJobConfig = initiationJobConfig;
         this.initiationTimeLimitFlag = initiationTimeLimitFlag;
         this.initiationTimeLimit = initiationTimeLimit;
 
@@ -60,7 +64,7 @@ public class InitiationJobService {
         List<CamundaTask> camundaTasks = camundaClient.getTasks(
             serviceToken,
             "0",
-            "1000",
+            initiationJobConfig.getCamundaMaxResults(),
             buildSearchQuery()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());
