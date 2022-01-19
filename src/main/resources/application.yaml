@@ -91,7 +91,11 @@ feign:
 
 job:
   configuration:
-    camunda-max-results: ${CONFIGURATION_CAMUNDA_MAX_RESULTS:10}
+    camunda-max-results: ${CONFIGURATION_CAMUNDA_MAX_RESULTS:100}
+  initiation:
+    camunda-max-results: ${INITIATION_CAMUNDA_MAX_RESULTS:100}
+  termination:
+    camunda-max-results: ${TERMINATION_CAMUNDA_MAX_RESULTS:100}
 
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}
