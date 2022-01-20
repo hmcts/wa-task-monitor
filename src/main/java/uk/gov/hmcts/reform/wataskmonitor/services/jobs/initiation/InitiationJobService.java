@@ -46,9 +46,9 @@ public class InitiationJobService {
                                 TaskManagementClient taskManagementClient,
                                 InitiationTaskAttributesMapper initiationTaskAttributesMapper,
                                 InitiationJobConfig initiationJobConfig,
-                                @Value("${job.configuration.camunda-initiation-time-limit-flag}")
+                                @Value("${job.initiation.camunda-time-limit-flag}")
                                 boolean initiationTimeLimitFlag,
-                                @Value("${job.configuration.camunda-initiation-time-limit}")
+                                @Value("${job.initiation.camunda-time-limit}")
                                 long initiationTimeLimit) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;

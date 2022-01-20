@@ -34,9 +34,9 @@ public class TerminationJobService {
     public TerminationJobService(CamundaClient camundaClient,
                                  TaskManagementClient taskManagementClient,
                                  TerminationJobConfig terminationJobConfig,
-                                 @Value("${job.configuration.termination.camunda-termination-time-limit-flag}")
+                                 @Value("${job.termination.camunda-time-limit-flag}")
                                  boolean terminationTimeLimitFlag,
-                                 @Value("${job.configuration.termination.camunda-termination-time-limit}")
+                                 @Value("${job.termination.camunda-time-limit}")
                                  long terminationTimeLimit) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;

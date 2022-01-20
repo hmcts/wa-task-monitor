@@ -53,10 +53,10 @@ withNightlyPipeline(type, product, component) {
   env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
   env.CCD_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
   env.CAMUNDA_URL = "http://camunda-api-aat.service.core-compute-aat.internal/engine-rest"
-  env.CONFIGURATION_INITIATION_TIME_LIMIT_FLAG = true
-  env.CONFIGURATION_INITIATION_TIME_LIMIT = 120
-  env.CONFIGURATION_TERMINATION_TIME_LIMIT_FLAG = true
-  env.CONFIGURATION_TERMINATION_TIME_LIMIT = 120
+  env.INITIATION_TIME_LIMIT_FLAG = true
+  env.INITIATION_TIME_LIMIT = 120
+  env.TERMINATION_TIME_LIMIT_FLAG = true
+  env.TERMINATION_TIME_LIMIT = 120
   loadVaultSecrets(secrets)
 //  enableFortifyScan()
   enableFullFunctionalTest()
