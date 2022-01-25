@@ -2,9 +2,11 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
@@ -13,6 +15,8 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.InitiateT
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskAttribute;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,19 +29,34 @@ import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_TA
 @Slf4j
 public class InitiationJobService {
 
-    public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS+0000";
+    public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN);
+
+    private final boolean initiationTimeLimitFlag;
+
+    private final long initiationTimeLimit;
 
     private final CamundaClient camundaClient;
     private final TaskManagementClient taskManagementClient;
     private final InitiationTaskAttributesMapper initiationTaskAttributesMapper;
+    private final InitiationJobConfig initiationJobConfig;
 
     @Autowired
     public InitiationJobService(CamundaClient camundaClient,
                                 TaskManagementClient taskManagementClient,
-                                InitiationTaskAttributesMapper initiationTaskAttributesMapper) {
+                                InitiationTaskAttributesMapper initiationTaskAttributesMapper,
+                                InitiationJobConfig initiationJobConfig,
+                                @Value("${job.initiation.camunda-time-limit-flag}")
+                                boolean initiationTimeLimitFlag,
+                                @Value("${job.initiation.camunda-time-limit}")
+                                long initiationTimeLimit) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;
         this.initiationTaskAttributesMapper = initiationTaskAttributesMapper;
+        this.initiationJobConfig = initiationJobConfig;
+        this.initiationTimeLimitFlag = initiationTimeLimitFlag;
+        this.initiationTimeLimit = initiationTimeLimit;
+
     }
 
     public List<CamundaTask> getUnConfiguredTasks(String serviceToken) {
@@ -45,7 +64,7 @@ public class InitiationJobService {
         List<CamundaTask> camundaTasks = camundaClient.getTasks(
             serviceToken,
             "0",
-            "1000",
+            initiationJobConfig.getCamundaMaxResults(),
             buildSearchQuery()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());
@@ -109,7 +128,22 @@ public class InitiationJobService {
     }
 
     private String buildSearchQuery() {
-        return ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED);
+        String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED);
+        if (isInitiationTimeLimitFlag()) {
+            ZonedDateTime createdTime =  ZonedDateTime.now().minusMinutes(initiationTimeLimit);
+            String createdAfter = createdTime.format(formatter);
+
+            return query
+                .replace("\"createdAfter\": \"*\",","\"createdAfter\": \"" + createdAfter + "\",");
+        }
+        return query;
     }
 
+    public boolean isInitiationTimeLimitFlag() {
+        return initiationTimeLimitFlag;
+    }
+
+    public long getInitiationTimeLimit() {
+        return initiationTimeLimit;
+    }
 }

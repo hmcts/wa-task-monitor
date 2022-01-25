@@ -58,7 +58,7 @@ class MonitorTaskJobControllerForTerminationJobTest extends SpringBootIntegratio
         verify(camundaClient).getTasksFromHistory(
             eq(SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             any()
         );
 
@@ -86,7 +86,7 @@ class MonitorTaskJobControllerForTerminationJobTest extends SpringBootIntegratio
         when(camundaClient.getTasksFromHistory(
             eq(SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             any()
         )).thenReturn(
             List.of(

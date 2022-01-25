@@ -3,8 +3,11 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -13,6 +16,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
@@ -20,6 +24,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.InitiationHelpers;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -30,29 +35,39 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class InitiationJobServiceTest extends UnitBaseTest {
+    public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN);
 
     @Mock
     private CamundaClient camundaClient;
     @Mock
     private TaskManagementClient taskManagementClient;
     private InitiationTaskAttributesMapper initiationTaskAttributesMapper;
+    @Mock
+    private InitiationJobConfig initiationJobConfig;
     private InitiationJobService initiationJobService;
     @Captor
     private ArgumentCaptor<String> actualQueryParametersCaptor;
 
     @BeforeEach
     void setUp() {
-        initiationTaskAttributesMapper = new InitiationTaskAttributesMapper(new ObjectMapper());
+        initiationTaskAttributesMapper =
+            new InitiationTaskAttributesMapper(new ObjectMapper());
         initiationJobService = new InitiationJobService(
             camundaClient,
             taskManagementClient,
-            initiationTaskAttributesMapper
+            initiationTaskAttributesMapper,
+            initiationJobConfig,
+            true,
+            120
         );
+        lenient().when(initiationJobConfig.getCamundaMaxResults()).thenReturn("100");
     }
 
     @Test
@@ -61,14 +76,14 @@ class InitiationJobServiceTest extends UnitBaseTest {
         when(camundaClient.getTasks(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
-            eq("1000"),
+            eq("100"),
             actualQueryParametersCaptor.capture()
         )).thenReturn(tasks);
 
         List<CamundaTask> actualCamundaTasks = initiationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN);
 
-        assertQueryTargetsUserTasksAndNotDelayedTasks("{taskDefinitionKey: processTask}");
-        assertQueryTargetsUserTasksAndNotDelayedTasks(getExpectedQueryParameters());
+        assertQueryTargetsUserTasksAndNotDelayedTasks();
+        assertQuery();
         assertThat(actualCamundaTasks).isEqualTo(tasks);
     }
 
@@ -81,8 +96,17 @@ class InitiationJobServiceTest extends UnitBaseTest {
         assertEquals(expectation, actual);
     }
 
-    @Test
-    void should_succeed_and_initiate_tasks() {
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1})
+    void should_succeed_and_initiate_tasks(int timeFlag) {
+        initiationJobService = new InitiationJobService(
+            camundaClient,
+            taskManagementClient,
+            initiationTaskAttributesMapper,
+            initiationJobConfig,
+            timeFlag == 1,
+            120
+        );
         ZonedDateTime createdDate = ZonedDateTime.now();
         ZonedDateTime dueDate = ZonedDateTime.now().plusDays(1);
         CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(
@@ -112,18 +136,35 @@ class InitiationJobServiceTest extends UnitBaseTest {
 
         GenericJobReport expectation = new GenericJobReport(1, singletonList(outcome));
         assertEquals(expectation, actual);
+
+        boolean expectedTimeFlag = timeFlag == 1;
+
+        assertEquals(expectedTimeFlag, initiationJobService.isInitiationTimeLimitFlag());
+        assertEquals(120, initiationJobService.getInitiationTimeLimit());
     }
 
-    private void assertQueryTargetsUserTasksAndNotDelayedTasks(String expected) throws JSONException {
+
+
+    private void assertQuery() throws JSONException {
+        JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
+        String createdAfter = query.getString("createdAfter");
         JSONAssert.assertEquals(
-            expected,
+            getExpectedQueryParameters(createdAfter),
+            actualQueryParametersCaptor.getValue(),
+            JSONCompareMode.LENIENT
+        );
+    }
+
+    private void assertQueryTargetsUserTasksAndNotDelayedTasks() throws JSONException {
+        JSONAssert.assertEquals(
+            "{taskDefinitionKey: processTask}",
             actualQueryParametersCaptor.getValue(),
             JSONCompareMode.LENIENT
         );
     }
 
     @NotNull
-    private String getExpectedQueryParameters() {
+    private String getExpectedQueryParameters(String createdAfter) {
         return "{\n"
                + "  \"orQueries\": [\n"
                + "    {\n"
@@ -136,6 +177,7 @@ class InitiationJobServiceTest extends UnitBaseTest {
                + "      ]\n"
                + "    }\n"
                + "  ],\n"
+               + " \"createdAfter\": \"" + createdAfter + "\",\n"
                + "  \"taskDefinitionKey\": \"processTask\",\n"
                + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
                + "  \"sorting\": [\n"

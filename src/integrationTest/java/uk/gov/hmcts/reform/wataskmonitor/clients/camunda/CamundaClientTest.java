@@ -46,7 +46,7 @@ class CamundaClientTest {
         List<CamundaTask> camundaTasks = camundaClient.getTasks(
             "some service Bearer token",
             "0",
-            "1000",
+            "100",
             ""
         );
 

@@ -91,7 +91,18 @@ feign:
 
 job:
   configuration:
-    camunda-max-results: ${CONFIGURATION_CAMUNDA_MAX_RESULTS:10}
+    camunda-max-results: ${CONFIGURATION_CAMUNDA_MAX_RESULTS:100}
+  initiation:
+    camunda-max-results: ${INITIATION_CAMUNDA_MAX_RESULTS:100}
+    camunda-time-limit-flag: ${INITIATION_TIME_LIMIT_FLAG:true}
+    #number of minutes
+    camunda-time-limit: ${INITIATION_TIME_LIMIT:1}
+  termination:
+    camunda-max-results: ${TERMINATION_CAMUNDA_MAX_RESULTS:100}
+    camunda-time-limit-flag: ${TERMINATION_TIME_LIMIT_FLAG:true}
+      #number of minutes
+    camunda-time-limit: ${TERMINATION_TIME_LIMIT:1}
+
 
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}
