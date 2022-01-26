@@ -143,7 +143,7 @@ public class Common {
     }
 
     public void setupCftOrganisationalRoleAssignment(Headers headers) {
-
+        log.info("oguz test setupCftOrganisationalRoleAssignment authenticationHeaders: {} ", headers);
         UserInfo userInfo = authorizationHeadersProvider.getUserInfo(headers.getValue(AUTHORIZATION));
 
         Map<String, String> attributes = Map.of(
@@ -159,15 +159,22 @@ public class Common {
 
         //Creates an organizational role for jurisdiction IA
         log.info("Creating Organizational Role");
-        postRoleAssignment(
-            null,
-            headers.getValue(AUTHORIZATION),
-            headers.getValue(SERVICE_AUTHORIZATION),
-            userInfo,
-            "tribunal-caseworker",
-            toJsonString(attributes),
-            "requests/roleAssignment/r2/set-organisational-role-assignment-request.json"
-        );
+        try {
+            log.info("oguz test setupCftOrganisationalRoleAssignment postRoleAssignment-2");
+            postRoleAssignment(
+                null,
+                headers.getValue(AUTHORIZATION),
+                headers.getValue(SERVICE_AUTHORIZATION),
+                userInfo,
+                "tribunal-caseworker",
+                toJsonString(attributes),
+                "requests/roleAssignment/r2/set-organisational-role-assignment-request.json"
+            );
+        } catch (Exception e) {
+            log.info("oguz test setupCftOrganisationalRoleAssignment postRoleAssignment-2 authenticationHeaders: {} ",
+                e.getMessage());
+            e.printStackTrace();
+        }
 
     }
 
@@ -288,7 +295,7 @@ public class Common {
                                     String resourceFilename) {
 
         try {
-            log.error("oguz roleAssignmentServiceApi userInfo: {} userInfo: {} s2sToken : {} bearerUserToken : {}",
+            log.error("oguz roleAssignmentServiceApi userInfo: {} roleName: {} s2sToken : {} bearerUserToken : {}",
                 userInfo, roleName, s2sToken, bearerUserToken);
             roleAssignmentServiceApi.createRoleAssignment(
                 getBody(caseId, userInfo, roleName, resourceFilename, attributes),
