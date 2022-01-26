@@ -77,7 +77,8 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
 
     @Test
     public void task_initiation_job_should_not_initiate_delayed_task_and_taskState_should_be_unconfigured() {
-        log.info("oguz test started task_initiation_job_should_not_initiate_delayed_task_and_taskState_should_be_unconfigured");
+        log.info("oguz test started "
+                 + "task_initiation_job_should_not_initiate_delayed_task_and_taskState_should_be_unconfigured");
         TestVariables taskVariables = common.setupDelayedTaskAndRetrieveIds();
 
         assertNotNull(taskVariables);
