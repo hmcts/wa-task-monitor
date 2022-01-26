@@ -110,6 +110,7 @@ task functional(type: Test) {
   group = "Verification"
   testClassesDirs = sourceSets.functionalTest.output.classesDirs
   classpath = sourceSets.functionalTest.runtimeClasspath
+  testLogging.showStandardStreams = true
 }
 
 task integration(type: Test) {
@@ -141,7 +142,7 @@ task tests {
   dependsOn test, integration, smoke, functional
 }
 
-task fortifyScan(type: JavaExec)  {
+task fortifyScan(type: JavaExec) {
   main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
