@@ -100,9 +100,16 @@ job:
   termination:
     camunda-max-results: ${TERMINATION_CAMUNDA_MAX_RESULTS:100}
     camunda-time-limit-flag: ${TERMINATION_TIME_LIMIT_FLAG:true}
-      #number of minutes
+    #number of minutes
     camunda-time-limit: ${TERMINATION_TIME_LIMIT:1}
 
 
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}
+
+
+logging:
+  level:
+    root: INFO
+    uk.gov.hmcts.reform.wataskmonitor.*: DEBUG
+    org.zalando.logbook: DEBUG
