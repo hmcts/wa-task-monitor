@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor;
 
 import io.restassured.http.Headers;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
+@Slf4j
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
 public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunctionalBaseTest {
 
@@ -109,6 +111,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
 
     @Test
     public void task_initiation_job_should_initiate_only_default_task_and_not_initiate_delayed_task() {
+        log.info("oguz test started");
         TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
         common.setupCftOrganisationalRoleAssignment(authenticationHeaders);
 
@@ -117,6 +120,8 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         assertNotNull(defaultTaskVariables.getCaseId());
         assertNotNull(defaultTaskVariables.getTaskId());
 
+        log.info("oguz test defaultTaskVariables.getCaseId() : {}  taskId: {}",
+            defaultTaskVariables.getCaseId(), defaultTaskVariables.getTaskId());
         caseIds.add(defaultTaskVariables.getCaseId());
 
         TestVariables delayedTaskVariables = common.setupDelayedTaskAndRetrieveIds();
@@ -125,6 +130,8 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         assertNotNull(delayedTaskVariables.getCaseId());
         assertNotNull(delayedTaskVariables.getTaskId());
 
+        log.info("oguz test delayedTaskVariables.getCaseId() : {}  taskId: {}",
+            delayedTaskVariables.getCaseId(), delayedTaskVariables.getTaskId());
         caseIds.add(delayedTaskVariables.getCaseId());
 
         given()

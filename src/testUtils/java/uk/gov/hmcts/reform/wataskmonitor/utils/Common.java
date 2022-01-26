@@ -213,14 +213,21 @@ public class Common {
     }
 
     public Map<String, CamundaVariable> getTaskFromTaskManagementApi(Headers authenticationHeaders, String value) {
-        return taskManagementApiActions.get(
-                "/task/" + value,
-                authenticationHeaders
-            ).then()
-            .extract()
-            .body()
-            .jsonPath()
-            .getMap("");
+        log.info("oguz test getTaskFromTaskManagementApi authenticationHeaders: {} - value: {}",
+            authenticationHeaders, value);
+        try {
+            return taskManagementApiActions.get(
+                    "/task/" + value,
+                    authenticationHeaders
+                ).then()
+                .extract()
+                .body()
+                .jsonPath()
+                .getMap("");
+        } catch (Exception e) {
+            log.info("oguz test getTaskFromTaskManagementApi exception : {} ", e.getMessage());
+            return null;
+        }
 
     }
 
@@ -281,12 +288,15 @@ public class Common {
                                     String resourceFilename) {
 
         try {
+            log.error("oguz roleAssignmentServiceApi userInfo: {} userInfo: {} s2sToken : {} bearerUserToken : {}",
+                userInfo, roleName, s2sToken, bearerUserToken);
             roleAssignmentServiceApi.createRoleAssignment(
                 getBody(caseId, userInfo, roleName, resourceFilename, attributes),
                 bearerUserToken,
                 s2sToken
             );
         } catch (FeignException ex) {
+            log.error("oguz roleAssignmentServiceApi exception {}", ex.getMessage());
             ex.printStackTrace();
         }
     }
