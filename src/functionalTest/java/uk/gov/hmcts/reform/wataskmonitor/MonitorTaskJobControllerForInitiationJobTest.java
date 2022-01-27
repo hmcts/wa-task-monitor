@@ -45,9 +45,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
     public void tearDown() {
         common.cleanUpTask(authenticationHeaders, caseIds);
     }
-
-    @Ignore
-    @Disabled("temporary")
+    
     @Test
     public void task_initiation_job_should_initiate_task_and_taskState_should_be_unassigned() {
         TestVariables taskVariables = common.setupTaskAndRetrieveIds();
