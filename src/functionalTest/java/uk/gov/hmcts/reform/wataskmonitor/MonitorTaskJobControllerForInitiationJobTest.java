@@ -48,7 +48,6 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
 
     @Test
     public void task_initiation_job_should_initiate_task_and_taskState_should_be_unassigned() {
-        log.info("oguz test started task_initiation_job_should_initiate_task_and_taskState_should_be_unassigned");
         TestVariables taskVariables = common.setupTaskAndRetrieveIds();
 
         assertNotNull(taskVariables);
@@ -77,8 +76,6 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
 
     @Test
     public void task_initiation_job_should_not_initiate_delayed_task_and_taskState_should_be_unconfigured() {
-        log.info("oguz test started "
-                 + "task_initiation_job_should_not_initiate_delayed_task_and_taskState_should_be_unconfigured");
         TestVariables taskVariables = common.setupDelayedTaskAndRetrieveIds();
 
         assertNotNull(taskVariables);
@@ -112,8 +109,6 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
 
     @Test
     public void task_initiation_job_should_initiate_only_default_task_and_not_initiate_delayed_task() {
-        log.info("oguz test started");
-        System.out.println("oguz test started xxxx");
         TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
         common.setupCftOrganisationalRoleAssignment(authenticationHeaders);
 
@@ -122,8 +117,6 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         assertNotNull(defaultTaskVariables.getCaseId());
         assertNotNull(defaultTaskVariables.getTaskId());
 
-        log.info("oguz test defaultTaskVariables.getCaseId() : {}  taskId: {}",
-            defaultTaskVariables.getCaseId(), defaultTaskVariables.getTaskId());
         caseIds.add(defaultTaskVariables.getCaseId());
 
         TestVariables delayedTaskVariables = common.setupDelayedTaskAndRetrieveIds();
@@ -132,8 +125,6 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         assertNotNull(delayedTaskVariables.getCaseId());
         assertNotNull(delayedTaskVariables.getTaskId());
 
-        log.info("oguz test delayedTaskVariables.getCaseId() : {}  taskId: {}",
-            delayedTaskVariables.getCaseId(), delayedTaskVariables.getTaskId());
         caseIds.add(delayedTaskVariables.getCaseId());
 
         given()

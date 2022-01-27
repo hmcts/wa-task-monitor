@@ -31,8 +31,3 @@ spring:
           oidc:
             client-id: ${WA_IDAM_CLIENT_ID:wa}
             client-secret: ${WA_IDAM_CLIENT_SECRET:something}
-
-logging:
-  level:
-    root: DEBUG
-    uk.gov.hmcts.reform.wataskmonitor.*: DEBUG

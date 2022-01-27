@@ -143,7 +143,6 @@ public class Common {
     }
 
     public void setupCftOrganisationalRoleAssignment(Headers headers) {
-        log.info("oguz test setupCftOrganisationalRoleAssignment authenticationHeaders: {} ", headers);
         UserInfo userInfo = authorizationHeadersProvider.getUserInfo(headers.getValue(AUTHORIZATION));
 
         Map<String, String> attributes = Map.of(
@@ -159,22 +158,16 @@ public class Common {
 
         //Creates an organizational role for jurisdiction IA
         log.info("Creating Organizational Role");
-        try {
-            log.info("oguz test setupCftOrganisationalRoleAssignment postRoleAssignment-2");
-            postRoleAssignment(
-                null,
-                headers.getValue(AUTHORIZATION),
-                headers.getValue(SERVICE_AUTHORIZATION),
-                userInfo,
-                "tribunal-caseworker",
-                toJsonString(attributes),
-                "requests/roleAssignment/r2/set-organisational-role-assignment-request.json"
-            );
-        } catch (Exception e) {
-            log.info("oguz test setupCftOrganisationalRoleAssignment postRoleAssignment-2 authenticationHeaders: {} ",
-                e.getMessage());
-            e.printStackTrace();
-        }
+
+        postRoleAssignment(
+            null,
+            headers.getValue(AUTHORIZATION),
+            headers.getValue(SERVICE_AUTHORIZATION),
+            userInfo,
+            "tribunal-caseworker",
+            toJsonString(attributes),
+            "requests/roleAssignment/r2/set-organisational-role-assignment-request.json"
+        );
 
     }
 
@@ -220,22 +213,14 @@ public class Common {
     }
 
     public Map<String, CamundaVariable> getTaskFromTaskManagementApi(Headers authenticationHeaders, String value) {
-        log.info("oguz test getTaskFromTaskManagementApi authenticationHeaders: {} - value: {}",
-            authenticationHeaders, value);
-        try {
-            return taskManagementApiActions.get(
-                    "/task/" + value,
-                    authenticationHeaders
-                ).then()
-                .extract()
-                .body()
-                .jsonPath()
-                .getMap("");
-        } catch (Exception e) {
-            log.info("oguz test getTaskFromTaskManagementApi exception : {} ", e.getMessage());
-            return null;
-        }
-
+        return taskManagementApiActions.get(
+                "/task/" + value,
+                authenticationHeaders
+            ).then()
+            .extract()
+            .body()
+            .jsonPath()
+            .getMap("");
     }
 
     private void clearAllRoleAssignmentsForUser(String userId, Headers headers) {
@@ -295,15 +280,12 @@ public class Common {
                                     String resourceFilename) {
 
         try {
-            log.error("oguz roleAssignmentServiceApi userInfo: {} roleName: {} s2sToken : {} bearerUserToken : {}",
-                userInfo, roleName, s2sToken, bearerUserToken);
             roleAssignmentServiceApi.createRoleAssignment(
                 getBody(caseId, userInfo, roleName, resourceFilename, attributes),
                 bearerUserToken,
                 s2sToken
             );
         } catch (FeignException ex) {
-            log.error("oguz roleAssignmentServiceApi exception {}", ex.getMessage());
             ex.printStackTrace();
         }
     }
