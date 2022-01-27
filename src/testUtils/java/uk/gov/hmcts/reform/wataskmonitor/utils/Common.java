@@ -233,9 +233,9 @@ public class Common {
     }
 
     public Map<String, CamundaVariable> getTaskFromTaskManagementApi(Headers authenticationHeaders, String value) {
-        String TASK_ACTIONS_CONTROLLER = "task/{task-id}";
+        String taskActionControllerEndPoint = "task/{task-id}";
         return taskManagementApiActions.get(
-                TASK_ACTIONS_CONTROLLER,
+                taskActionControllerEndPoint,
                 value,
                 authenticationHeaders
             ).then()
@@ -243,7 +243,7 @@ public class Common {
             .body()
             .jsonPath()
             .getMap("");
-        
+
     }
 
     private void clearAllRoleAssignmentsForUser(String userId, Headers headers) {
