@@ -171,6 +171,26 @@ public class Common {
 
     }
 
+    public void setupOrganisationalRoleAssignmentWithCustomAttributes(Headers headers, Map<String, String> attributes) {
+
+        UserInfo userInfo = idamService.getUserInfo(headers.getValue(AUTHORIZATION));
+
+        //Clean/Reset user
+        clearAllRoleAssignmentsForUser(userInfo.getUid(), headers);
+
+        //Creates an organizational role for jurisdiction IA
+        log.info("Creating Organizational Role");
+        postRoleAssignment(
+            null,
+            headers.getValue(AUTHORIZATION),
+            headers.getValue(SERVICE_AUTHORIZATION),
+            userInfo,
+            "tribunal-caseworker",
+            toJsonString(attributes),
+            "requests/roleAssignment/set-organisational-role-assignment-request.json"
+        );
+    }
+
     public void clearAllRoleAssignments(Headers headers) {
         UserInfo userInfo = idamService.getUserInfo(headers.getValue(AUTHORIZATION));
         clearAllRoleAssignmentsForUser(userInfo.getUid(), headers);

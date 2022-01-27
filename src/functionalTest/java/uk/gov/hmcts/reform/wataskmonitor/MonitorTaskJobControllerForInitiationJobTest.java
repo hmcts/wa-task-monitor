@@ -104,12 +104,19 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         assertNull(actualCftTaskState);
 
     }
-    
+
     @Test
     public void task_initiation_job_should_initiate_only_default_task_and_not_initiate_delayed_task() {
         TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
         common.setupCftOrganisationalRoleAssignment(authenticationHeaders);
 
+        common.setupOrganisationalRoleAssignmentWithCustomAttributes(
+            authenticationHeaders,
+            Map.of(
+                "primaryLocation", "765324",
+                "jurisdiction", "IA"
+            )
+        );
 
         assertNotNull(defaultTaskVariables);
         assertNotNull(defaultTaskVariables.getCaseId());
