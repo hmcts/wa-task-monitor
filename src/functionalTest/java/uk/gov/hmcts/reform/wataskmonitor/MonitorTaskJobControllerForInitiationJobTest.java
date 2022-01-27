@@ -3,9 +3,7 @@ package uk.gov.hmcts.reform.wataskmonitor;
 import io.restassured.http.Headers;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
@@ -45,7 +43,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
     public void tearDown() {
         common.cleanUpTask(authenticationHeaders, caseIds);
     }
-    
+
     @Test
     public void task_initiation_job_should_initiate_task_and_taskState_should_be_unassigned() {
         TestVariables taskVariables = common.setupTaskAndRetrieveIds();
@@ -74,8 +72,6 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
 
     }
 
-    @Ignore
-    @Disabled("temporary")
     @Test
     public void task_initiation_job_should_not_initiate_delayed_task_and_taskState_should_be_unconfigured() {
         TestVariables taskVariables = common.setupDelayedTaskAndRetrieveIds();
@@ -108,9 +104,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         assertNull(actualCftTaskState);
 
     }
-
-    @Ignore
-    @Disabled("temporary")
+    
     @Test
     public void task_initiation_job_should_initiate_only_default_task_and_not_initiate_delayed_task() {
         TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
