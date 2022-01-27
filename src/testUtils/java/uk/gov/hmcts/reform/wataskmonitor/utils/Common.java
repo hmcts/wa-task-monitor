@@ -243,16 +243,7 @@ public class Common {
             .body()
             .jsonPath()
             .getMap("");
-
-
-        /*return taskManagementApiActions.get(
-                "/task/" + value,
-                authenticationHeaders
-            ).then()
-            .extract()
-            .body()
-            .jsonPath()
-            .getMap("");*/
+        
     }
 
     private void clearAllRoleAssignmentsForUser(String userId, Headers headers) {
