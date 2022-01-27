@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.wataskmonitor;
 
 import io.restassured.http.Headers;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
@@ -26,7 +26,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
-@Slf4j
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
 public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunctionalBaseTest {
 
@@ -46,6 +45,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         common.cleanUpTask(authenticationHeaders, caseIds);
     }
 
+    @Disabled
     @Test
     public void task_initiation_job_should_initiate_task_and_taskState_should_be_unassigned() {
         TestVariables taskVariables = common.setupTaskAndRetrieveIds();
@@ -74,6 +74,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
 
     }
 
+    @Disabled
     @Test
     public void task_initiation_job_should_not_initiate_delayed_task_and_taskState_should_be_unconfigured() {
         TestVariables taskVariables = common.setupDelayedTaskAndRetrieveIds();
@@ -107,6 +108,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
 
     }
 
+    @Disabled
     @Test
     public void task_initiation_job_should_initiate_only_default_task_and_not_initiate_delayed_task() {
         TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
