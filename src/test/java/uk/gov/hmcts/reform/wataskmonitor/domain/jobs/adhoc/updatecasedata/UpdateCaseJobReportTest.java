@@ -24,10 +24,11 @@ class UpdateCaseJobReportTest extends UnitBaseTest {
             .areWellImplemented();
     }
 
+
     @Test
-    void totalNumberOfNonUpdatedCases() {
+    void should_return_total_number_updated_cases() {
         UpdateCaseJobReport updateCaseJobReport = new UpdateCaseJobReport(
-            2,
+            3,
             List.of(
                 builder()
                     .caseId(SOME_CASE_ID_1)
@@ -36,10 +37,17 @@ class UpdateCaseJobReportTest extends UnitBaseTest {
                 builder()
                     .caseId(SOME_CASE_ID_2)
                     .updated(false)
+                    .build(),
+                builder()
+                    .caseId(SOME_CASE_ID_3)
+                    .updated(false)
                     .build()
             )
         );
 
-        assertThat(updateCaseJobReport.getTotalNumberOfNonUpdatedCases()).isEqualTo(1);
+        assertThat(updateCaseJobReport.getTotalNumberOfUpdatedCases()).isEqualTo(1);
+        assertThat(updateCaseJobReport.getTotalNumberOfNonUpdatedCases()).isEqualTo(2);
+        assertThat(updateCaseJobReport.getTotalNumberOfCasesProcessed()).isEqualTo(3);
     }
+
 }

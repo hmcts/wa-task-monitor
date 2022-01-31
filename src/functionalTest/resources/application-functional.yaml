@@ -1,6 +1,8 @@
 targets:
   instance: ${TEST_URL:http://localhost:8077}
   camunda: ${CAMUNDA_URL:http://camunda-bpm/engine-rest}
+  task-management:
+    url: ${TASK_MANAGEMENT_SERVICE_URL:http://localhost:8087}
 
 idam:
   api:

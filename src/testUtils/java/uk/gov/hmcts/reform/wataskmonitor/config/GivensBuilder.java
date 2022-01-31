@@ -181,6 +181,26 @@ public class GivensBuilder {
         return this;
     }
 
+    public GivensBuilder createDelayedTaskWithCaseId(String caseId) {
+        Map<String, CamundaValue<?>> processVariables = initiateProcessVariablesForDelayedTask(caseId);
+
+        CamundaSendMessageRequest request = new CamundaSendMessageRequest(
+            CREATE_TASK_MESSAGE.toString(),
+            processVariables
+        );
+
+        Response result = camundaApiActions.post(
+            "message",
+            request,
+            authorizationHeadersProvider.getServiceAuthorizationHeader()
+        );
+
+        result.then().assertThat()
+            .statusCode(HttpStatus.NO_CONTENT.value());
+
+        return this;
+    }
+
 
     public List<CamundaTask> retrieveTaskWithProcessVariableFilter(String key, String value) {
         log.info("Attempting to retrieve task with {} = {}", key, value);
@@ -194,6 +214,39 @@ public class GivensBuilder {
                 () -> {
                     Response result = camundaApiActions.get(
                         "/task" + filter,
+                        authorizationHeadersProvider.getServiceAuthorizationHeader()
+                    );
+
+                    result.then().assertThat()
+                        .statusCode(HttpStatus.OK.value())
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .body("size()", is(1));
+
+                    response.set(
+                        result.then()
+                            .extract()
+                            .jsonPath().getList("", CamundaTask.class)
+                    );
+
+                    return true;
+                });
+
+        return response.get();
+    }
+
+    public List<CamundaTask> retrieveDelayedTaskWithProcessVariableFilter(String key, String value) {
+        log.info("Attempting to retrieve task with {} = {}", key, value);
+        String filter = "?variables=" + key + "_eq_" + value;
+
+        AtomicReference<List<CamundaTask>> response = new AtomicReference<>();
+        await().ignoreException(AssertionError.class)
+            .pollInterval(500, MILLISECONDS)
+            .atMost(60, SECONDS)
+            .until(
+                () -> {
+
+                    Response result = camundaApiActions.get(
+                        "process-instance" + filter,
                         authorizationHeadersProvider.getServiceAuthorizationHeader()
                     );
 
@@ -250,9 +303,45 @@ public class GivensBuilder {
         return processVariables.getProcessVariablesMap();
     }
 
+    public Map<String, CamundaValue<?>> createDelayedTaskVariables(String caseId) {
+        CamundaProcessVariables processVariables = processVariables()
+            .withProcessVariable("caseId", caseId)
+            .withProcessVariable("jurisdiction", "IA")
+            .withProcessVariable("caseTypeId", "Asylum")
+            .withProcessVariable("region", "1")
+            .withProcessVariable("location", "765324")
+            .withProcessVariable("locationName", "Taylor House")
+            .withProcessVariable("staffLocation", "Taylor House")
+            .withProcessVariable("securityClassification", "PUBLIC")
+            .withProcessVariable("group", "TCW")
+            .withProcessVariable("name", "task name")
+            .withProcessVariable("taskId", "reviewTheAppeal")
+            .withProcessVariable("taskAttributes", "")
+            .withProcessVariable("taskType", "reviewTheAppeal")
+            .withProcessVariable("taskCategory", "Case Progression")
+            .withProcessVariable("taskState", "unconfigured")
+            //for testing-purposes
+            .withProcessVariable("dueDate", now().plusDays(10).format(CAMUNDA_DATA_TIME_FORMATTER))
+            .withProcessVariable("task-supervisor", "Read,Refer,Manage,Cancel")
+            .withProcessVariable("tribunal-caseworker", "Read,Refer,Own,Manage,Cancel")
+            .withProcessVariable("senior-tribunal-caseworker", "Read,Refer,Own,Manage,Cancel")
+            .withProcessVariable("delayUntil", now().plusDays(2).format(CAMUNDA_DATA_TIME_FORMATTER))
+            .withProcessVariable("workingDaysAllowed", "2")
+            .withProcessVariableBoolean("hasWarnings", false)
+            //.withProcessVariable("warningList", (new WarningValues()).toString())
+            .withProcessVariable("caseManagementCategory", "Protection")
+            .withProcessVariable("description", "aDescription")
+            .build();
+
+        return processVariables.getProcessVariablesMap();
+    }
+
     private Map<String, CamundaValue<?>> initiateProcessVariables(String caseId) {
         return createDefaultTaskVariables(caseId);
     }
 
-}
+    private Map<String, CamundaValue<?>> initiateProcessVariablesForDelayedTask(String caseId) {
+        return createDelayedTaskVariables(caseId);
+    }
 
+}
