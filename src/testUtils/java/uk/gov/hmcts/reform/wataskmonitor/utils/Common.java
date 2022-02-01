@@ -6,6 +6,7 @@ import feign.FeignException;
 import io.restassured.http.Headers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ResourceUtils;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
@@ -139,7 +140,7 @@ public class Common {
     }
 
     public void setupCftOrganisationalRoleAssignment(Headers headers) {
-        UserInfo userInfo = authorizationHeadersProvider.getUserInfo(headers.getValue(AUTHORIZATION));
+        UserInfo userInfo = authorizationProvider.getUserInfo(headers.getValue(AUTHORIZATION));
 
         Map<String, String> attributes = Map.of(
             "primaryLocation", "765324",

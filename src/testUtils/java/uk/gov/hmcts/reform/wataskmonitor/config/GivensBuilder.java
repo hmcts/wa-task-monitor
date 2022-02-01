@@ -189,7 +189,7 @@ public class GivensBuilder {
         Response result = camundaApiActions.post(
             "message",
             request,
-            authorizationHeadersProvider.getServiceAuthorizationHeader()
+            authorizationProvider.getServiceAuthorizationHeader()
         );
 
         result.then().assertThat()
@@ -244,7 +244,7 @@ public class GivensBuilder {
 
                     Response result = camundaApiActions.get(
                         "process-instance" + filter,
-                        authorizationHeadersProvider.getServiceAuthorizationHeader()
+                        authorizationProvider.getServiceAuthorizationHeader()
                     );
 
                     result.then().assertThat()
