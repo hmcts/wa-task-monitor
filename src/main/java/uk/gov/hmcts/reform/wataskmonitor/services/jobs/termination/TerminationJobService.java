@@ -28,16 +28,16 @@ public class TerminationJobService {
     private final TaskManagementClient taskManagementClient;
     private final TerminationJobConfig terminationJobConfig;
 
-    private final  boolean terminationTimeLimitFlag;
+    private final boolean terminationTimeLimitFlag;
     private final long terminationTimeLimit;
 
     public TerminationJobService(CamundaClient camundaClient,
                                  TaskManagementClient taskManagementClient,
                                  TerminationJobConfig terminationJobConfig,
                                  @Value("${job.termination.camunda-time-limit-flag}")
-                                 boolean terminationTimeLimitFlag,
+                                     boolean terminationTimeLimitFlag,
                                  @Value("${job.termination.camunda-time-limit}")
-                                 long terminationTimeLimit) {
+                                     long terminationTimeLimit) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;
         this.terminationJobConfig = terminationJobConfig;
@@ -89,10 +89,13 @@ public class TerminationJobService {
     private String buildHistoricTasksPendingTerminationRequest() {
 
         String query = ResourceUtility.getResource(CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION);
-        if (terminationTimeLimitFlag) {
-            ZonedDateTime endTime =  ZonedDateTime.now().minusMinutes(terminationTimeLimit);
+        if (isTerminationTimeLimitFlag()) {
+            ZonedDateTime endTime = ZonedDateTime.now().minusMinutes(getTerminationTimeLimit());
             String finishedAfter = endTime.format(formatter);
             return query.replace("\"finishedAfter\": \"*\",", "\"finishedAfter\": \"" + finishedAfter + "\",");
+        } else {
+            query = query
+                .replace("\"finishedAfter\": \"*\",", "");
         }
         return query;
     }

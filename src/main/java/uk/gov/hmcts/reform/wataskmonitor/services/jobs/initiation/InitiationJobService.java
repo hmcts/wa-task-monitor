@@ -47,9 +47,9 @@ public class InitiationJobService {
                                 InitiationTaskAttributesMapper initiationTaskAttributesMapper,
                                 InitiationJobConfig initiationJobConfig,
                                 @Value("${job.initiation.camunda-time-limit-flag}")
-                                boolean initiationTimeLimitFlag,
+                                    boolean initiationTimeLimitFlag,
                                 @Value("${job.initiation.camunda-time-limit}")
-                                long initiationTimeLimit) {
+                                    long initiationTimeLimit) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;
         this.initiationTaskAttributesMapper = initiationTaskAttributesMapper;
@@ -130,11 +130,14 @@ public class InitiationJobService {
     private String buildSearchQuery() {
         String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED);
         if (isInitiationTimeLimitFlag()) {
-            ZonedDateTime createdTime =  ZonedDateTime.now().minusMinutes(initiationTimeLimit);
+            ZonedDateTime createdTime = ZonedDateTime.now().minusMinutes(getInitiationTimeLimit());
             String createdAfter = createdTime.format(formatter);
 
             return query
-                .replace("\"createdAfter\": \"*\",","\"createdAfter\": \"" + createdAfter + "\",");
+                .replace("\"createdAfter\": \"*\",", "\"createdAfter\": \"" + createdAfter + "\",");
+        } else {
+            query = query
+                .replace("\"createdAfter\": \"*\",", "");
         }
         return query;
     }

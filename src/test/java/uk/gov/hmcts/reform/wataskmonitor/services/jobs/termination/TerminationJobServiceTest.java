@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TerminateTaskRequest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options.TerminateInfo;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,8 +36,6 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class TerminationJobServiceTest extends UnitBaseTest {
-    public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN);
 
     @Mock
     private CamundaClient camundaClient;
@@ -85,7 +82,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
 
 
     @Test
-    void should_handle_exception_when_call_to_task_management_fails() throws JSONException {
+    void should_handle_exception_when_call_to_task_management_fails() {
 
         doThrow(FeignException.GatewayTimeout.class)
             .when(taskManagementClient)
@@ -112,13 +109,13 @@ class TerminationJobServiceTest extends UnitBaseTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {0, 1})
-    void should_succeed_when_no_tasks_returned(int timeFlag) throws JSONException {
+    @ValueSource(booleans = {true, false})
+    void should_succeed_when_no_tasks_returned(boolean timeFlag) throws JSONException {
         terminationJobService = new TerminationJobService(camundaClient,
-                                                          taskManagementClient,
-                                                          terminationJobConfig,
-                                                          timeFlag == 0 ? false : true,
-                                                          120);
+            taskManagementClient,
+            terminationJobConfig,
+            timeFlag,
+            120);
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
@@ -128,7 +125,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
 
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
-        assertQuery();
+        assertQuery(timeFlag);
         verifyTerminateEndpointWasCalledWithTerminateReason("cancelled", 0);
         verifyTerminateEndpointWasCalledWithTerminateReason("completed", 0);
         verifyTerminateEndpointWasCalledWithTerminateReason("deleted", 0);
@@ -136,13 +133,13 @@ class TerminationJobServiceTest extends UnitBaseTest {
 
 
     @ParameterizedTest
-    @ValueSource(ints = {0, 1})
-    void should_fetch_tasks_and_terminate_them(int timeFlag) throws JSONException {
+    @ValueSource(booleans = {true, false})
+    void should_fetch_tasks_and_terminate_them(boolean timeFlag) throws JSONException {
         terminationJobService = new TerminationJobService(camundaClient,
-                                                          taskManagementClient,
-                                                          terminationJobConfig,
-                                                          timeFlag == 0 ? false : true,
-                                                          120);
+            taskManagementClient,
+            terminationJobConfig,
+            timeFlag,
+            120);
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "cancelled"),
             new HistoricCamundaTask("2", "completed"),
@@ -158,20 +155,20 @@ class TerminationJobServiceTest extends UnitBaseTest {
 
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
-        assertQuery();
+        assertQuery(timeFlag);
         verifyTerminateEndpointWasCalledWithTerminateReason("cancelled", 1);
         verifyTerminateEndpointWasCalledWithTerminateReason("completed", 1);
         verifyTerminateEndpointWasCalledWithTerminateReason("deleted", 1);
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {0, 1})
-    void should_fetch_tasks_and_call_terminate_for_cancelled_task_only(int timeFlag) throws JSONException {
+    @ValueSource(booleans = {true, false})
+    void should_fetch_tasks_and_call_terminate_for_cancelled_task_only(boolean timeFlag) throws JSONException {
         terminationJobService = new TerminationJobService(camundaClient,
-                                                          taskManagementClient,
-                                                          terminationJobConfig,
-                                                          timeFlag == 0 ? false : true,
-                                                          120);
+            taskManagementClient,
+            terminationJobConfig,
+            timeFlag,
+            120);
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "cancelled")
         );
@@ -185,23 +182,26 @@ class TerminationJobServiceTest extends UnitBaseTest {
 
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
-        assertQuery();
+        assertQuery(timeFlag);
         verifyTerminateEndpointWasCalledWithTerminateReason("cancelled", 1);
         verifyTerminateEndpointWasCalledWithTerminateReason("completed", 0);
         verifyTerminateEndpointWasCalledWithTerminateReason("deleted", 0);
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {0, 1})
-    void should_fetch_tasks_and_call_terminate_for_completed_task_only(int timeFlag) throws JSONException {
+    @ValueSource(booleans = {true, false})
+    void should_fetch_tasks_and_call_terminate_for_completed_task_only(boolean timeFlag) throws JSONException {
         terminationJobService = new TerminationJobService(camundaClient,
-                                                          taskManagementClient,
-                                                          terminationJobConfig,
-                                                          timeFlag == 0 ? false : true,
-                                                          120);
+            taskManagementClient,
+            terminationJobConfig,
+            timeFlag,
+            120);
+
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "completed")
         );
+
+        when(terminationJobConfig.getCamundaMaxResults()).thenReturn("100");
 
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
@@ -212,20 +212,21 @@ class TerminationJobServiceTest extends UnitBaseTest {
 
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
-        assertQuery();
+        assertQuery(timeFlag);
         verifyTerminateEndpointWasCalledWithTerminateReason("cancelled", 0);
         verifyTerminateEndpointWasCalledWithTerminateReason("completed", 1);
         verifyTerminateEndpointWasCalledWithTerminateReason("deleted", 0);
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {0, 1})
-    void should_fetch_tasks_and_call_terminate_for_deleted_task_only(int timeFlag) throws JSONException {
+    @ValueSource(booleans = {true, false})
+    void should_fetch_tasks_and_call_terminate_for_deleted_task_only(boolean timeFlag) throws JSONException {
         terminationJobService = new TerminationJobService(camundaClient,
-                                                          taskManagementClient,
-                                                          terminationJobConfig,
-                                                          timeFlag == 1,
-                                                          120);
+            taskManagementClient,
+            terminationJobConfig,
+            timeFlag,
+            120);
+
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "deleted")
         );
@@ -239,30 +240,66 @@ class TerminationJobServiceTest extends UnitBaseTest {
 
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
-        boolean expectedTimeFlag = timeFlag == 1;
-
-        assertEquals(expectedTimeFlag, terminationJobService.isTerminationTimeLimitFlag());
+        assertEquals(timeFlag, terminationJobService.isTerminationTimeLimitFlag());
         assertEquals(120, terminationJobService.getTerminationTimeLimit());
-        assertQuery();
+        assertQuery(timeFlag);
         verifyTerminateEndpointWasCalledWithTerminateReason("cancelled", 0);
         verifyTerminateEndpointWasCalledWithTerminateReason("completed", 0);
         verifyTerminateEndpointWasCalledWithTerminateReason("deleted", 1);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void should_createdAfter_exists_or_not_in_query_according_to_termination_flag(
+        boolean timeFlag) throws JSONException {
+
+        List<HistoricCamundaTask> expectedCamundaTasks = List.of(
+            new HistoricCamundaTask("1", "deleted")
+        );
+
+        when(terminationJobConfig.getCamundaMaxResults()).thenReturn("100");
+
+        when(camundaClient.getTasksFromHistory(
+            eq(SOME_SERVICE_TOKEN),
+            eq("0"),
+            eq("100"),
+            actualQueryParametersCaptor.capture()
+        )).thenReturn(expectedCamundaTasks);
+
+        terminationJobService = new TerminationJobService(camundaClient,
+            taskManagementClient,
+            terminationJobConfig,
+            timeFlag,
+            120);
+
+        terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
+
+        assertQuery(timeFlag);
+
+    }
+
+    private void assertQuery(boolean timeFlag) throws JSONException {
+        JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
+        if (timeFlag) {
+            String createdAfter = query.getString("finishedAfter");
+            JSONAssert.assertEquals(
+                getExpectedQueryParameters(createdAfter),
+                actualQueryParametersCaptor.getValue(),
+                JSONCompareMode.LENIENT
+            );
+        } else {
+            JSONAssert.assertEquals(
+                getExpectedQueryParameters(),
+                actualQueryParametersCaptor.getValue(),
+                JSONCompareMode.LENIENT
+            );
+        }
     }
 
     private void verifyTerminateEndpointWasCalledWithTerminateReason(String terminateReason,
                                                                      int times) {
         TerminateTaskRequest request = new TerminateTaskRequest(new TerminateInfo(terminateReason));
         verify(taskManagementClient, times(times)).terminateTask(eq(SOME_SERVICE_TOKEN), any(), eq(request));
-    }
-
-    private void assertQuery() throws JSONException {
-        JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
-        String finishedAfter = query.getString("finishedAfter");
-        JSONAssert.assertEquals(
-            getExpectedQueryParameters(finishedAfter),
-            actualQueryParametersCaptor.getValue(),
-            JSONCompareMode.LENIENT
-        );
     }
 
     @NotNull
@@ -276,6 +313,27 @@ class TerminationJobServiceTest extends UnitBaseTest {
                + "    }\n"
                + "  ],\n"
                + " \"finishedAfter\": \"" + finishedAfter + "\",\n"
+               + "  \"taskDefinitionKey\": \"processTask\",\n"
+               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
+               + "  \"sorting\": [\n"
+               + "    {\n"
+               + "      \"sortBy\": \"endTime\",\n"
+               + "      \"sortOrder\": \"desc\"\n"
+               + "    }\n"
+               + "  ]"
+               + "}";
+    }
+
+    @NotNull
+    private String getExpectedQueryParameters() {
+        return "{\n"
+               + "  \"taskVariables\": [\n"
+               + "    {\n"
+               + "      \"name\": \"cftTaskState\",\n"
+               + "      \"operator\": \"eq\",\n"
+               + "      \"value\": \"pendingTermination\"\n"
+               + "    }\n"
+               + "  ],\n"
                + "  \"taskDefinitionKey\": \"processTask\",\n"
                + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
                + "  \"sorting\": [\n"

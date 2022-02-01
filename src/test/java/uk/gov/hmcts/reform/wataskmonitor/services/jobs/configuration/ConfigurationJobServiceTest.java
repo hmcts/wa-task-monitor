@@ -200,7 +200,6 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
         configurationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN);
         assertQuery(configurationTimeLimitFlag);
 
-
     }
 
     private void assertQuery(boolean configurationTimeLimitFlag) throws JSONException {
