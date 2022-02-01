@@ -36,7 +36,7 @@ spring:
             client-secret: ${WA_IDAM_CLIENT_SECRET:something}
 
 camunda:
-  url: ${CAMUNDA_URL:http://camunda-bpm/engine-rest}
+  url: ${CAMUNDA_URL:http://camunda-local-bpm/engine-rest}
 
 task-management:
   url: ${TASK_MANAGEMENT_SERVICE_URL:http://localhost:8087}
@@ -94,7 +94,7 @@ job:
     camunda-max-results: ${CONFIGURATION_CAMUNDA_MAX_RESULTS:100}
     camunda-time-limit-flag: ${CONFIGURATION_TIME_LIMIT_FLAG:true}
     #number of minutes
-    camunda-time-limit: ${CONFIGURATION_TIME_LIMIT:120}
+    camunda-time-limit: ${CONFIGURATION_TIME_LIMIT:60}
   initiation:
     camunda-max-results: ${INITIATION_CAMUNDA_MAX_RESULTS:100}
     camunda-time-limit-flag: ${INITIATION_TIME_LIMIT_FLAG:true}

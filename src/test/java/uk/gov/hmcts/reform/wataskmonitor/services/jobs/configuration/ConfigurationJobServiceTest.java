@@ -2,11 +2,14 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.configuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -17,6 +20,7 @@ import uk.gov.hmcts.reform.wataskmonitor.config.job.ConfigurationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -63,12 +67,24 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
     private TaskConfigurationClient taskConfigurationClient;
     @Mock
     private ConfigurationJobConfig configurationJobConfig;
-    @InjectMocks
+
     private ConfigurationJobService configurationJobService;
+
     @Captor
     private ArgumentCaptor<String> actualQueryParametersCaptor;
     @Captor
     private ArgumentCaptor<String> taskIdCaptor;
+
+    @BeforeEach
+    void setUp() {
+        configurationJobService = new ConfigurationJobService(
+            camundaClient,
+            taskConfigurationClient,
+            configurationJobConfig,
+            true,
+            60
+        );
+    }
 
     @Test
     void givenGetTasksCamundaRequestShouldRetrieveUserTasksAndNotDelayedTasks() throws JSONException {
@@ -84,7 +100,7 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
         List<CamundaTask> actualCamundaTasks = configurationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN);
 
         assertQueryTargetsUserTasksAndNotDelayedTasks("{taskDefinitionKey: processTask}");
-        assertQueryTargetsUserTasksAndNotDelayedTasks(getExpectedQueryParameters());
+        assertQuery();
         assertThat(actualCamundaTasks).isEqualTo(camundaTasks);
     }
 
@@ -144,6 +160,42 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
         assertEquals(0, genericJobReport.getOutcomeList().size());
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void should_configure_tasks_according_to_time_flag(boolean configurationTimeLimitFlag) throws JSONException {
+
+        ZonedDateTime createdDate = ZonedDateTime.now().minusMinutes(100);
+        ZonedDateTime dueDate = ZonedDateTime.now().plusDays(1);
+        CamundaTask camundaTask = createMockedCamundaTask(createdDate, dueDate);
+
+        List<CamundaTask> expectedCamundaTasks = List.of(camundaTask);
+
+        configurationJobService = new ConfigurationJobService(
+            camundaClient,
+            taskConfigurationClient,
+            configurationJobConfig,
+            configurationTimeLimitFlag,
+            60
+        );
+
+        configurationJobService.configureTasks(expectedCamundaTasks, SOME_SERVICE_TOKEN);
+        assertEquals(configurationTimeLimitFlag, configurationJobService.isConfigurationTimeLimitFlag());
+        assertEquals(60, configurationJobService.getConfigurationTimeLimit());
+        verify(taskConfigurationClient, times(1))
+            .configureTask(eq(SOME_SERVICE_TOKEN), any());
+
+    }
+
+    private void assertQuery() throws JSONException {
+        JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
+        String createdAfter = query.getString("createdAfter");
+        JSONAssert.assertEquals(
+            getExpectedQueryParameters(createdAfter),
+            actualQueryParametersCaptor.getValue(),
+            JSONCompareMode.LENIENT
+        );
+    }
+
     private void assertQueryTargetsUserTasksAndNotDelayedTasks(String expected) throws JSONException {
         JSONAssert.assertEquals(
             expected,
@@ -153,7 +205,7 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
     }
 
     @NotNull
-    private String getExpectedQueryParameters() {
+    private String getExpectedQueryParameters(String createdAfter) {
         return "{\n"
                + "  \"orQueries\": [\n"
                + "    {\n"
@@ -166,6 +218,7 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
                + "      ]\n"
                + "    }\n"
                + "  ],\n"
+               + " \"createdAfter\": \"" + createdAfter + "\",\n"
                + "  \"taskDefinitionKey\": \"processTask\",\n"
                + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
                + "  \"sorting\": [\n"
@@ -177,4 +230,17 @@ class ConfigurationJobServiceTest extends UnitBaseTest {
                + "}\n";
     }
 
+    public static CamundaTask createMockedCamundaTask(ZonedDateTime createdDate, ZonedDateTime dueDate) {
+        return new CamundaTask(
+            "someCamundaTaskId",
+            "someCamundaTaskName",
+            "someProcessInstanceId",
+            "someAssignee",
+            createdDate,
+            dueDate,
+            "someCamundaTaskDescription",
+            "someCamundaTaskOwner",
+            "someCamundaTaskFormKey"
+        );
+    }
 }

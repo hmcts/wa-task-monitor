@@ -26,7 +26,6 @@ import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_TA
 public class ConfigurationJobService {
 
     public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN);
 
     private final boolean configurationTimeLimitFlag;
     private final long configurationTimeLimit;
@@ -48,6 +47,14 @@ public class ConfigurationJobService {
         this.configurationJobConfig = configurationJobConfig;
         this.configurationTimeLimitFlag = configurationTimeLimitFlag;
         this.configurationTimeLimit = configurationTimeLimit;
+    }
+
+    public boolean isConfigurationTimeLimitFlag() {
+        return configurationTimeLimitFlag;
+    }
+
+    public long getConfigurationTimeLimit() {
+        return configurationTimeLimit;
     }
 
     public List<CamundaTask> getUnConfiguredTasks(String serviceToken) {
@@ -72,14 +79,6 @@ public class ConfigurationJobService {
             List<GenericJobOutcome> outcomesList = configureTasksAndReturnOutcome(camundaTasks, serviceToken);
             return new GenericJobReport(camundaTasks.size(), outcomesList);
         }
-    }
-
-    public boolean isConfigurationTimeLimitFlag() {
-        return configurationTimeLimitFlag;
-    }
-
-    public long getConfigurationTimeLimit() {
-        return configurationTimeLimit;
     }
 
     private List<GenericJobOutcome> configureTasksAndReturnOutcome(List<CamundaTask> camundaTasks,
@@ -112,23 +111,24 @@ public class ConfigurationJobService {
     private String buildSearchQuery() {
         String query = ResourceUtility.getResource(CAMUNDA_TASKS_UNCONFIGURED);
 
-        query = query.replace("CREATED_BEFORE_PLACEHOLDER", getCreatedBeforeDate());
+        query = query.replace("CREATED_BEFORE_PLACEHOLDER", getCreatedBeforeDate(5));
 
-        if (configurationTimeLimitFlag) {
-            ZonedDateTime createdTime = ZonedDateTime.now().minusMinutes(configurationTimeLimit);
-            String createdAfter = createdTime.format(formatter);
-
+        if (isConfigurationTimeLimitFlag()) {
+            String createdAfter = getCreatedBeforeDate(getConfigurationTimeLimit());
             query = query
                 .replace("\"createdAfter\": \"*\",", "\"createdAfter\": \"" + createdAfter + "\",");
+        } else {
+            query = query
+                .replace("\"createdAfter\": \"*\",", "");
         }
 
         log.info("Configuration Job build query : {}", LoggingUtility.logPrettyPrint(query));
         return query;
     }
 
-    private static String getCreatedBeforeDate() {
+    private static String getCreatedBeforeDate(long minutes) {
         return ZonedDateTime.now()
-            .minusMinutes(5)
+            .minusMinutes(minutes)
             .format(DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN));
     }
 
