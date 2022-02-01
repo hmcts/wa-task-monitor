@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.InitiateTaskRequest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskAttribute;
+import uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
 import java.time.ZonedDateTime;
@@ -129,16 +130,18 @@ public class InitiationJobService {
 
     private String buildSearchQuery() {
         String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED);
+
         if (isInitiationTimeLimitFlag()) {
             ZonedDateTime createdTime = ZonedDateTime.now().minusMinutes(getInitiationTimeLimit());
             String createdAfter = createdTime.format(formatter);
-
-            return query
+            query = query
                 .replace("\"createdAfter\": \"*\",", "\"createdAfter\": \"" + createdAfter + "\",");
         } else {
             query = query
                 .replace("\"createdAfter\": \"*\",", "");
         }
+        
+        log.info("Initiation Job build query : {}", LoggingUtility.logPrettyPrint(query));
         return query;
     }
 

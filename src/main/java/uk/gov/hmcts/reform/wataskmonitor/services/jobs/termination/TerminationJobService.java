@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.wataskmonitor.config.job.TerminationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TerminateTaskRequest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options.TerminateInfo;
+import uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
 import java.time.ZonedDateTime;
@@ -87,16 +88,20 @@ public class TerminationJobService {
     }
 
     private String buildHistoricTasksPendingTerminationRequest() {
-
         String query = ResourceUtility.getResource(CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION);
+
         if (isTerminationTimeLimitFlag()) {
             ZonedDateTime endTime = ZonedDateTime.now().minusMinutes(getTerminationTimeLimit());
             String finishedAfter = endTime.format(formatter);
-            return query.replace("\"finishedAfter\": \"*\",", "\"finishedAfter\": \"" + finishedAfter + "\",");
+            query = query
+                .replace("\"finishedAfter\": \"*\",", "\"finishedAfter\": \""
+                                                      + finishedAfter + "\",");
         } else {
             query = query
                 .replace("\"finishedAfter\": \"*\",", "");
         }
+
+        log.info("Termination Job build query : {}", LoggingUtility.logPrettyPrint(query));
         return query;
     }
 
