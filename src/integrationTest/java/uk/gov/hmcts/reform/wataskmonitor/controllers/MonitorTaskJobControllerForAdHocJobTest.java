@@ -32,11 +32,6 @@ class MonitorTaskJobControllerForAdHocJobTest extends SpringBootIntegrationBaseT
     private AuthTokenGenerator authTokenGenerator;
     private String requestParameter;
 
-    @BeforeEach
-    void setUp() {
-        mockExternalDependencies();
-    }
-
     @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
     @Test
     public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() throws Exception {
@@ -44,15 +39,20 @@ class MonitorTaskJobControllerForAdHocJobTest extends SpringBootIntegrationBaseT
             AD_HOC_DELETE_PROCESS_INSTANCES));
 
         mockMvc.perform(
-            post("/monitor/tasks/jobs")
-                .contentType(MediaType.APPLICATION_JSON)
-                .characterEncoding("utf8")
-                .content(TestUtility.asJsonString(monitorTaskJobReq)))
+                post("/monitor/tasks/jobs")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("utf8")
+                    .content(TestUtility.asJsonString(monitorTaskJobReq)))
             .andExpect(status().isOk())
             .andExpect(content().string(equalTo(expectedResponse.apply(AD_HOC_DELETE_PROCESS_INSTANCES.name()))));
 
         verify(authTokenGenerator).generate();
         verify(camundaClient).deleteProcessInstance(eq(SERVICE_TOKEN), eq(requestParameter));
+    }
+
+    @BeforeEach
+    void setUp() {
+        mockExternalDependencies();
     }
 
     private void mockExternalDependencies() {

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.restassured.http.Headers;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -14,11 +13,12 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.idam.UserInfo;
+import uk.gov.hmcts.reform.wataskmonitor.entities.TestAuthenticationCredentials;
 import uk.gov.hmcts.reform.wataskmonitor.entities.camunda.CamundaProcessVariables;
 import uk.gov.hmcts.reform.wataskmonitor.entities.camunda.CamundaSendMessageRequest;
 import uk.gov.hmcts.reform.wataskmonitor.entities.camunda.CamundaValue;
 import uk.gov.hmcts.reform.wataskmonitor.entities.documents.Document;
-import uk.gov.hmcts.reform.wataskmonitor.services.AuthorizationHeadersProvider;
+import uk.gov.hmcts.reform.wataskmonitor.services.AuthorizationProvider;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,33 +42,30 @@ import static uk.gov.hmcts.reform.wataskmonitor.utils.Common.CAMUNDA_DATA_TIME_F
 public class GivensBuilder {
 
     private final RestApiActions camundaApiActions;
-    private final RestApiActions restApiActions;
-    private final AuthorizationHeadersProvider authorizationHeadersProvider;
+    private final AuthorizationProvider authorizationProvider;
     private final DocumentManagementFiles documentManagementFiles;
 
     private final CoreCaseDataApi coreCaseDataApi;
 
     public GivensBuilder(RestApiActions camundaApiActions,
-                         RestApiActions restApiActions,
-                         AuthorizationHeadersProvider authorizationHeadersProvider,
+                         AuthorizationProvider authorizationProvider,
                          CoreCaseDataApi coreCaseDataApi,
                          DocumentManagementFiles documentManagementFiles
     ) {
         this.camundaApiActions = camundaApiActions;
-        this.restApiActions = restApiActions;
-        this.authorizationHeadersProvider = authorizationHeadersProvider;
+        this.authorizationProvider = authorizationProvider;
         this.coreCaseDataApi = coreCaseDataApi;
         this.documentManagementFiles = documentManagementFiles;
 
     }
 
     public String createCcdCase() {
-        Headers headers = authorizationHeadersProvider.getLawFirmAuthorization();
-        String userToken = headers.getValue(AUTHORIZATION);
-        String serviceToken = headers.getValue(SERVICE_AUTHORIZATION);
-        UserInfo userInfo = authorizationHeadersProvider.getUserInfo(userToken);
+        TestAuthenticationCredentials lawFirmCredentials = authorizationProvider.getNewLawFirm();
+        String userToken = lawFirmCredentials.getHeaders().getValue(AUTHORIZATION);
+        String serviceToken = lawFirmCredentials.getHeaders().getValue(SERVICE_AUTHORIZATION);
+        UserInfo userInfo = authorizationProvider.getUserInfo(userToken);
 
-        Document document = documentManagementFiles.getDocument(NOTICE_OF_APPEAL_PDF);
+        Document document = documentManagementFiles.getDocumentAs(NOTICE_OF_APPEAL_PDF, lawFirmCredentials);
 
         StartEventResponse startCase = coreCaseDataApi.startForCaseworker(
             userToken,
@@ -172,7 +169,7 @@ public class GivensBuilder {
         Response result = camundaApiActions.post(
             "message",
             request,
-            authorizationHeadersProvider.getServiceAuthorizationHeader()
+            authorizationProvider.getServiceAuthorizationHeader()
         );
 
         result.then().assertThat()
@@ -192,7 +189,7 @@ public class GivensBuilder {
         Response result = camundaApiActions.post(
             "message",
             request,
-            authorizationHeadersProvider.getServiceAuthorizationHeader()
+            authorizationProvider.getServiceAuthorizationHeader()
         );
 
         result.then().assertThat()
@@ -214,7 +211,7 @@ public class GivensBuilder {
                 () -> {
                     Response result = camundaApiActions.get(
                         "/task" + filter,
-                        authorizationHeadersProvider.getServiceAuthorizationHeader()
+                        authorizationProvider.getServiceAuthorizationHeader()
                     );
 
                     result.then().assertThat()
@@ -247,7 +244,7 @@ public class GivensBuilder {
 
                     Response result = camundaApiActions.get(
                         "process-instance" + filter,
-                        authorizationHeadersProvider.getServiceAuthorizationHeader()
+                        authorizationProvider.getServiceAuthorizationHeader()
                     );
 
                     result.then().assertThat()

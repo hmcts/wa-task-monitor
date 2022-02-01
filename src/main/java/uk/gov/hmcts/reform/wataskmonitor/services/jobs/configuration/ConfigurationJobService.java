@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.configuration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskConfigurationClient;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.wataskmonitor.config.job.ConfigurationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
+import uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
 import java.time.ZonedDateTime;
@@ -23,7 +25,11 @@ import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_TA
 @Slf4j
 public class ConfigurationJobService {
 
-    public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS+0000";
+    public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN);
+
+    private final boolean configurationTimeLimitFlag;
+    private final long configurationTimeLimit;
 
     private final CamundaClient camundaClient;
     private final TaskConfigurationClient taskConfigurationClient;
@@ -32,10 +38,16 @@ public class ConfigurationJobService {
     @Autowired
     public ConfigurationJobService(CamundaClient camundaClient,
                                    TaskConfigurationClient taskConfigurationClient,
-                                   ConfigurationJobConfig configurationJobConfig) {
+                                   ConfigurationJobConfig configurationJobConfig,
+                                   @Value("${job.configuration.camunda-time-limit-flag}")
+                                       boolean configurationTimeLimitFlag,
+                                   @Value("${job.configuration.camunda-time-limit}")
+                                       long configurationTimeLimit) {
         this.camundaClient = camundaClient;
         this.taskConfigurationClient = taskConfigurationClient;
         this.configurationJobConfig = configurationJobConfig;
+        this.configurationTimeLimitFlag = configurationTimeLimitFlag;
+        this.configurationTimeLimit = configurationTimeLimit;
     }
 
     public List<CamundaTask> getUnConfiguredTasks(String serviceToken) {
@@ -60,6 +72,14 @@ public class ConfigurationJobService {
             List<GenericJobOutcome> outcomesList = configureTasksAndReturnOutcome(camundaTasks, serviceToken);
             return new GenericJobReport(camundaTasks.size(), outcomesList);
         }
+    }
+
+    public boolean isConfigurationTimeLimitFlag() {
+        return configurationTimeLimitFlag;
+    }
+
+    public long getConfigurationTimeLimit() {
+        return configurationTimeLimit;
     }
 
     private List<GenericJobOutcome> configureTasksAndReturnOutcome(List<CamundaTask> camundaTasks,
@@ -90,8 +110,20 @@ public class ConfigurationJobService {
     }
 
     private String buildSearchQuery() {
-        return ResourceUtility.getResource(CAMUNDA_TASKS_UNCONFIGURED)
-            .replace("CREATED_BEFORE_PLACEHOLDER", getCreatedBeforeDate());
+        String query = ResourceUtility.getResource(CAMUNDA_TASKS_UNCONFIGURED);
+
+        query = query.replace("CREATED_BEFORE_PLACEHOLDER", getCreatedBeforeDate());
+
+        if (configurationTimeLimitFlag) {
+            ZonedDateTime createdTime = ZonedDateTime.now().minusMinutes(configurationTimeLimit);
+            String createdAfter = createdTime.format(formatter);
+
+            query = query
+                .replace("\"createdAfter\": \"*\",", "\"createdAfter\": \"" + createdAfter + "\",");
+        }
+
+        log.info("Configuration Job build query : {}", LoggingUtility.logPrettyPrint(query));
+        return query;
     }
 
     private static String getCreatedBeforeDate() {
