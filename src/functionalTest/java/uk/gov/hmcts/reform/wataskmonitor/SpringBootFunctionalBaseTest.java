@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.config.DocumentManagementFiles;
 import uk.gov.hmcts.reform.wataskmonitor.config.GivensBuilder;
 import uk.gov.hmcts.reform.wataskmonitor.config.RestApiActions;
-import uk.gov.hmcts.reform.wataskmonitor.services.AuthorizationHeadersProvider;
+import uk.gov.hmcts.reform.wataskmonitor.services.AuthorizationProvider;
 import uk.gov.hmcts.reform.wataskmonitor.services.IdamService;
 import uk.gov.hmcts.reform.wataskmonitor.services.RoleAssignmentServiceApi;
 import uk.gov.hmcts.reform.wataskmonitor.utils.Common;
@@ -34,25 +34,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
 public class SpringBootFunctionalBaseTest {
 
-    @Value("${targets.camunda}")
-    private String camundaUrl;
-
-    @Value("${targets.task-management.url}")
-    private String taskmanagementUrl;
-
-    @Value("${targets.instance}")
-    private String testUrl;
-
     public String serviceToken;
-
     protected GivensBuilder given;
     protected Common common;
-    protected RestApiActions restApiActions;
     protected RestApiActions camundaApiActions;
     protected RestApiActions taskManagementApiActions;
-
     @Autowired
-    protected AuthorizationHeadersProvider authorizationHeadersProvider;
+    protected AuthorizationProvider authorizationProvider;
     @Autowired
     protected CoreCaseDataApi coreCaseDataApi;
     @Autowired
@@ -61,6 +49,13 @@ public class SpringBootFunctionalBaseTest {
     protected IdamService idamService;
     @Autowired
     protected RoleAssignmentServiceApi roleAssignmentServiceApi;
+    @Value("${targets.camunda}")
+    private String camundaUrl;
+    @Value("${targets.instance}")
+    private String testUrl;
+    @Value("${targets.task-management.url}")
+    private String taskManagementUrl;
+
     @Autowired
     private CamundaClient camundaClient;
     @Autowired
@@ -73,25 +68,22 @@ public class SpringBootFunctionalBaseTest {
 
         serviceToken = authTokenGenerator.generate();
 
-        restApiActions = new RestApiActions(testUrl, SNAKE_CASE).setUp();
         camundaApiActions = new RestApiActions(camundaUrl, LOWER_CAMEL_CASE).setUp();
-        taskManagementApiActions = new RestApiActions(taskmanagementUrl, SNAKE_CASE).setUp();
+        taskManagementApiActions = new RestApiActions(taskManagementUrl, SNAKE_CASE).setUp();
 
         documentManagementFiles.prepare();
 
         given = new GivensBuilder(
             camundaApiActions,
-            restApiActions,
-            authorizationHeadersProvider,
+            authorizationProvider,
             coreCaseDataApi,
             documentManagementFiles
         );
 
         common = new Common(
             given,
-            restApiActions,
             camundaApiActions,
-            authorizationHeadersProvider,
+            authorizationProvider,
             idamService,
             roleAssignmentServiceApi,
             camundaClient,

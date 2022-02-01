@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.IdamWebApi;
 import uk.gov.hmcts.reform.wataskmonitor.domain.idam.UserInfo;
 import uk.gov.hmcts.reform.wataskmonitor.entities.RoleCode;
 import uk.gov.hmcts.reform.wataskmonitor.entities.TestAccount;
+import uk.gov.hmcts.reform.wataskmonitor.entities.TestAuthenticationCredentials;
 
 import java.util.List;
 import java.util.Map;
@@ -25,23 +26,14 @@ import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SER
 
 @Slf4j
 @Service
-public class AuthorizationHeadersProvider {
+public class AuthorizationProvider {
 
     private final Map<String, String> tokens = new ConcurrentHashMap<>();
     private final Map<String, UserInfo> userInfo = new ConcurrentHashMap<>();
-
-    @Value("${idam.redirectUrl}")
-    protected String idamRedirectUrl;
-
-    @Value("${idam.scope}")
-    protected String userScope;
-
-    @Value("${spring.security.oauth2.client.registration.oidc.client-id}")
-    protected String idamClientId;
-
-    @Value("${spring.security.oauth2.client.registration.oidc.client-secret}")
-    protected String idamClientSecret;
-
+    @Value("${idam.redirectUrl}") protected String idamRedirectUrl;
+    @Value("${idam.scope}") protected String userScope;
+    @Value("${spring.security.oauth2.client.registration.oidc.client-id}") protected String idamClientId;
+    @Value("${spring.security.oauth2.client.registration.oidc.client-secret}") protected String idamClientSecret;
     @Autowired
     private IdamWebApi idamWebApi;
 
@@ -50,6 +42,19 @@ public class AuthorizationHeadersProvider {
 
     @Autowired
     private AuthTokenGenerator serviceAuthTokenGenerator;
+
+    @Value("${idam.test.userCleanupEnabled:false}")
+    private boolean testUserDeletionEnabled;
+
+    public void deleteAccount(String username) {
+
+        if (testUserDeletionEnabled) {
+            log.info("Deleting test account '{}'", username);
+            idamServiceApi.deleteTestUser(username);
+        } else {
+            log.info("Test User deletion feature flag was not enabled, user '{}' was not deleted", username);
+        }
+    }
 
     public Header getServiceAuthorizationHeader() {
         String serviceToken = tokens.computeIfAbsent(
@@ -60,46 +65,37 @@ public class AuthorizationHeadersProvider {
         return new Header(SERVICE_AUTHORIZATION, serviceToken);
     }
 
-    public Headers getTribunalCaseworkerAAuthorization(String emailPrefix) {
+    public TestAuthenticationCredentials getNewTribunalCaseworker(String emailPrefix) {
         /*
          * This user is used to assign role assignments to on a per test basis.
          * A clean up before assigning new role assignments is needed.
          */
-        return new Headers(
-            getCaseworkerAAuthorizationOnly(emailPrefix),
+        TestAccount caseworker = getIdamLawFirmCredentials(emailPrefix);
+
+        Headers authenticationHeaders = new Headers(
+            getAuthorizationOnly(caseworker),
             getServiceAuthorizationHeader()
         );
+
+        return new TestAuthenticationCredentials(caseworker, authenticationHeaders);
     }
 
-    public Headers getTribunalCaseworkerBAuthorization(String emailPrefix) {
-        /*
-         * This user is used to assign role assignments to on a per test basis.
-         * A clean up before assigning new role assignments is needed.
-         */
-        return new Headers(
-            getCaseworkerBAuthorizationOnly(emailPrefix),
-            getServiceAuthorizationHeader()
-        );
-    }
-
-    public Headers getLawFirmAuthorization() {
+    public TestAuthenticationCredentials getNewLawFirm() {
         /*
          * This user is used to create cases in ccd
          */
-        return new Headers(
-            getLawFirmAuthorizationOnly(),
+        TestAccount lawfirm = getIdamLawFirmCredentials("wa-ft-lawfirm-");
+
+        Headers authenticationHeaders = new Headers(
+            getAuthorizationOnly(lawfirm),
             getServiceAuthorizationHeader()
         );
+
+        return new TestAuthenticationCredentials(lawfirm, authenticationHeaders);
     }
 
 
-    public Header getCaseworkerAAuthorizationOnly(String emailPrefix) {
-        TestAccount caseworker = getIdamCaseWorkerCredentials(emailPrefix);
-        return getAuthorization(caseworker.getUsername(), caseworker.getPassword());
-
-    }
-
-    public Header getCaseworkerBAuthorizationOnly(String emailPrefix) {
+    public Header getCaseworkerAuthorizationOnly(String emailPrefix) {
         TestAccount caseworker = getIdamCaseWorkerCredentials(emailPrefix);
         return getAuthorization(caseworker.getUsername(), caseworker.getPassword());
 
@@ -110,6 +106,10 @@ public class AuthorizationHeadersProvider {
         TestAccount lawfirm = getIdamLawFirmCredentials("wa-ft-lawfirm-");
         return getAuthorization(lawfirm.getUsername(), lawfirm.getPassword());
 
+    }
+
+    public Header getAuthorizationOnly(TestAccount account) {
+        return getAuthorization(account.getUsername(), account.getPassword());
     }
 
     public UserInfo getUserInfo(String userToken) {
@@ -132,6 +132,7 @@ public class AuthorizationHeadersProvider {
             username,
             user -> "Bearer " + idamWebApi.token(body).getAccessToken()
         );
+
         return new Header(AUTHORIZATION, accessToken);
     }
 

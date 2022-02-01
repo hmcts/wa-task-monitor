@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import io.restassured.http.Headers;
 import lombok.extern.slf4j.Slf4j;
-import net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ResourceUtils;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.idam.UserInfo;
 import uk.gov.hmcts.reform.wataskmonitor.entities.RoleAssignment;
 import uk.gov.hmcts.reform.wataskmonitor.entities.RoleAssignmentResource;
 import uk.gov.hmcts.reform.wataskmonitor.entities.TestVariables;
-import uk.gov.hmcts.reform.wataskmonitor.services.AuthorizationHeadersProvider;
+import uk.gov.hmcts.reform.wataskmonitor.services.AuthorizationProvider;
 import uk.gov.hmcts.reform.wataskmonitor.services.IdamService;
 import uk.gov.hmcts.reform.wataskmonitor.services.RoleAssignmentServiceApi;
 
@@ -52,10 +52,9 @@ public class Common {
                                            + "    }";
 
     private final GivensBuilder given;
-    private final RestApiActions restApiActions;
     private final RestApiActions camundaApiActions;
+    private final AuthorizationProvider authorizationProvider;
     private final RestApiActions taskManagementApiActions;
-    private final AuthorizationHeadersProvider authorizationHeadersProvider;
 
     private final IdamService idamService;
     private final RoleAssignmentServiceApi roleAssignmentServiceApi;
@@ -63,17 +62,15 @@ public class Common {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public Common(GivensBuilder given,
-                  RestApiActions restApiActions,
                   RestApiActions camundaApiActions,
-                  AuthorizationHeadersProvider authorizationHeadersProvider,
+                  AuthorizationProvider authorizationProvider,
                   IdamService idamService,
                   RoleAssignmentServiceApi roleAssignmentServiceApi,
                   CamundaClient camundaClient,
                   RestApiActions taskManagementApiActions) {
         this.given = given;
-        this.restApiActions = restApiActions;
         this.camundaApiActions = camundaApiActions;
-        this.authorizationHeadersProvider = authorizationHeadersProvider;
+        this.authorizationProvider = authorizationProvider;
         this.idamService = idamService;
         this.roleAssignmentServiceApi = roleAssignmentServiceApi;
         this.camundaClient = camundaClient;
@@ -115,7 +112,7 @@ public class Common {
 
     public void setupOrganisationalRoleAssignment(Headers headers) {
 
-        UserInfo userInfo = authorizationHeadersProvider.getUserInfo(headers.getValue(AUTHORIZATION));
+        UserInfo userInfo = authorizationProvider.getUserInfo(headers.getValue(AUTHORIZATION));
 
         Map<String, String> attributes = Map.of(
             "primaryLocation", "765324",
@@ -143,7 +140,7 @@ public class Common {
     }
 
     public void setupCftOrganisationalRoleAssignment(Headers headers) {
-        UserInfo userInfo = authorizationHeadersProvider.getUserInfo(headers.getValue(AUTHORIZATION));
+        UserInfo userInfo = authorizationProvider.getUserInfo(headers.getValue(AUTHORIZATION));
 
         Map<String, String> attributes = Map.of(
             "primaryLocation", "765324",
@@ -196,13 +193,12 @@ public class Common {
         clearAllRoleAssignmentsForUser(userInfo.getUid(), headers);
     }
 
-
-    public void cleanUpTask(Headers authenticationHeaders, List<String> values) {
+    public void cleanUpTask(Headers authenticationHeaders, List<String> caseIds) {
 
         Set<String> processIds = new HashSet<>();
 
-        values
-            .forEach(value -> processIds.addAll(getProcesses(authenticationHeaders, value)));
+        caseIds
+            .forEach(caseId -> processIds.addAll(getProcesses(authenticationHeaders, caseId)));
 
         processIds
             .forEach(processId -> deleteProcessInstance(authenticationHeaders, processId));
@@ -353,8 +349,8 @@ public class Common {
         return json;
     }
 
-    private Set<String> getProcesses(Headers authenticationHeaders, String value) {
-        String filter = "/?variables=" + "caseId" + "_eq_" + value;
+    private Set<String> getProcesses(Headers authenticationHeaders, String caseId) {
+        String filter = "/?variables=" + "caseId" + "_eq_" + caseId;
         List<String> processIds = camundaApiActions.get(
             "process-instance" + filter,
             authenticationHeaders
