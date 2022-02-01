@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.wataskmonitor;
 
-import io.restassured.http.Headers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,9 +8,11 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
+import uk.gov.hmcts.reform.wataskmonitor.entities.TestAuthenticationCredentials;
 import uk.gov.hmcts.reform.wataskmonitor.entities.TestVariables;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import static net.serenitybdd.rest.SerenityRest.given;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
@@ -66,8 +68,8 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         Map<String, CamundaVariable> camundaVariableMap =
             common.getTaskVariables(caseworkerCredentials.getHeaders(), taskVariables.getTaskId());
 
-        assertEquals(taskVariables.getCaseId(), camundaVariables.get("caseId").getValue());
-        assertEquals("unassigned", camundaVariables.get("taskState").getValue());
+        assertEquals(taskVariables.getCaseId(), camundaVariableMap.get("caseId").getValue());
+        assertEquals("unassigned", camundaVariableMap.get("taskState").getValue());
 
     }
 
@@ -93,7 +95,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
             .body(is(expectedResponse.apply(JobName.INITIATION.name())));
 
         Map<String, CamundaVariable> camundaVariables =
-            common.getTaskVariablesFromCamunda(authenticationHeaders, taskVariables.getTaskId());
+            common.getTaskVariablesFromCamunda(caseworkerCredentials.getHeaders(), taskVariables.getTaskId());
 
         String caseId = ((HashMap) (((HashMap) camundaVariables).get("caseId"))).get("value").toString();
         String actualTaskState = ((HashMap) (((HashMap) camundaVariables).get("taskState"))).get("value").toString();
@@ -108,10 +110,10 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
     @Test
     public void task_initiation_job_should_initiate_only_default_task_and_not_initiate_delayed_task() {
         TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
-        common.setupCftOrganisationalRoleAssignment(authenticationHeaders);
+        common.setupCftOrganisationalRoleAssignment(caseworkerCredentials.getHeaders());
 
         common.setupOrganisationalRoleAssignmentWithCustomAttributes(
-            authenticationHeaders,
+            caseworkerCredentials.getHeaders(),
             Map.of(
                 "primaryLocation", "765324",
                 "jurisdiction", "IA"
@@ -149,16 +151,16 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         }
 
         Map<String, CamundaVariable> defaultTaskCamundaVariables =
-            common.getTaskVariables(authenticationHeaders, defaultTaskVariables.getTaskId());
+            common.getTaskVariables(caseworkerCredentials.getHeaders(), defaultTaskVariables.getTaskId());
 
         Map<String, CamundaVariable> delayedTaskCamundaVariables =
-            common.getTaskVariablesFromCamunda(authenticationHeaders, delayedTaskVariables.getTaskId());
+            common.getTaskVariablesFromCamunda(caseworkerCredentials.getHeaders(), delayedTaskVariables.getTaskId());
 
         Map<String, CamundaVariable> delayedTaskCftResponse =
-            common.getTaskFromTaskManagementApi(authenticationHeaders, delayedTaskVariables.getTaskId());
+            common.getTaskFromTaskManagementApi(caseworkerCredentials.getHeaders(), delayedTaskVariables.getTaskId());
 
         Map<String, CamundaVariable> defaultTaskCftResponse =
-            common.getTaskFromTaskManagementApi(authenticationHeaders, defaultTaskVariables.getTaskId());
+            common.getTaskFromTaskManagementApi(caseworkerCredentials.getHeaders(), defaultTaskVariables.getTaskId());
 
         String actualDefaultTaskCftTaskState = ((HashMap) (((HashMap) defaultTaskCftResponse)
             .get("task"))).get("task_state").toString();

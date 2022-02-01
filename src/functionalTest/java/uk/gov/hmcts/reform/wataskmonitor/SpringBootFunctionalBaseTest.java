@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.wataskmonitor.utils.Common;
 import java.io.IOException;
 
 import static com.fasterxml.jackson.databind.PropertyNamingStrategy.LOWER_CAMEL_CASE;
+import static com.fasterxml.jackson.databind.PropertyNamingStrategy.SNAKE_CASE;
 import static net.serenitybdd.rest.SerenityRest.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -52,6 +53,9 @@ public class SpringBootFunctionalBaseTest {
     private String camundaUrl;
     @Value("${targets.instance}")
     private String testUrl;
+    @Value("${targets.task-management.url}")
+    private String taskManagementUrl;
+
     @Autowired
     private CamundaClient camundaClient;
     @Autowired
@@ -65,7 +69,7 @@ public class SpringBootFunctionalBaseTest {
         serviceToken = authTokenGenerator.generate();
 
         camundaApiActions = new RestApiActions(camundaUrl, LOWER_CAMEL_CASE).setUp();
-        taskManagementApiActions = new RestApiActions(taskmanagementUrl, SNAKE_CASE).setUp();
+        taskManagementApiActions = new RestApiActions(taskManagementUrl, SNAKE_CASE).setUp();
 
         documentManagementFiles.prepare();
 
