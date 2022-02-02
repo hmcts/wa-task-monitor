@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.wataskmonitor.config.job.TerminationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TerminateTaskRequest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.options.TerminateInfo;
+import uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
 import java.time.ZonedDateTime;
@@ -28,16 +29,16 @@ public class TerminationJobService {
     private final TaskManagementClient taskManagementClient;
     private final TerminationJobConfig terminationJobConfig;
 
-    private final  boolean terminationTimeLimitFlag;
+    private final boolean terminationTimeLimitFlag;
     private final long terminationTimeLimit;
 
     public TerminationJobService(CamundaClient camundaClient,
                                  TaskManagementClient taskManagementClient,
                                  TerminationJobConfig terminationJobConfig,
                                  @Value("${job.termination.camunda-time-limit-flag}")
-                                 boolean terminationTimeLimitFlag,
+                                     boolean terminationTimeLimitFlag,
                                  @Value("${job.termination.camunda-time-limit}")
-                                 long terminationTimeLimit) {
+                                     long terminationTimeLimit) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;
         this.terminationJobConfig = terminationJobConfig;
@@ -87,13 +88,20 @@ public class TerminationJobService {
     }
 
     private String buildHistoricTasksPendingTerminationRequest() {
-
         String query = ResourceUtility.getResource(CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION);
-        if (terminationTimeLimitFlag) {
-            ZonedDateTime endTime =  ZonedDateTime.now().minusMinutes(terminationTimeLimit);
+
+        if (isTerminationTimeLimitFlag()) {
+            ZonedDateTime endTime = ZonedDateTime.now().minusMinutes(getTerminationTimeLimit());
             String finishedAfter = endTime.format(formatter);
-            return query.replace("\"finishedAfter\": \"*\",", "\"finishedAfter\": \"" + finishedAfter + "\",");
+            query = query
+                .replace("\"finishedAfter\": \"*\",", "\"finishedAfter\": \""
+                                                      + finishedAfter + "\",");
+        } else {
+            query = query
+                .replace("\"finishedAfter\": \"*\",", "");
         }
+
+        log.info("Termination Job build query : {}", LoggingUtility.logPrettyPrint(query));
         return query;
     }
 

@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.InitiationHelpers;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -41,8 +40,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class InitiationJobServiceTest extends UnitBaseTest {
-    public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN);
 
     @Mock
     private CamundaClient camundaClient;
@@ -83,7 +80,7 @@ class InitiationJobServiceTest extends UnitBaseTest {
         List<CamundaTask> actualCamundaTasks = initiationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN);
 
         assertQueryTargetsUserTasksAndNotDelayedTasks();
-        assertQuery();
+        assertQuery(true);
         assertThat(actualCamundaTasks).isEqualTo(tasks);
     }
 
@@ -97,14 +94,14 @@ class InitiationJobServiceTest extends UnitBaseTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {0, 1})
-    void should_succeed_and_initiate_tasks(int timeFlag) {
+    @ValueSource(booleans = {true, false})
+    void should_succeed_and_initiate_tasks(boolean timeFlag) {
         initiationJobService = new InitiationJobService(
             camundaClient,
             taskManagementClient,
             initiationTaskAttributesMapper,
             initiationJobConfig,
-            timeFlag == 1,
+            timeFlag,
             120
         );
         ZonedDateTime createdDate = ZonedDateTime.now();
@@ -137,22 +134,64 @@ class InitiationJobServiceTest extends UnitBaseTest {
         GenericJobReport expectation = new GenericJobReport(1, singletonList(outcome));
         assertEquals(expectation, actual);
 
-        boolean expectedTimeFlag = timeFlag == 1;
-
-        assertEquals(expectedTimeFlag, initiationJobService.isInitiationTimeLimitFlag());
+        assertEquals(timeFlag, initiationJobService.isInitiationTimeLimitFlag());
         assertEquals(120, initiationJobService.getInitiationTimeLimit());
+
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void should_createdAfter_exists_or_not_in_query_according_to_initiation_flag(
+        boolean timeFlag) throws JSONException {
 
-
-    private void assertQuery() throws JSONException {
-        JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
-        String createdAfter = query.getString("createdAfter");
-        JSONAssert.assertEquals(
-            getExpectedQueryParameters(createdAfter),
-            actualQueryParametersCaptor.getValue(),
-            JSONCompareMode.LENIENT
+        ZonedDateTime createdDate = ZonedDateTime.now();
+        ZonedDateTime dueDate = ZonedDateTime.now().plusDays(1);
+        CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(
+            createdDate,
+            dueDate
         );
+        List<CamundaTask> camundaTasks = singletonList(camundaTask);
+
+        when(initiationJobConfig.getCamundaMaxResults()).thenReturn("10");
+
+        when(camundaClient.getTasks(
+            eq(SOME_SERVICE_TOKEN),
+            eq("0"),
+            eq("10"),
+            actualQueryParametersCaptor.capture()
+        )).thenReturn(camundaTasks);
+
+        initiationJobService = new InitiationJobService(
+            camundaClient,
+            taskManagementClient,
+            initiationTaskAttributesMapper,
+            initiationJobConfig,
+            timeFlag,
+            120
+        );
+
+        initiationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN);
+
+        assertQuery(timeFlag);
+
+    }
+
+    private void assertQuery(boolean timeFlag) throws JSONException {
+        JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
+        if (timeFlag) {
+            String createdAfter = query.getString("createdAfter");
+            JSONAssert.assertEquals(
+                getExpectedQueryParameters(createdAfter),
+                actualQueryParametersCaptor.getValue(),
+                JSONCompareMode.LENIENT
+            );
+        } else {
+            JSONAssert.assertEquals(
+                getExpectedQueryParameters(),
+                actualQueryParametersCaptor.getValue(),
+                JSONCompareMode.LENIENT
+            );
+        }
     }
 
     private void assertQueryTargetsUserTasksAndNotDelayedTasks() throws JSONException {
@@ -178,6 +217,31 @@ class InitiationJobServiceTest extends UnitBaseTest {
                + "    }\n"
                + "  ],\n"
                + " \"createdAfter\": \"" + createdAfter + "\",\n"
+               + "  \"taskDefinitionKey\": \"processTask\",\n"
+               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
+               + "  \"sorting\": [\n"
+               + "    {\n"
+               + "      \"sortBy\": \"created\",\n"
+               + "      \"sortOrder\": \"desc\"\n"
+               + "    }\n"
+               + "  ]"
+               + "}\n";
+    }
+
+    @NotNull
+    private String getExpectedQueryParameters() {
+        return "{\n"
+               + "  \"orQueries\": [\n"
+               + "    {\n"
+               + "      \"taskVariables\": [\n"
+               + "        {\n"
+               + "          \"name\": \"cftTaskState\",\n"
+               + "          \"operator\": \"eq\",\n"
+               + "          \"value\": \"unconfigured\"\n"
+               + "        }\n"
+               + "      ]\n"
+               + "    }\n"
+               + "  ],\n"
                + "  \"taskDefinitionKey\": \"processTask\",\n"
                + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
                + "  \"sorting\": [\n"

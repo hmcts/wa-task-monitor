@@ -13,6 +13,7 @@
     }
   ],
   "createdBefore": "CREATED_BEFORE_PLACEHOLDER",
+  "createdAfter": "*",
   "sorting": [
     {
       "sortBy": "created",
