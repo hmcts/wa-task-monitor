@@ -274,7 +274,7 @@ def versions = [
   reformLogging       : '5.1.9',
   springfoxSwagger    : '3.0.0',
   serenity            : '2.2.12',
-  springFrameworkCloud: '2.2.9.RELEASE',
+  springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.5.2',
   pactVersion         : '4.1.7'
 ]
