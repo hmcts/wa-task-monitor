@@ -58,6 +58,8 @@ withPipeline(type, product, component) {
   after('test') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/integration/**/*'
+    echo('mmmutation test running')
+    enableMutationTest()
   }
 
   after('functionalTest:preview') {
@@ -81,8 +83,6 @@ withPipeline(type, product, component) {
   }
 
   onPR() {
-    echo('mutation test running')
-    enableMutationTest()
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
   }
 
