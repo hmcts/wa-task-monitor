@@ -62,6 +62,7 @@ withNightlyPipeline(type, product, component) {
   env.TERMINATION_TIME_LIMIT = 120
   loadVaultSecrets(secrets)
 //  enableFortifyScan()
+  enableMutationTest()
   enableFullFunctionalTest()
   enableSlackNotifications('#wa-build')
 
