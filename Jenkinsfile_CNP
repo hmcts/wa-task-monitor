@@ -81,6 +81,7 @@ withPipeline(type, product, component) {
   }
 
   onPR() {
+    echo('mutation test running')
     enableMutationTest()
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
   }
