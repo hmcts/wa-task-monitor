@@ -50,4 +50,10 @@
    ]]></notes>
     <cve>CVE-2020-17533</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+     Suppressing as spring boot version needs to be updated CWE-862
+   ]]></notes>
+    <cve>CVE-2018-1258</cve>
+  </suppress>
 </suppressions>
