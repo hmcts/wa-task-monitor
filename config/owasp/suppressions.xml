@@ -40,20 +40,9 @@
   </suppress>
   <suppress>
     <notes><![CDATA[
-     Suppressing as spring boot version needs to be updated CWE-862
+   file name: spring-security-core-5.4.9.jar
    ]]></notes>
-    <cve>CVE-2005-1036</cve>
-  </suppress>
-  <suppress>
-    <notes><![CDATA[
-     Suppressing as spring boot version needs to be updated CWE-862
-   ]]></notes>
-    <cve>CVE-2020-17533</cve>
-  </suppress>
-  <suppress>
-    <notes><![CDATA[
-     Suppressing as spring boot version needs to be updated CWE-862
-   ]]></notes>
-    <cve>CVE-2018-1258</cve>
+    <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
+    <vulnerabilityName>CWE-862: Missing Authorization</vulnerabilityName>
   </suppress>
 </suppressions>
