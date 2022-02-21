@@ -38,4 +38,10 @@
    ]]></notes>
     <cve>CVE-2021-43797</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+     Suppressing as spring boot version needs to be updated
+   ]]></notes>
+    <cve>CVE-2005-1036</cve>
+  </suppress>
 </suppressions>
