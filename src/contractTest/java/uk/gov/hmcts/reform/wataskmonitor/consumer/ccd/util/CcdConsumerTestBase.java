@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.wataskmonitor.SpringBootContractBaseTest;
+import uk.gov.hmcts.reform.wataskmonitor.clients.CcdClient;
 import uk.gov.hmcts.reform.wataskmonitor.consumer.ccd.CoreCaseDataConsumerApplication;
 
 import java.io.File;
@@ -44,6 +45,9 @@ public abstract class CcdConsumerTestBase extends SpringBootContractBaseTest {
 
     @Autowired
     protected CoreCaseDataApi coreCaseDataApi;
+
+    @Autowired
+    protected CcdClient ccdClient;
 
     @Autowired
     private ObjectMapper objectMapper;
