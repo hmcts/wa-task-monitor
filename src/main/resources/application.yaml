@@ -77,7 +77,7 @@ security:
     - "/swagger-ui/**"
     - "/swagger-ui/index.html"
     - "/v2/api-docs"
-    - "/webjars/springfox-swagger-ui/**"
+    - "/v3/api-docs"
     - "/favicon.ico"
 
 feign:
