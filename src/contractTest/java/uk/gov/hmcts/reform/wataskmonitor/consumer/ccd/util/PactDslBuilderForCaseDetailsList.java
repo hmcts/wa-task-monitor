@@ -54,6 +54,15 @@ public final class PactDslBuilderForCaseDetailsList {
                 .object("case_data", PactDslBuilderForCaseDetailsList::getCaseDataPactDsl)).build();
     }
 
+    public static DslPart buildSearchResultDsl(Long caseId) {
+        return newJsonBody((o) -> {
+            o.numberType("total", 1)
+                .minArrayLike("cases", 1, (cd) -> {
+                    cd.numberType("id", caseId);
+                });
+        }).build();
+    }
+
     private static void getCaseDataPactDsl(final LambdaDslObject dataMap) {
         dataMap
             .stringType("homeOfficeReferenceNumber", "000123456")
