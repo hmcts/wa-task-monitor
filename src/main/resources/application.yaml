@@ -100,11 +100,22 @@ job:
     camunda-time-limit-flag: ${INITIATION_TIME_LIMIT_FLAG:true}
     #number of minutes
     camunda-time-limit: ${INITIATION_TIME_LIMIT:1}
+    migration:
+      migration-flag: ${MIGRATION_INITIATION_FLAG:true}
+      camunda-max-results: ${MIGRATION_INITIATION_CAMUNDA_MAX_RESULTS:1}
+      camunda-time-limit-flag: ${MIGRATION_INITIATION_TIME_LIMIT_FLAG:true}
+      camunda-time-limit: ${MIGRATION_INITIATION_TIME_LIMIT:1}
+
   termination:
     camunda-max-results: ${TERMINATION_CAMUNDA_MAX_RESULTS:100}
     camunda-time-limit-flag: ${TERMINATION_TIME_LIMIT_FLAG:true}
     #number of minutes
     camunda-time-limit: ${TERMINATION_TIME_LIMIT:1}
+    migration:
+      migration-flag: ${MIGRATION_TERMINATION_FLAG:false}
+      camunda-max-results: ${MIGRATION_TERMINATION_CAMUNDA_MAX_RESULTS:1}
+      camunda-time-limit-flag: ${MIGRATION_TERMINATION_TIME_LIMIT_FLAG:true}
+      camunda-time-limit: ${MIGRATION_TERMINATION_TIME_LIMIT:1}
 
 
 role-assignment-service:

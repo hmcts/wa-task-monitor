@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.termination;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
@@ -29,21 +28,15 @@ public class TerminationJobService {
     private final TaskManagementClient taskManagementClient;
     private final TerminationJobConfig terminationJobConfig;
 
-    private final boolean terminationTimeLimitFlag;
-    private final long terminationTimeLimit;
+    private final boolean isMigration;
 
     public TerminationJobService(CamundaClient camundaClient,
                                  TaskManagementClient taskManagementClient,
-                                 TerminationJobConfig terminationJobConfig,
-                                 @Value("${job.termination.camunda-time-limit-flag}")
-                                     boolean terminationTimeLimitFlag,
-                                 @Value("${job.termination.camunda-time-limit}")
-                                     long terminationTimeLimit) {
+                                 TerminationJobConfig terminationJobConfig) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;
         this.terminationJobConfig = terminationJobConfig;
-        this.terminationTimeLimitFlag = terminationTimeLimitFlag;
-        this.terminationTimeLimit = terminationTimeLimit;
+        this.isMigration = isMigrationProcess();
     }
 
     public void terminateTasks(String serviceAuthorizationToken) {
@@ -53,10 +46,11 @@ public class TerminationJobService {
 
     private List<HistoricCamundaTask> getTasksPendingTermination(String serviceToken) {
         log.info("Retrieving historic tasks pending termination from camunda.");
+        String maxResults = getMaxResults();
         List<HistoricCamundaTask> camundaTasks = camundaClient.getTasksFromHistory(
             serviceToken,
             "0",
-            terminationJobConfig.getCamundaMaxResults(),
+            maxResults,
             buildHistoricTasksPendingTerminationRequest()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());
@@ -106,10 +100,32 @@ public class TerminationJobService {
     }
 
     public boolean isTerminationTimeLimitFlag() {
-        return terminationTimeLimitFlag;
+        return isMigration
+            ? terminationJobConfig.getMigration().isCamundaTimeLimitFlag()
+            : terminationJobConfig.isCamundaTimeLimitFlag();
     }
 
     public long getTerminationTimeLimit() {
-        return terminationTimeLimit;
+        return isMigration
+            ? terminationJobConfig.getMigration().getCamundaTimeLimit()
+            : terminationJobConfig.getCamundaTimeLimit();
+    }
+
+    public String getMaxResults() {
+        return isMigration
+            ? terminationJobConfig.getMigration().getCamundaMaxResults()
+            : terminationJobConfig.getCamundaMaxResults();
+    }
+
+    private boolean isMigrationProcess() {
+
+        try {
+            log.info("terminationJobConfig Parameters : {}", terminationJobConfig);
+            return terminationJobConfig.getMigration().isMigrationFlag();
+        } catch (Exception e) {
+            log.warn("isMigrationProcess terminationJobConfig exception: {}", e.getMessage());
+            return false;
+        }
+
     }
 }

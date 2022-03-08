@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
@@ -42,6 +43,8 @@ class MonitorTaskJobControllerForInitiationJobTest extends SpringBootIntegration
     private AuthTokenGenerator authTokenGenerator;
     @MockBean
     private TaskManagementClient taskManagementClient;
+    @MockBean
+    private InitiationJobConfig initiationJobConfig;
 
     @BeforeEach
     void setUp() {
@@ -115,7 +118,7 @@ class MonitorTaskJobControllerForInitiationJobTest extends SpringBootIntegration
 
     private void mockExternalDependencies() {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
-
+        when(initiationJobConfig.getCamundaMaxResults()).thenReturn("100");
         ZonedDateTime createdDate = ZonedDateTime.now();
         ZonedDateTime dueDate = createdDate.plusDays(1);
         CamundaTask camundaTask = createMockedCamundaTask(createdDate, dueDate);

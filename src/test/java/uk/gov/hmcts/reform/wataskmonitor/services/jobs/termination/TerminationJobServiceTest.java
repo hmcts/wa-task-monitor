@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -16,6 +17,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.entity.Migration;
 import uk.gov.hmcts.reform.wataskmonitor.config.job.TerminationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TerminateTaskRequest;
@@ -30,6 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,11 +60,11 @@ class TerminationJobServiceTest extends UnitBaseTest {
         terminationJobService = new TerminationJobService(
             camundaClient,
             taskManagementClient,
-            terminationJobConfig,
-            false,
-            120
+            terminationJobConfig
         );
         when(terminationJobConfig.getCamundaMaxResults()).thenReturn("100");
+        lenient().when(terminationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
+        lenient().when(terminationJobConfig.getCamundaTimeLimit()).thenReturn(120L);
     }
 
     @Test
@@ -111,11 +115,11 @@ class TerminationJobServiceTest extends UnitBaseTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void should_succeed_when_no_tasks_returned(boolean timeFlag) throws JSONException {
-        terminationJobService = new TerminationJobService(camundaClient,
+        terminationJobService = new TerminationJobService(
+            camundaClient,
             taskManagementClient,
-            terminationJobConfig,
-            timeFlag,
-            120);
+            terminationJobConfig
+        );
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
@@ -135,11 +139,11 @@ class TerminationJobServiceTest extends UnitBaseTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void should_fetch_tasks_and_terminate_them(boolean timeFlag) throws JSONException {
-        terminationJobService = new TerminationJobService(camundaClient,
+        terminationJobService = new TerminationJobService(
+            camundaClient,
             taskManagementClient,
-            terminationJobConfig,
-            timeFlag,
-            120);
+            terminationJobConfig
+        );
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "cancelled"),
             new HistoricCamundaTask("2", "completed"),
@@ -164,11 +168,11 @@ class TerminationJobServiceTest extends UnitBaseTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void should_fetch_tasks_and_call_terminate_for_cancelled_task_only(boolean timeFlag) throws JSONException {
-        terminationJobService = new TerminationJobService(camundaClient,
+        terminationJobService = new TerminationJobService(
+            camundaClient,
             taskManagementClient,
-            terminationJobConfig,
-            timeFlag,
-            120);
+            terminationJobConfig
+        );
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "cancelled")
         );
@@ -191,11 +195,11 @@ class TerminationJobServiceTest extends UnitBaseTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void should_fetch_tasks_and_call_terminate_for_completed_task_only(boolean timeFlag) throws JSONException {
-        terminationJobService = new TerminationJobService(camundaClient,
+        terminationJobService = new TerminationJobService(
+            camundaClient,
             taskManagementClient,
-            terminationJobConfig,
-            timeFlag,
-            120);
+            terminationJobConfig
+        );
 
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "completed")
@@ -221,11 +225,13 @@ class TerminationJobServiceTest extends UnitBaseTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void should_fetch_tasks_and_call_terminate_for_deleted_task_only(boolean timeFlag) throws JSONException {
-        terminationJobService = new TerminationJobService(camundaClient,
+        terminationJobService = new TerminationJobService(
+            camundaClient,
             taskManagementClient,
-            terminationJobConfig,
-            timeFlag,
-            120);
+            terminationJobConfig
+        );
+
+        lenient().when(terminationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeFlag);
 
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "deleted")
@@ -266,15 +272,56 @@ class TerminationJobServiceTest extends UnitBaseTest {
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
-        terminationJobService = new TerminationJobService(camundaClient,
+        terminationJobService = new TerminationJobService(
+            camundaClient,
             taskManagementClient,
-            terminationJobConfig,
-            timeFlag,
-            120);
+            terminationJobConfig
+        );
 
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
         assertQuery(timeFlag);
+
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "false, 100, true",
+        "true, 1, false"
+    })
+    void should_fetch_tasks_and_call_terminate_for_deleted_task_only_according_to_migration_flag(
+        boolean migrationFlag, String camundaMaxResult, boolean timeFlag) {
+        terminationJobService = new TerminationJobService(
+            camundaClient,
+            taskManagementClient,
+            terminationJobConfig
+        );
+
+        Migration migration = spy(Migration.class);
+        lenient().when(terminationJobConfig.getMigration()).thenReturn(migration);
+        lenient().when(migration.isMigrationFlag()).thenReturn(migrationFlag);
+        lenient().when(migration.getCamundaMaxResults()).thenReturn(camundaMaxResult);
+        lenient().when(migration.isMigrationFlag()).thenReturn(migrationFlag);
+
+        lenient().when(terminationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeFlag);
+        lenient().when(terminationJobConfig.getCamundaMaxResults()).thenReturn(camundaMaxResult);
+
+        List<HistoricCamundaTask> expectedCamundaTasks = List.of(
+            new HistoricCamundaTask("1", "deleted")
+        );
+
+        when(camundaClient.getTasksFromHistory(
+            eq(SOME_SERVICE_TOKEN),
+            eq("0"),
+            eq(camundaMaxResult),
+            actualQueryParametersCaptor.capture()
+        )).thenReturn(expectedCamundaTasks);
+
+        terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
+
+        assertEquals(timeFlag, terminationJobService.isTerminationTimeLimitFlag());
+        assertEquals(120, terminationJobService.getTerminationTimeLimit());
+        assertEquals(camundaMaxResult, terminationJobService.getMaxResults());
 
     }
 

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
@@ -33,45 +32,38 @@ public class InitiationJobService {
     public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN);
 
-    private final boolean initiationTimeLimitFlag;
-
-    private final long initiationTimeLimit;
-
     private final CamundaClient camundaClient;
     private final TaskManagementClient taskManagementClient;
     private final InitiationTaskAttributesMapper initiationTaskAttributesMapper;
     private final InitiationJobConfig initiationJobConfig;
 
+    private final boolean isMigration;
+
     @Autowired
     public InitiationJobService(CamundaClient camundaClient,
                                 TaskManagementClient taskManagementClient,
                                 InitiationTaskAttributesMapper initiationTaskAttributesMapper,
-                                InitiationJobConfig initiationJobConfig,
-                                @Value("${job.initiation.camunda-time-limit-flag}")
-                                    boolean initiationTimeLimitFlag,
-                                @Value("${job.initiation.camunda-time-limit}")
-                                    long initiationTimeLimit) {
+                                InitiationJobConfig initiationJobConfig) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;
         this.initiationTaskAttributesMapper = initiationTaskAttributesMapper;
         this.initiationJobConfig = initiationJobConfig;
-        this.initiationTimeLimitFlag = initiationTimeLimitFlag;
-        this.initiationTimeLimit = initiationTimeLimit;
-
+        this.isMigration = isMigrationProcess();
     }
 
     public List<CamundaTask> getUnConfiguredTasks(String serviceToken) {
         log.info("Retrieving tasks with '{}' = '{}' from camunda.", "cftTaskState", "unconfigured");
+
+        String maxResults = getMaxResults();
         List<CamundaTask> camundaTasks = camundaClient.getTasks(
             serviceToken,
             "0",
-            initiationJobConfig.getCamundaMaxResults(),
+            maxResults,
             buildSearchQuery()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());
         return camundaTasks;
     }
-
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public GenericJobReport initiateTasks(List<CamundaTask> camundaTasks, String serviceToken) {
@@ -140,16 +132,39 @@ public class InitiationJobService {
             query = query
                 .replace("\"createdAfter\": \"*\",", "");
         }
-        
+
         log.info("Initiation Job build query : {}", LoggingUtility.logPrettyPrint(query));
         return query;
     }
 
     public boolean isInitiationTimeLimitFlag() {
-        return initiationTimeLimitFlag;
+        return isMigration
+            ? initiationJobConfig.getMigration().isCamundaTimeLimitFlag()
+            : initiationJobConfig.isCamundaTimeLimitFlag();
     }
 
     public long getInitiationTimeLimit() {
-        return initiationTimeLimit;
+        return isMigration
+            ? initiationJobConfig.getMigration().getCamundaTimeLimit()
+            : initiationJobConfig.getCamundaTimeLimit();
     }
+
+    public String getMaxResults() {
+        return isMigration
+            ? initiationJobConfig.getMigration().getCamundaMaxResults()
+            : initiationJobConfig.getCamundaMaxResults();
+    }
+
+    private boolean isMigrationProcess() {
+
+        try {
+            log.info("initiationJobConfig Parameters : {}", initiationJobConfig);
+            return initiationJobConfig.getMigration().isMigrationFlag();
+        } catch (Exception e) {
+            log.warn("isMigrationProcess initiationJobConfig exception: {}", e.getMessage());
+            return false;
+        }
+
+    }
+
 }

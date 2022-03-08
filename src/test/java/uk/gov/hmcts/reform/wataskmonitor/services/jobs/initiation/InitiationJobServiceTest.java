@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -16,6 +17,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.entity.Migration;
 import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
@@ -35,6 +37,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,11 +63,11 @@ class InitiationJobServiceTest extends UnitBaseTest {
             camundaClient,
             taskManagementClient,
             initiationTaskAttributesMapper,
-            initiationJobConfig,
-            true,
-            120
+            initiationJobConfig
         );
         lenient().when(initiationJobConfig.getCamundaMaxResults()).thenReturn("100");
+        lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
+        lenient().when(initiationJobConfig.getCamundaTimeLimit()).thenReturn(120L);
     }
 
     @Test
@@ -100,10 +103,11 @@ class InitiationJobServiceTest extends UnitBaseTest {
             camundaClient,
             taskManagementClient,
             initiationTaskAttributesMapper,
-            initiationJobConfig,
-            timeFlag,
-            120
+            initiationJobConfig
         );
+
+        lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeFlag);
+
         ZonedDateTime createdDate = ZonedDateTime.now();
         ZonedDateTime dueDate = ZonedDateTime.now().plusDays(1);
         CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(
@@ -165,14 +169,72 @@ class InitiationJobServiceTest extends UnitBaseTest {
             camundaClient,
             taskManagementClient,
             initiationTaskAttributesMapper,
-            initiationJobConfig,
-            timeFlag,
-            120
+            initiationJobConfig
         );
 
         initiationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN);
 
         assertQuery(timeFlag);
+
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "false, 100, true",
+        "true, 1, false"
+    })
+    void should_succeed_and_initiate_tasks_according_to_migration_flag(
+        boolean migrationFlag, String camundaMaxResult, boolean timeFlag) {
+
+        initiationJobService = new InitiationJobService(
+            camundaClient,
+            taskManagementClient,
+            initiationTaskAttributesMapper,
+            initiationJobConfig
+        );
+
+        Migration migration = spy(Migration.class);
+        lenient().when(initiationJobConfig.getMigration()).thenReturn(migration);
+        lenient().when(migration.isMigrationFlag()).thenReturn(migrationFlag);
+        lenient().when(migration.getCamundaMaxResults()).thenReturn(camundaMaxResult);
+        lenient().when(migration.isMigrationFlag()).thenReturn(migrationFlag);
+
+        lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeFlag);
+        lenient().when(initiationJobConfig.getCamundaMaxResults()).thenReturn(camundaMaxResult);
+
+        ZonedDateTime createdDate = ZonedDateTime.now();
+        ZonedDateTime dueDate = ZonedDateTime.now().plusDays(1);
+        CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(
+            createdDate,
+            dueDate
+        );
+        List<CamundaTask> tasks = singletonList(camundaTask);
+
+        Map<String, CamundaVariable> mockedVariables = InitiationHelpers.createMockCamundaVariables();
+
+        when(camundaClient.getVariables(
+            SOME_SERVICE_TOKEN,
+            camundaTask.getId()
+        )).thenReturn(mockedVariables);
+
+        GenericJobReport actual = initiationJobService.initiateTasks(tasks, SOME_SERVICE_TOKEN);
+
+        verify(taskManagementClient, times(1))
+            .initiateTask(anyString(), anyString(), any());
+
+        GenericJobOutcome outcome = GenericJobOutcome.builder()
+            .taskId(camundaTask.getId())
+            .processInstanceId(camundaTask.getProcessInstanceId())
+            .successful(true)
+            .jobType("Task Initiation")
+            .build();
+
+        GenericJobReport expectation = new GenericJobReport(1, singletonList(outcome));
+        assertEquals(expectation, actual);
+
+        assertEquals(timeFlag, initiationJobService.isInitiationTimeLimitFlag());
+        assertEquals(120, initiationJobService.getInitiationTimeLimit());
+        assertEquals(camundaMaxResult, initiationJobService.getMaxResults());
 
     }
 
