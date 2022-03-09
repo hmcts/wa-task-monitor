@@ -325,6 +325,41 @@ class TerminationJobServiceTest extends UnitBaseTest {
 
     }
 
+    @ParameterizedTest
+    @CsvSource({
+        "false, true, 1, 100",
+        "true, true, 1, 1"
+    })
+    void validate_configuration_parameters(
+        boolean migrationFlag, boolean terminationTimeLimitFlag, long terminationTimeLimit, String maxResult) {
+
+        terminationJobService = new TerminationJobService(
+            camundaClient,
+            taskManagementClient,
+            terminationJobConfig
+        );
+
+        lenient().when(terminationJobConfig.isCamundaTimeLimitFlag()).thenReturn(terminationTimeLimitFlag);
+        lenient().when(terminationJobConfig.getCamundaTimeLimit()).thenReturn(terminationTimeLimit);
+        lenient().when(terminationJobConfig.getCamundaMaxResults()).thenReturn(maxResult);
+
+        Migration migration = spy(Migration.class);
+        lenient().when(terminationJobConfig.getMigration()).thenReturn(migration);
+        lenient().when(migration.isMigrationFlag()).thenReturn(migrationFlag);
+        lenient().when(migration.isCamundaTimeLimitFlag()).thenReturn(terminationTimeLimitFlag);
+        lenient().when(migration.getCamundaTimeLimit()).thenReturn(terminationTimeLimit);
+        lenient().when(migration.getCamundaMaxResults()).thenReturn(maxResult);
+
+        boolean actualTerminationTimeLimitFlag = terminationJobService.isTerminationTimeLimitFlag();
+        long actualTerminationTimeLimit = terminationJobService.getTerminationTimeLimit();
+        String actualMaxResult = terminationJobService.getMaxResults();
+
+        assertEquals(terminationTimeLimitFlag, actualTerminationTimeLimitFlag);
+        assertEquals(terminationTimeLimit, actualTerminationTimeLimit);
+        assertEquals(maxResult, actualMaxResult);
+
+    }
+
     private void assertQuery(boolean timeFlag) throws JSONException {
         JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
         if (timeFlag) {

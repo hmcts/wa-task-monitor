@@ -197,7 +197,6 @@ class InitiationJobServiceTest extends UnitBaseTest {
         lenient().when(initiationJobConfig.getMigration()).thenReturn(migration);
         lenient().when(migration.isMigrationFlag()).thenReturn(migrationFlag);
         lenient().when(migration.getCamundaMaxResults()).thenReturn(camundaMaxResult);
-        lenient().when(migration.isMigrationFlag()).thenReturn(migrationFlag);
 
         lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeFlag);
         lenient().when(initiationJobConfig.getCamundaMaxResults()).thenReturn(camundaMaxResult);
@@ -235,6 +234,42 @@ class InitiationJobServiceTest extends UnitBaseTest {
         assertEquals(timeFlag, initiationJobService.isInitiationTimeLimitFlag());
         assertEquals(120, initiationJobService.getInitiationTimeLimit());
         assertEquals(camundaMaxResult, initiationJobService.getMaxResults());
+
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "false, true, 1, 100",
+        "true, true, 1, 1"
+    })
+    void validate_configuration_parameters(
+        boolean migrationFlag, boolean initiationTimeLimitFlag, long initiationTimeLimit, String maxResult) {
+
+        initiationJobService = new InitiationJobService(
+            camundaClient,
+            taskManagementClient,
+            initiationTaskAttributesMapper,
+            initiationJobConfig
+        );
+
+        lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(initiationTimeLimitFlag);
+        lenient().when(initiationJobConfig.getCamundaTimeLimit()).thenReturn(initiationTimeLimit);
+        lenient().when(initiationJobConfig.getCamundaMaxResults()).thenReturn(maxResult);
+
+        Migration migration = spy(Migration.class);
+        lenient().when(initiationJobConfig.getMigration()).thenReturn(migration);
+        lenient().when(migration.isMigrationFlag()).thenReturn(migrationFlag);
+        lenient().when(migration.isCamundaTimeLimitFlag()).thenReturn(initiationTimeLimitFlag);
+        lenient().when(migration.getCamundaTimeLimit()).thenReturn(initiationTimeLimit);
+        lenient().when(migration.getCamundaMaxResults()).thenReturn(maxResult);
+
+        boolean actualInitiationTimeLimitFlag = initiationJobService.isInitiationTimeLimitFlag();
+        long actualInitiationTimeLimit = initiationJobService.getInitiationTimeLimit();
+        String actualMaxResult = initiationJobService.getMaxResults();
+
+        assertEquals(initiationTimeLimitFlag, actualInitiationTimeLimitFlag);
+        assertEquals(initiationTimeLimit, actualInitiationTimeLimit);
+        assertEquals(maxResult, actualMaxResult);
 
     }
 
