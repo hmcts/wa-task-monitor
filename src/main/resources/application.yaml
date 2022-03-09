@@ -101,7 +101,7 @@ job:
     #number of minutes
     camunda-time-limit: ${INITIATION_TIME_LIMIT:1}
     migration:
-      migration-flag: ${MIGRATION_INITIATION_FLAG:true}
+      migration-flag: ${MIGRATION_INITIATION_FLAG:false}
       camunda-max-results: ${MIGRATION_INITIATION_CAMUNDA_MAX_RESULTS:1}
       camunda-time-limit-flag: ${MIGRATION_INITIATION_TIME_LIMIT_FLAG:true}
       camunda-time-limit: ${MIGRATION_INITIATION_TIME_LIMIT:1}
