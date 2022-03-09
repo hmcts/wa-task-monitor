@@ -245,13 +245,6 @@ class InitiationJobServiceTest extends UnitBaseTest {
     void validate_configuration_parameters(
         boolean migrationFlag, boolean initiationTimeLimitFlag, long initiationTimeLimit, String maxResult) {
 
-        initiationJobService = new InitiationJobService(
-            camundaClient,
-            taskManagementClient,
-            initiationTaskAttributesMapper,
-            initiationJobConfig
-        );
-
         lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(initiationTimeLimitFlag);
         lenient().when(initiationJobConfig.getCamundaTimeLimit()).thenReturn(initiationTimeLimit);
         lenient().when(initiationJobConfig.getCamundaMaxResults()).thenReturn(maxResult);
@@ -263,6 +256,13 @@ class InitiationJobServiceTest extends UnitBaseTest {
         lenient().when(migration.getCamundaTimeLimit()).thenReturn(initiationTimeLimit);
         lenient().when(migration.getCamundaMaxResults()).thenReturn(maxResult);
 
+        initiationJobService = new InitiationJobService(
+            camundaClient,
+            taskManagementClient,
+            initiationTaskAttributesMapper,
+            initiationJobConfig
+        );
+        
         boolean actualInitiationTimeLimitFlag = initiationJobService.isInitiationTimeLimitFlag();
         long actualInitiationTimeLimit = initiationJobService.getInitiationTimeLimit();
         String actualMaxResult = initiationJobService.getMaxResults();

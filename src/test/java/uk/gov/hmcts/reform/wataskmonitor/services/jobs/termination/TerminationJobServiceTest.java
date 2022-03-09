@@ -333,12 +333,6 @@ class TerminationJobServiceTest extends UnitBaseTest {
     void validate_configuration_parameters(
         boolean migrationFlag, boolean terminationTimeLimitFlag, long terminationTimeLimit, String maxResult) {
 
-        terminationJobService = new TerminationJobService(
-            camundaClient,
-            taskManagementClient,
-            terminationJobConfig
-        );
-
         lenient().when(terminationJobConfig.isCamundaTimeLimitFlag()).thenReturn(terminationTimeLimitFlag);
         lenient().when(terminationJobConfig.getCamundaTimeLimit()).thenReturn(terminationTimeLimit);
         lenient().when(terminationJobConfig.getCamundaMaxResults()).thenReturn(maxResult);
@@ -350,6 +344,12 @@ class TerminationJobServiceTest extends UnitBaseTest {
         lenient().when(migration.getCamundaTimeLimit()).thenReturn(terminationTimeLimit);
         lenient().when(migration.getCamundaMaxResults()).thenReturn(maxResult);
 
+        terminationJobService = new TerminationJobService(
+            camundaClient,
+            taskManagementClient,
+            terminationJobConfig
+        );
+        
         boolean actualTerminationTimeLimitFlag = terminationJobService.isTerminationTimeLimitFlag();
         long actualTerminationTimeLimit = terminationJobService.getTerminationTimeLimit();
         String actualMaxResult = terminationJobService.getMaxResults();
