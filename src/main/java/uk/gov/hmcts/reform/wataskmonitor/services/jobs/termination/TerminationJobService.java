@@ -28,15 +28,12 @@ public class TerminationJobService {
     private final TaskManagementClient taskManagementClient;
     private final TerminationJobConfig terminationJobConfig;
 
-    private final boolean isMigration;
-
     public TerminationJobService(CamundaClient camundaClient,
                                  TaskManagementClient taskManagementClient,
                                  TerminationJobConfig terminationJobConfig) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;
         this.terminationJobConfig = terminationJobConfig;
-        this.isMigration = isMigrationProcess();
     }
 
     public void terminateTasks(String serviceAuthorizationToken) {
@@ -46,11 +43,12 @@ public class TerminationJobService {
 
     private List<HistoricCamundaTask> getTasksPendingTermination(String serviceToken) {
         log.info("Retrieving historic tasks pending termination from camunda.");
-        String maxResults = getMaxResults();
+        log.info("terminationJobConfig: {}", terminationJobConfig.toString());
+
         List<HistoricCamundaTask> camundaTasks = camundaClient.getTasksFromHistory(
             serviceToken,
             "0",
-            maxResults,
+            terminationJobConfig.getCamundaMaxResults(),
             buildHistoricTasksPendingTerminationRequest()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());
@@ -84,8 +82,9 @@ public class TerminationJobService {
     private String buildHistoricTasksPendingTerminationRequest() {
         String query = ResourceUtility.getResource(CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION);
 
-        if (isTerminationTimeLimitFlag()) {
-            ZonedDateTime endTime = ZonedDateTime.now().minusMinutes(getTerminationTimeLimit());
+        if (terminationJobConfig.isCamundaTimeLimitFlag()) {
+            ZonedDateTime endTime = ZonedDateTime.now()
+                .minusMinutes(terminationJobConfig.getCamundaTimeLimit());
             String finishedAfter = endTime.format(formatter);
             query = query
                 .replace("\"finishedAfter\": \"*\",", "\"finishedAfter\": \""
@@ -99,33 +98,4 @@ public class TerminationJobService {
         return query;
     }
 
-    public boolean isTerminationTimeLimitFlag() {
-        return isMigration
-            ? terminationJobConfig.getMigration().isCamundaTimeLimitFlag()
-            : terminationJobConfig.isCamundaTimeLimitFlag();
-    }
-
-    public long getTerminationTimeLimit() {
-        return isMigration
-            ? terminationJobConfig.getMigration().getCamundaTimeLimit()
-            : terminationJobConfig.getCamundaTimeLimit();
-    }
-
-    public String getMaxResults() {
-        return isMigration
-            ? terminationJobConfig.getMigration().getCamundaMaxResults()
-            : terminationJobConfig.getCamundaMaxResults();
-    }
-
-    private boolean isMigrationProcess() {
-
-        try {
-            log.info("terminationJobConfig Parameters : {}", terminationJobConfig);
-            return terminationJobConfig.getMigration().isMigrationFlag();
-        } catch (Exception e) {
-            log.warn("isMigrationProcess terminationJobConfig exception: {}", e.getMessage());
-            return false;
-        }
-
-    }
 }

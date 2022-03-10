@@ -5,7 +5,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import uk.gov.hmcts.reform.wataskmonitor.config.entity.Migration;
 
 @Configuration
 @ConfigurationProperties(prefix = "job.initiation")
@@ -18,5 +17,4 @@ public class InitiationJobConfig {
     private boolean camundaTimeLimitFlag;
     private Long camundaTimeLimit;
 
-    private Migration migration;
 }

@@ -37,8 +37,6 @@ public class InitiationJobService {
     private final InitiationTaskAttributesMapper initiationTaskAttributesMapper;
     private final InitiationJobConfig initiationJobConfig;
 
-    private final boolean isMigration;
-
     @Autowired
     public InitiationJobService(CamundaClient camundaClient,
                                 TaskManagementClient taskManagementClient,
@@ -48,17 +46,15 @@ public class InitiationJobService {
         this.taskManagementClient = taskManagementClient;
         this.initiationTaskAttributesMapper = initiationTaskAttributesMapper;
         this.initiationJobConfig = initiationJobConfig;
-        this.isMigration = isMigrationProcess();
     }
 
     public List<CamundaTask> getUnConfiguredTasks(String serviceToken) {
         log.info("Retrieving tasks with '{}' = '{}' from camunda.", "cftTaskState", "unconfigured");
-
-        String maxResults = getMaxResults();
+        log.info("initiationJobConfig: {}", initiationJobConfig.toString());
         List<CamundaTask> camundaTasks = camundaClient.getTasks(
             serviceToken,
             "0",
-            maxResults,
+            initiationJobConfig.getCamundaMaxResults(),
             buildSearchQuery()
         );
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());
@@ -123,8 +119,9 @@ public class InitiationJobService {
     private String buildSearchQuery() {
         String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED);
 
-        if (isInitiationTimeLimitFlag()) {
-            ZonedDateTime createdTime = ZonedDateTime.now().minusMinutes(getInitiationTimeLimit());
+        if (initiationJobConfig.isCamundaTimeLimitFlag()) {
+            ZonedDateTime createdTime = ZonedDateTime.now()
+                .minusMinutes(initiationJobConfig.getCamundaTimeLimit());
             String createdAfter = createdTime.format(formatter);
             query = query
                 .replace("\"createdAfter\": \"*\",", "\"createdAfter\": \"" + createdAfter + "\",");
@@ -135,36 +132,6 @@ public class InitiationJobService {
 
         log.info("Initiation Job build query : {}", LoggingUtility.logPrettyPrint(query));
         return query;
-    }
-
-    public boolean isInitiationTimeLimitFlag() {
-        return isMigration
-            ? initiationJobConfig.getMigration().isCamundaTimeLimitFlag()
-            : initiationJobConfig.isCamundaTimeLimitFlag();
-    }
-
-    public long getInitiationTimeLimit() {
-        return isMigration
-            ? initiationJobConfig.getMigration().getCamundaTimeLimit()
-            : initiationJobConfig.getCamundaTimeLimit();
-    }
-
-    public String getMaxResults() {
-        return isMigration
-            ? initiationJobConfig.getMigration().getCamundaMaxResults()
-            : initiationJobConfig.getCamundaMaxResults();
-    }
-
-    private boolean isMigrationProcess() {
-
-        try {
-            log.info("initiationJobConfig Parameters : {}", initiationJobConfig);
-            return initiationJobConfig.getMigration().isMigrationFlag();
-        } catch (Exception e) {
-            log.warn("isMigrationProcess initiationJobConfig exception: {}", e.getMessage());
-            return false;
-        }
-
     }
 
 }

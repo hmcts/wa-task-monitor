@@ -7,7 +7,6 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -17,7 +16,6 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
-import uk.gov.hmcts.reform.wataskmonitor.config.entity.Migration;
 import uk.gov.hmcts.reform.wataskmonitor.config.job.TerminationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TerminateTaskRequest;
@@ -28,12 +26,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -246,8 +242,6 @@ class TerminationJobServiceTest extends UnitBaseTest {
 
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
-        assertEquals(timeFlag, terminationJobService.isTerminationTimeLimitFlag());
-        assertEquals(120, terminationJobService.getTerminationTimeLimit());
         assertQuery(timeFlag);
         verifyTerminateEndpointWasCalledWithTerminateReason("cancelled", 0);
         verifyTerminateEndpointWasCalledWithTerminateReason("completed", 0);
@@ -262,8 +256,6 @@ class TerminationJobServiceTest extends UnitBaseTest {
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "deleted")
         );
-
-        when(terminationJobConfig.getCamundaMaxResults()).thenReturn("100");
 
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
@@ -281,82 +273,6 @@ class TerminationJobServiceTest extends UnitBaseTest {
         terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
 
         assertQuery(timeFlag);
-
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "false, 100, true",
-        "true, 1, false"
-    })
-    void should_fetch_tasks_and_call_terminate_for_deleted_task_only_according_to_migration_flag(
-        boolean migrationFlag, String camundaMaxResult, boolean timeFlag) {
-        terminationJobService = new TerminationJobService(
-            camundaClient,
-            taskManagementClient,
-            terminationJobConfig
-        );
-
-        Migration migration = spy(Migration.class);
-        lenient().when(terminationJobConfig.getMigration()).thenReturn(migration);
-        lenient().when(migration.isMigrationFlag()).thenReturn(migrationFlag);
-        lenient().when(migration.getCamundaMaxResults()).thenReturn(camundaMaxResult);
-        lenient().when(migration.isMigrationFlag()).thenReturn(migrationFlag);
-
-        lenient().when(terminationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeFlag);
-        lenient().when(terminationJobConfig.getCamundaMaxResults()).thenReturn(camundaMaxResult);
-
-        List<HistoricCamundaTask> expectedCamundaTasks = List.of(
-            new HistoricCamundaTask("1", "deleted")
-        );
-
-        when(camundaClient.getTasksFromHistory(
-            eq(SOME_SERVICE_TOKEN),
-            eq("0"),
-            eq(camundaMaxResult),
-            actualQueryParametersCaptor.capture()
-        )).thenReturn(expectedCamundaTasks);
-
-        terminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
-
-        assertEquals(timeFlag, terminationJobService.isTerminationTimeLimitFlag());
-        assertEquals(120, terminationJobService.getTerminationTimeLimit());
-        assertEquals(camundaMaxResult, terminationJobService.getMaxResults());
-
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "false, true, 1, 100",
-        "true, true, 1, 1"
-    })
-    void validate_configuration_parameters(
-        boolean migrationFlag, boolean terminationTimeLimitFlag, long terminationTimeLimit, String maxResult) {
-
-        lenient().when(terminationJobConfig.isCamundaTimeLimitFlag()).thenReturn(terminationTimeLimitFlag);
-        lenient().when(terminationJobConfig.getCamundaTimeLimit()).thenReturn(terminationTimeLimit);
-        lenient().when(terminationJobConfig.getCamundaMaxResults()).thenReturn(maxResult);
-
-        Migration migration = spy(Migration.class);
-        lenient().when(terminationJobConfig.getMigration()).thenReturn(migration);
-        lenient().when(migration.isMigrationFlag()).thenReturn(migrationFlag);
-        lenient().when(migration.isCamundaTimeLimitFlag()).thenReturn(terminationTimeLimitFlag);
-        lenient().when(migration.getCamundaTimeLimit()).thenReturn(terminationTimeLimit);
-        lenient().when(migration.getCamundaMaxResults()).thenReturn(maxResult);
-
-        terminationJobService = new TerminationJobService(
-            camundaClient,
-            taskManagementClient,
-            terminationJobConfig
-        );
-        
-        boolean actualTerminationTimeLimitFlag = terminationJobService.isTerminationTimeLimitFlag();
-        long actualTerminationTimeLimit = terminationJobService.getTerminationTimeLimit();
-        String actualMaxResult = terminationJobService.getMaxResults();
-
-        assertEquals(terminationTimeLimitFlag, actualTerminationTimeLimitFlag);
-        assertEquals(terminationTimeLimit, actualTerminationTimeLimit);
-        assertEquals(maxResult, actualMaxResult);
 
     }
 
