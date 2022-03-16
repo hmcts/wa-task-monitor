@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
@@ -33,10 +32,6 @@ public class InitiationJobService {
     public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN);
 
-    private final boolean initiationTimeLimitFlag;
-
-    private final long initiationTimeLimit;
-
     private final CamundaClient camundaClient;
     private final TaskManagementClient taskManagementClient;
     private final InitiationTaskAttributesMapper initiationTaskAttributesMapper;
@@ -46,22 +41,16 @@ public class InitiationJobService {
     public InitiationJobService(CamundaClient camundaClient,
                                 TaskManagementClient taskManagementClient,
                                 InitiationTaskAttributesMapper initiationTaskAttributesMapper,
-                                InitiationJobConfig initiationJobConfig,
-                                @Value("${job.initiation.camunda-time-limit-flag}")
-                                    boolean initiationTimeLimitFlag,
-                                @Value("${job.initiation.camunda-time-limit}")
-                                    long initiationTimeLimit) {
+                                InitiationJobConfig initiationJobConfig) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;
         this.initiationTaskAttributesMapper = initiationTaskAttributesMapper;
         this.initiationJobConfig = initiationJobConfig;
-        this.initiationTimeLimitFlag = initiationTimeLimitFlag;
-        this.initiationTimeLimit = initiationTimeLimit;
-
     }
 
     public List<CamundaTask> getUnConfiguredTasks(String serviceToken) {
         log.info("Retrieving tasks with '{}' = '{}' from camunda.", "cftTaskState", "unconfigured");
+        log.info("initiationJobConfig: {}", initiationJobConfig.toString());
         List<CamundaTask> camundaTasks = camundaClient.getTasks(
             serviceToken,
             "0",
@@ -71,7 +60,6 @@ public class InitiationJobService {
         log.info("{} task(s) retrieved successfully.", camundaTasks.size());
         return camundaTasks;
     }
-
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public GenericJobReport initiateTasks(List<CamundaTask> camundaTasks, String serviceToken) {
@@ -131,8 +119,9 @@ public class InitiationJobService {
     private String buildSearchQuery() {
         String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED);
 
-        if (isInitiationTimeLimitFlag()) {
-            ZonedDateTime createdTime = ZonedDateTime.now().minusMinutes(getInitiationTimeLimit());
+        if (initiationJobConfig.isCamundaTimeLimitFlag()) {
+            ZonedDateTime createdTime = ZonedDateTime.now()
+                .minusMinutes(initiationJobConfig.getCamundaTimeLimit());
             String createdAfter = createdTime.format(formatter);
             query = query
                 .replace("\"createdAfter\": \"*\",", "\"createdAfter\": \"" + createdAfter + "\",");
@@ -140,16 +129,9 @@ public class InitiationJobService {
             query = query
                 .replace("\"createdAfter\": \"*\",", "");
         }
-        
+
         log.info("Initiation Job build query : {}", LoggingUtility.logPrettyPrint(query));
         return query;
     }
 
-    public boolean isInitiationTimeLimitFlag() {
-        return initiationTimeLimitFlag;
-    }
-
-    public long getInitiationTimeLimit() {
-        return initiationTimeLimit;
-    }
 }

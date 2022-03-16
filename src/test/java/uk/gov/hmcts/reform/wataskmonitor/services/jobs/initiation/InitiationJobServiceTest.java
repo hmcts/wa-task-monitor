@@ -60,11 +60,11 @@ class InitiationJobServiceTest extends UnitBaseTest {
             camundaClient,
             taskManagementClient,
             initiationTaskAttributesMapper,
-            initiationJobConfig,
-            true,
-            120
+            initiationJobConfig
         );
         lenient().when(initiationJobConfig.getCamundaMaxResults()).thenReturn("100");
+        lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
+        lenient().when(initiationJobConfig.getCamundaTimeLimit()).thenReturn(120L);
     }
 
     @Test
@@ -100,10 +100,11 @@ class InitiationJobServiceTest extends UnitBaseTest {
             camundaClient,
             taskManagementClient,
             initiationTaskAttributesMapper,
-            initiationJobConfig,
-            timeFlag,
-            120
+            initiationJobConfig
         );
+
+        lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeFlag);
+
         ZonedDateTime createdDate = ZonedDateTime.now();
         ZonedDateTime dueDate = ZonedDateTime.now().plusDays(1);
         CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(
@@ -133,10 +134,6 @@ class InitiationJobServiceTest extends UnitBaseTest {
 
         GenericJobReport expectation = new GenericJobReport(1, singletonList(outcome));
         assertEquals(expectation, actual);
-
-        assertEquals(timeFlag, initiationJobService.isInitiationTimeLimitFlag());
-        assertEquals(120, initiationJobService.getInitiationTimeLimit());
-
     }
 
     @ParameterizedTest
@@ -165,9 +162,7 @@ class InitiationJobServiceTest extends UnitBaseTest {
             camundaClient,
             taskManagementClient,
             initiationTaskAttributesMapper,
-            initiationJobConfig,
-            timeFlag,
-            120
+            initiationJobConfig
         );
 
         initiationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN);
@@ -175,7 +170,7 @@ class InitiationJobServiceTest extends UnitBaseTest {
         assertQuery(timeFlag);
 
     }
-
+    
     private void assertQuery(boolean timeFlag) throws JSONException {
         JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
         if (timeFlag) {

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.termination;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
@@ -29,21 +28,12 @@ public class TerminationJobService {
     private final TaskManagementClient taskManagementClient;
     private final TerminationJobConfig terminationJobConfig;
 
-    private final boolean terminationTimeLimitFlag;
-    private final long terminationTimeLimit;
-
     public TerminationJobService(CamundaClient camundaClient,
                                  TaskManagementClient taskManagementClient,
-                                 TerminationJobConfig terminationJobConfig,
-                                 @Value("${job.termination.camunda-time-limit-flag}")
-                                     boolean terminationTimeLimitFlag,
-                                 @Value("${job.termination.camunda-time-limit}")
-                                     long terminationTimeLimit) {
+                                 TerminationJobConfig terminationJobConfig) {
         this.camundaClient = camundaClient;
         this.taskManagementClient = taskManagementClient;
         this.terminationJobConfig = terminationJobConfig;
-        this.terminationTimeLimitFlag = terminationTimeLimitFlag;
-        this.terminationTimeLimit = terminationTimeLimit;
     }
 
     public void terminateTasks(String serviceAuthorizationToken) {
@@ -53,6 +43,8 @@ public class TerminationJobService {
 
     private List<HistoricCamundaTask> getTasksPendingTermination(String serviceToken) {
         log.info("Retrieving historic tasks pending termination from camunda.");
+        log.info("terminationJobConfig: {}", terminationJobConfig.toString());
+
         List<HistoricCamundaTask> camundaTasks = camundaClient.getTasksFromHistory(
             serviceToken,
             "0",
@@ -90,8 +82,9 @@ public class TerminationJobService {
     private String buildHistoricTasksPendingTerminationRequest() {
         String query = ResourceUtility.getResource(CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION);
 
-        if (isTerminationTimeLimitFlag()) {
-            ZonedDateTime endTime = ZonedDateTime.now().minusMinutes(getTerminationTimeLimit());
+        if (terminationJobConfig.isCamundaTimeLimitFlag()) {
+            ZonedDateTime endTime = ZonedDateTime.now()
+                .minusMinutes(terminationJobConfig.getCamundaTimeLimit());
             String finishedAfter = endTime.format(formatter);
             query = query
                 .replace("\"finishedAfter\": \"*\",", "\"finishedAfter\": \""
@@ -105,11 +98,4 @@ public class TerminationJobService {
         return query;
     }
 
-    public boolean isTerminationTimeLimitFlag() {
-        return terminationTimeLimitFlag;
-    }
-
-    public long getTerminationTimeLimit() {
-        return terminationTimeLimit;
-    }
 }

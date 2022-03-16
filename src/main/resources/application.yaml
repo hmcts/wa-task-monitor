@@ -106,6 +106,5 @@ job:
     #number of minutes
     camunda-time-limit: ${TERMINATION_TIME_LIMIT:1}
 
-
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}
