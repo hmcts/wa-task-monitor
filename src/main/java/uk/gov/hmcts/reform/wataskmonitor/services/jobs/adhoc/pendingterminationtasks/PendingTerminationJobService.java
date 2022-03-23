@@ -62,26 +62,32 @@ public class PendingTerminationJobService {
         } else {
             log.info("Attempting to delete CFT Task state {} task(s)", tasks.size());
             tasks.forEach(task -> {
-                Map<String, Object> body = Map.of(
-                    "variableName", CFT_TASK_STATE.value(),
-                    "taskIdIn", singleton(task.getId())
-                );
+                try {
+                    Map<String, Object> body = Map.of(
+                        "variableName", CFT_TASK_STATE.value(),
+                        "taskIdIn", singleton(task.getId())
+                    );
 
-                List<HistoryVariableInstance> results = camundaClient.searchHistory(
-                    serviceAuthorizationToken,
-                    body
-                );
-
-                Optional<HistoryVariableInstance> maybeCftTaskState = results.stream()
-                    .filter(r -> r.getName().equals(CFT_TASK_STATE.value()))
-                    .findFirst();
-
-                maybeCftTaskState.ifPresent(
-                    historyVariableInstance -> camundaClient.deleteVariableFromHistory(
+                    List<HistoryVariableInstance> results = camundaClient.searchHistory(
                         serviceAuthorizationToken,
-                        historyVariableInstance.getId()
-                    )
-                );
+                        body
+                    );
+
+                    Optional<HistoryVariableInstance> maybeCftTaskState = results.stream()
+                        .filter(r -> r.getName().equals(CFT_TASK_STATE.value()))
+                        .findFirst();
+
+                    maybeCftTaskState.ifPresent(
+                        historyVariableInstance -> camundaClient.deleteVariableFromHistory(
+                            serviceAuthorizationToken,
+                            historyVariableInstance.getId()
+                        )
+                    );
+                } catch (Exception e) {
+                    log.error("Failed to delete pendingTermination CFT task state of task id {} with error: {}",
+                              task.getId(),
+                              e.getMessage());
+                }
             });
         }
     }

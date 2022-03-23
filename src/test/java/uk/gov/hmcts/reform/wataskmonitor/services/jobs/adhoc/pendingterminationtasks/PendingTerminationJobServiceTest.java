@@ -62,9 +62,10 @@ class PendingTerminationJobServiceTest extends UnitBaseTest {
     }
 
     @Test
-    void should_throw_exception_when_camunda_call_fails_for_search_history() {
+    void should_handle_exception_when_camunda_call_fails_for_search_history() {
 
-        doReturn(List.of(new HistoricCamundaTask(taskId, "delete reason")))
+        doReturn(List.of(new HistoricCamundaTask("task-id-2", "delete reason"),
+                         new HistoricCamundaTask(taskId, "delete reason")))
             .when(camundaClient)
             .getTasksFromHistory(
                 eq(SOME_SERVICE_TOKEN),
@@ -73,22 +74,30 @@ class PendingTerminationJobServiceTest extends UnitBaseTest {
                 any()
             );
 
-        doThrow(FeignException.GatewayTimeout.class)
+        doReturn(List.of(new HistoryVariableInstance(taskId, CFT_TASK_STATE.value(), "pendingTermination")))
             .when(camundaClient)
             .searchHistory(
                 SOME_SERVICE_TOKEN,
                 Map.of("variableName", CFT_TASK_STATE.value(),"taskIdIn", singleton(taskId))
             );
 
-        assertThatThrownBy(() -> pendingTerminationJobService.terminateTasks(SOME_SERVICE_TOKEN))
-            .isInstanceOf(FeignException.class)
-            .hasNoCause();
+        doThrow(FeignException.GatewayTimeout.class)
+            .when(camundaClient)
+            .searchHistory(
+                SOME_SERVICE_TOKEN,
+                Map.of("variableName", CFT_TASK_STATE.value(),"taskIdIn", singleton("task-id-2"))
+            );
+
+        pendingTerminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
+
+        verify(camundaClient).deleteVariableFromHistory(SOME_SERVICE_TOKEN, taskId);
     }
 
     @Test
-    void should_throw_exception_when_camunda_call_fails_for_delete_variable_from_history() {
+    void should_handle_exception_when_camunda_call_fails_for_delete_variable_from_history() {
 
-        doReturn(List.of(new HistoricCamundaTask(taskId, "delete reason")))
+        doReturn(List.of(new HistoricCamundaTask("task-id-2", "delete reason"),
+                         new HistoricCamundaTask(taskId, "delete reason")))
             .when(camundaClient)
             .getTasksFromHistory(
                 eq(SOME_SERVICE_TOKEN),
@@ -108,12 +117,12 @@ class PendingTerminationJobServiceTest extends UnitBaseTest {
             .when(camundaClient)
             .deleteVariableFromHistory(
                 SOME_SERVICE_TOKEN,
-                taskId
+                "task-id-2"
             );
 
-        assertThatThrownBy(() -> pendingTerminationJobService.terminateTasks(SOME_SERVICE_TOKEN))
-            .isInstanceOf(FeignException.class)
-            .hasNoCause();
+        pendingTerminationJobService.terminateTasks(SOME_SERVICE_TOKEN);
+
+        verify(camundaClient).deleteVariableFromHistory(SOME_SERVICE_TOKEN, taskId);
     }
 
     @Test

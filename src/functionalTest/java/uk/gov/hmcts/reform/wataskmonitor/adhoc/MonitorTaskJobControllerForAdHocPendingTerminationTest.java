@@ -43,7 +43,7 @@ public class MonitorTaskJobControllerForAdHocPendingTerminationTest extends Spri
     }
 
     @Test
-    public void task_initiation_job_should_initiate_task_and_taskState_should_be_unassigned() {
+    public void task_delete_pending_termination_task_job_should_remove_cft_state_from_historic_tasks() {
         List<HistoricCamundaTask> oldestTask = common.getTasksFromHistory(caseworkerCredentials.getHeaders());
 
         assertNotNull(oldestTask);
