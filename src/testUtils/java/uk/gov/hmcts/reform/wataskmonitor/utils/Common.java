@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.wataskmonitor.config.RestApiActions;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoryVariableInstance;
 import uk.gov.hmcts.reform.wataskmonitor.domain.idam.UserInfo;
 import uk.gov.hmcts.reform.wataskmonitor.entities.RoleAssignment;
 import uk.gov.hmcts.reform.wataskmonitor.entities.RoleAssignmentResource;
@@ -31,10 +32,12 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.fail;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.AUTHORIZATION;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.CFT_TASK_STATE;
 import static uk.gov.hmcts.reform.wataskmonitor.entities.enums.RoleType.CASE;
 import static uk.gov.hmcts.reform.wataskmonitor.entities.enums.RoleType.ORGANISATION;
 import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION;
@@ -219,12 +222,26 @@ public class Common {
     public List<HistoricCamundaTask> getTasksFromHistory(Headers headers) {
         String serviceToken = headers.getValue(SERVICE_AUTHORIZATION);
         String query = ResourceUtility.getResource(CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION);
+        query = query.replace("\"finishedAfter\": \"*\",", "");
 
         return camundaClient.getTasksFromHistory(
             serviceToken,
             "0",
             "1",
             query
+        );
+    }
+
+    public List<HistoryVariableInstance> getTaskHistoryVariable(Headers headers, String taskId, String variableName) {
+        String serviceToken = headers.getValue(SERVICE_AUTHORIZATION);
+        Map<String, Object> body = Map.of(
+            "variableName", variableName,
+            "taskIdIn", singleton(taskId)
+        );
+
+        return camundaClient.searchHistory(
+            serviceToken,
+            body
         );
     }
 

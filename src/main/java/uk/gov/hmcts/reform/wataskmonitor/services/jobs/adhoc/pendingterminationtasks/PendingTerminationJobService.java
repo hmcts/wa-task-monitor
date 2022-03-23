@@ -41,6 +41,7 @@ public class PendingTerminationJobService {
         log.info("pendingTerminationJobConfig: {}", pendingTerminationJobConfig.toString());
 
         String query = ResourceUtility.getResource(CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION);
+        query = query.replace("\"finishedAfter\": \"*\",", "");
         log.info("Pending Termination Job build query : {}", LoggingUtility.logPrettyPrint(query));
 
         List<HistoricCamundaTask> camundaTasks = camundaClient.getTasksFromHistory(

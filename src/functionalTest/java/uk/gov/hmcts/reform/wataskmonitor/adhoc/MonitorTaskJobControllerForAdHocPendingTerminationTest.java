@@ -7,24 +7,24 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.wataskmonitor.SpringBootFunctionalBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.TestUtility;
-import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoryVariableInstance;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
 import uk.gov.hmcts.reform.wataskmonitor.entities.TestAuthenticationCredentials;
 
 import java.util.List;
-import java.util.Map;
 
 import static net.serenitybdd.rest.SerenityRest.given;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.CFT_TASK_STATE;
 
 @Slf4j
 public class MonitorTaskJobControllerForAdHocPendingTerminationTest extends SpringBootFunctionalBaseTest {
@@ -50,10 +50,10 @@ public class MonitorTaskJobControllerForAdHocPendingTerminationTest extends Spri
         assertEquals(1, oldestTask.size());
 
         log.info("Testing on task id {}", oldestTask.get(0).getId());
-        Map<String, CamundaVariable> camundaVariableMap =
-            common.getTaskVariables(caseworkerCredentials.getHeaders(), oldestTask.get(0).getId());
+        List<HistoryVariableInstance> variables =
+            common.getTaskHistoryVariable(caseworkerCredentials.getHeaders(), oldestTask.get(0).getId(), CFT_TASK_STATE.value());
 
-        assertEquals("pendingTermination", camundaVariableMap.get("cftTaskState").getValue());
+        assertEquals("pendingTermination", variables.get(0).getValue());
 
         given()
             .contentType(APPLICATION_JSON_VALUE)
@@ -66,9 +66,9 @@ public class MonitorTaskJobControllerForAdHocPendingTerminationTest extends Spri
             .statusCode(HttpStatus.OK.value())
             .body(is(expectedResponse.apply(JobName.AD_HOC_PENDING_TERMINATION_TASKS.name())));
 
-        camundaVariableMap =
-            common.getTaskVariables(caseworkerCredentials.getHeaders(), oldestTask.get(0).getId());
+        variables =
+            common.getTaskHistoryVariable(caseworkerCredentials.getHeaders(), oldestTask.get(0).getId(), CFT_TASK_STATE.value());
 
-        assertFalse(camundaVariableMap.containsKey("cftTaskState"));
+        assertTrue(variables.isEmpty());
     }
 }
