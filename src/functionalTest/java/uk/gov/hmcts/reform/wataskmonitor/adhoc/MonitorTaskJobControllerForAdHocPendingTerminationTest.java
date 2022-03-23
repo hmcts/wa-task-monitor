@@ -51,7 +51,9 @@ public class MonitorTaskJobControllerForAdHocPendingTerminationTest extends Spri
 
         log.info("Testing on task id {}", oldestTask.get(0).getId());
         List<HistoryVariableInstance> variables =
-            common.getTaskHistoryVariable(caseworkerCredentials.getHeaders(), oldestTask.get(0).getId(), CFT_TASK_STATE.value());
+            common.getTaskHistoryVariable(caseworkerCredentials.getHeaders(),
+                                          oldestTask.get(0).getId(),
+                                          CFT_TASK_STATE.value());
 
         assertEquals("pendingTermination", variables.get(0).getValue());
 
@@ -67,7 +69,9 @@ public class MonitorTaskJobControllerForAdHocPendingTerminationTest extends Spri
             .body(is(expectedResponse.apply(JobName.AD_HOC_PENDING_TERMINATION_TASKS.name())));
 
         variables =
-            common.getTaskHistoryVariable(caseworkerCredentials.getHeaders(), oldestTask.get(0).getId(), CFT_TASK_STATE.value());
+            common.getTaskHistoryVariable(caseworkerCredentials.getHeaders(),
+                                          oldestTask.get(0).getId(),
+                                          CFT_TASK_STATE.value());
 
         assertTrue(variables.isEmpty());
     }
