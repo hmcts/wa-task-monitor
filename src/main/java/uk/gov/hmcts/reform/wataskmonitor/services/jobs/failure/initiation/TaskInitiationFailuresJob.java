@@ -29,6 +29,6 @@ public class TaskInitiationFailuresJob implements JobService {
     public void run(String serviceToken) {
         log.info("Starting task {} job.", TASK_INITIATION_FAILURES);
         GenericJobReport report = taskInitiationFailuresJobService.getUnInitiatedTasks(serviceToken);
-        log.info("{} job finished successfully: {}", TASK_INITIATION_FAILURES, logPrettyPrint(report));
+        log.info("{} job completed successfully: {}", TASK_INITIATION_FAILURES, logPrettyPrint(report));
     }
 }

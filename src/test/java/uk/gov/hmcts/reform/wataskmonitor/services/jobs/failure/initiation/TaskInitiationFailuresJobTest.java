@@ -16,11 +16,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_INITIATION_FAILURES;
 
-class TaskInitiationFailureJobTest extends UnitBaseTest {
+class TaskInitiationFailuresJobTest extends UnitBaseTest {
 
     @Mock
     private TaskInitiationFailuresJobService taskInitiationFailuresJobService;
-    
+
     @InjectMocks
     private TaskInitiationFailuresJob taskInitiationFailuresJob;
 

@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
@@ -13,6 +14,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
@@ -34,7 +37,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
-class TaskInitiationFailureJobServiceTest extends UnitBaseTest {
+@ExtendWith(OutputCaptureExtension.class)
+class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
 
     @Mock
     private CamundaClient camundaClient;
@@ -58,7 +62,7 @@ class TaskInitiationFailureJobServiceTest extends UnitBaseTest {
     }
 
     @Test
-    void should_return_active_tasks_and_not_delayed_tasks() throws JSONException {
+    void should_return_active_tasks_and_not_delayed_tasks(CapturedOutput output) throws JSONException {
         ZonedDateTime createdDate = ZonedDateTime.now();
         ZonedDateTime dueDate = ZonedDateTime.now().plusDays(1);
         CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(
@@ -88,10 +92,12 @@ class TaskInitiationFailureJobServiceTest extends UnitBaseTest {
         assertThat(genericJobReport.getTotalTasks()).isEqualTo(camundaTasks.size());
         assertThat(genericJobReport.getOutcomeList().size()).isEqualTo(camundaTasks.size());
         assertTrue(genericJobReport.getOutcomeList().get(0).isSuccessful());
+        assertThat(output).contains("TASK_INITIATION_FAILURES There are some uninitiated tasks");
+        
     }
 
     @Test
-    void should_return_empty_list_when_camundaTasks_is_empty() throws JSONException {
+    void should_return_empty_list_when_camundaTasks_is_empty(CapturedOutput output) throws JSONException {
 
         when(camundaClient.getTasks(
             eq(SOME_SERVICE_TOKEN),
@@ -106,6 +112,7 @@ class TaskInitiationFailureJobServiceTest extends UnitBaseTest {
         assertQuery(true);
         assertThat(genericJobReport.getTotalTasks()).isEqualTo(0);
         assertThat(genericJobReport.getOutcomeList().size()).isEqualTo(0);
+        assertThat(output).contains("TASK_INITIATION_FAILURES There was no task");
     }
 
     @Test
@@ -172,6 +179,7 @@ class TaskInitiationFailureJobServiceTest extends UnitBaseTest {
             camundaClient,
             initiationJobConfig
         );
+        lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeFlag);
 
         taskInitiationFailuresJobService.getUnInitiatedTasks(SOME_SERVICE_TOKEN);
 
