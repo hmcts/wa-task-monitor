@@ -1,0 +1,22 @@
+{
+  "taskDefinitionKey": "processTask",
+  "processDefinitionKey": "wa-task-initiation-ia-asylum",
+  "orQueries": [
+    {
+      "taskVariables": [
+        {
+          "name": "cftTaskState",
+          "operator": "eq",
+          "value": "unconfigured"
+        }
+      ]
+    }
+  ],
+  "createdBefore": "*",
+  "sorting": [
+    {
+      "sortBy": "created",
+      "sortOrder": "desc"
+    }
+  ]
+}
