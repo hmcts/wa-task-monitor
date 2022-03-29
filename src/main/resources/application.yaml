@@ -104,6 +104,8 @@ job:
     camunda-time-limit-flag: ${TERMINATION_TIME_LIMIT_FLAG:true}
     #number of minutes
     camunda-time-limit: ${TERMINATION_TIME_LIMIT:1}
+  pendingtermination:
+    camunda-max-results: ${PENDING_TERMINATION_CAMUNDA_MAX_RESULTS:1}
 
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}
