@@ -55,7 +55,7 @@ public class TaskInitiationFailuresJobService {
             log.info("{} There was no task", TASK_INITIATION_FAILURES.name());
             return new GenericJobReport(0, emptyList());
         } else {
-            log.warn("{} There are some initiation failure(s)", TASK_INITIATION_FAILURES.name());
+            log.warn("{} There are some uninitiated tasks", TASK_INITIATION_FAILURES.name());
             List<GenericJobOutcome> outcomesList = prepareInitiationFailureReport(camundaTasks, serviceToken);
             return new GenericJobReport(camundaTasks.size(), outcomesList);
         }
