@@ -50,11 +50,11 @@ class TaskInitiationFailuresJobTest extends UnitBaseTest {
                 .build())
         );
 
-        when(taskInitiationFailuresJobService.getUnInitiatedTasks(SOME_SERVICE_TOKEN))
+        when(taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN))
             .thenReturn(jobReport);
 
         taskInitiationFailuresJob.run(SOME_SERVICE_TOKEN);
 
-        verify(taskInitiationFailuresJobService).getUnInitiatedTasks(SOME_SERVICE_TOKEN);
+        verify(taskInitiationFailuresJobService).getInitiationFailures(SOME_SERVICE_TOKEN);
     }
 }

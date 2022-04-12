@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_TERMINATION_FAILURES;
-import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_TASKS_UNTERMINATED;
+import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_TASKS_TERMINATION_FAILURES;
 
 @Slf4j
 @Component
@@ -63,7 +63,7 @@ public class TaskTerminationFailuresJobService {
     }
 
     private String buildHistoricTasksPendingTerminationRequest() {
-        String query = ResourceUtility.getResource(CAMUNDA_TASKS_UNTERMINATED);
+        String query = ResourceUtility.getResource(CAMUNDA_TASKS_TERMINATION_FAILURES);
 
         if (terminationJobConfig.isCamundaTimeLimitFlag()) {
             ZonedDateTime endTime = ZonedDateTime.now()

@@ -20,7 +20,7 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_INITIATION_FAILURES;
-import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_TASKS_UNINITIATED;
+import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED;
 
 @Component
 @Slf4j
@@ -39,7 +39,7 @@ public class TaskInitiationFailuresJobService {
         this.initiationJobConfig = initiationJobConfig;
     }
 
-    public GenericJobReport getUnInitiatedTasks(String serviceToken) {
+    public GenericJobReport getInitiationFailures(String serviceToken) {
         log.info("{} initiationJobConfig: {}", TASK_INITIATION_FAILURES.name(), initiationJobConfig.toString());
         List<CamundaTask> camundaTasks = camundaClient.getTasks(
             serviceToken,
@@ -55,15 +55,15 @@ public class TaskInitiationFailuresJobService {
             log.info("{} There was no task", TASK_INITIATION_FAILURES.name());
             return new GenericJobReport(0, emptyList());
         } else {
-            log.warn("{} There are some uninitiated tasks", TASK_INITIATION_FAILURES.name());
-            List<GenericJobOutcome> outcomesList = prepareUnInitiatedTasksAndReturnOutcome(camundaTasks, serviceToken);
+            log.warn("{} There are some initiation failure(s)", TASK_INITIATION_FAILURES.name());
+            List<GenericJobOutcome> outcomesList = prepareInitiationFailureReport(camundaTasks, serviceToken);
             return new GenericJobReport(camundaTasks.size(), outcomesList);
         }
 
     }
 
-    private List<GenericJobOutcome> prepareUnInitiatedTasksAndReturnOutcome(List<CamundaTask> camundaTasks,
-                                                                            String serviceToken) {
+    private List<GenericJobOutcome> prepareInitiationFailureReport(List<CamundaTask> camundaTasks,
+                                                                   String serviceToken) {
         List<GenericJobOutcome> outcomeList = new ArrayList<>();
         camundaTasks.forEach(task -> {
             try {
@@ -105,7 +105,9 @@ public class TaskInitiationFailuresJobService {
     }
 
     private String buildSearchQuery() {
-        String query = ResourceUtility.getResource(CAMUNDA_TASKS_UNINITIATED);
+        String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED);
+        query = query
+            .replace("\"createdAfter\": \"*\",", "");
 
         if (initiationJobConfig.isCamundaTimeLimitFlag()) {
             ZonedDateTime createdTime = ZonedDateTime.now()

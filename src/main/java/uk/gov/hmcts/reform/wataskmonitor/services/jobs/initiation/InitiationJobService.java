@@ -118,7 +118,9 @@ public class InitiationJobService {
 
     private String buildSearchQuery() {
         String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED);
-
+        query = query
+            .replace("\"createdBefore\": \"*\",", "");
+        
         if (initiationJobConfig.isCamundaTimeLimitFlag()) {
             ZonedDateTime createdTime = ZonedDateTime.now()
                 .minusMinutes(initiationJobConfig.getCamundaTimeLimit());

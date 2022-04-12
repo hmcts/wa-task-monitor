@@ -85,7 +85,7 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
             camundaTask.getId()
         )).thenReturn(mockedVariables);
 
-        GenericJobReport genericJobReport = taskInitiationFailuresJobService.getUnInitiatedTasks(SOME_SERVICE_TOKEN);
+        GenericJobReport genericJobReport = taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
 
         assertQueryTargetsUserTasksAndNotDelayedTasks();
         assertQuery(true);
@@ -93,7 +93,7 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
         assertThat(genericJobReport.getOutcomeList().size()).isEqualTo(camundaTasks.size());
         assertTrue(genericJobReport.getOutcomeList().get(0).isSuccessful());
         assertThat(output).contains("TASK_INITIATION_FAILURES There are some uninitiated tasks");
-        
+
     }
 
     @Test
@@ -106,7 +106,7 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
             actualQueryParametersCaptor.capture()
         )).thenReturn(emptyList());
 
-        GenericJobReport genericJobReport = taskInitiationFailuresJobService.getUnInitiatedTasks(SOME_SERVICE_TOKEN);
+        GenericJobReport genericJobReport = taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
 
         assertQueryTargetsUserTasksAndNotDelayedTasks();
         assertQuery(true);
@@ -137,7 +137,7 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
             camundaTask.getId()
         )).thenThrow(FeignException.class);
 
-        GenericJobReport genericJobReport = taskInitiationFailuresJobService.getUnInitiatedTasks(SOME_SERVICE_TOKEN);
+        GenericJobReport genericJobReport = taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
 
         assertQueryTargetsUserTasksAndNotDelayedTasks();
         assertQuery(true);
@@ -181,7 +181,7 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
         );
         lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeFlag);
 
-        taskInitiationFailuresJobService.getUnInitiatedTasks(SOME_SERVICE_TOKEN);
+        taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
 
         assertQuery(timeFlag);
 

@@ -18,9 +18,7 @@ public enum ResourceEnum {
         "adhoc/update-case/ad-hoc-update-case-ccd-elastic-search-query.json"),
     CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION(
         "camunda/camunda-historic-task-pending-termination-query.json"),
-    CAMUNDA_TASKS_UNINITIATED(
-        "camunda/camunda-search-cftTaskState-uninitiated.json"),
-    CAMUNDA_TASKS_UNTERMINATED(
+    CAMUNDA_TASKS_TERMINATION_FAILURES(
         "camunda/camunda-historic-task-unterminated-query.json");
 
     private final String resourcePath;
