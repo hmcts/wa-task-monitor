@@ -76,8 +76,7 @@ security:
     - "/swagger-resources/**"
     - "/swagger-ui/**"
     - "/swagger-ui/index.html"
-    - "/v2/api-docs"
-    - "/v3/api-docs"
+    - "/v3/**"
     - "/favicon.ico"
 
 feign:
@@ -105,6 +104,8 @@ job:
     camunda-time-limit-flag: ${TERMINATION_TIME_LIMIT_FLAG:true}
     #number of minutes
     camunda-time-limit: ${TERMINATION_TIME_LIMIT:120}
+  pendingtermination:
+    camunda-max-results: ${PENDING_TERMINATION_CAMUNDA_MAX_RESULTS:1}
 
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}
