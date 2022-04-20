@@ -13,7 +13,9 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
 import uk.gov.hmcts.reform.wataskmonitor.entities.TestAuthenticationCredentials;
+import uk.gov.hmcts.reform.wataskmonitor.entities.TestVariables;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static net.serenitybdd.rest.SerenityRest.given;
@@ -31,19 +33,26 @@ public class MonitorTaskJobControllerForAdHocPendingTerminationTest extends Spri
 
     private TestAuthenticationCredentials caseworkerCredentials;
 
+    private List<String> caseIds;
+
     @Before
     public void setUp() {
         caseworkerCredentials = authorizationProvider
             .getNewTribunalCaseworker("wa-ft-test-r2-");
+        caseIds = new ArrayList<>();
     }
 
     @After
     public void cleanUp() {
         authorizationProvider.deleteAccount(caseworkerCredentials.getAccount().getUsername());
+        common.cleanUpTask(caseworkerCredentials.getHeaders(), caseIds);
     }
 
     @Test
     public void task_delete_pending_termination_task_job_should_remove_cft_state_from_historic_tasks() {
+        TestVariables taskVariables = common.setupTaskAndRetrieveIds();
+        caseIds.add(taskVariables.getCaseId());
+        common.updateTaskVariable(caseworkerCredentials.getHeaders(), taskVariables.getTaskId());
         List<HistoricCamundaTask> oldestTask = common.getTasksFromHistory(caseworkerCredentials.getHeaders());
 
         assertNotNull(oldestTask);
@@ -54,8 +63,8 @@ public class MonitorTaskJobControllerForAdHocPendingTerminationTest extends Spri
         log.info("Testing on task id {}", taskId);
         List<HistoryVariableInstance> variables =
             common.getTaskHistoryVariable(caseworkerCredentials.getHeaders(),
-                                          taskId,
-                                          CFT_TASK_STATE.value());
+                taskId,
+                CFT_TASK_STATE.value());
 
         assertEquals("pendingTermination", variables.get(0).getValue());
 
@@ -78,9 +87,10 @@ public class MonitorTaskJobControllerForAdHocPendingTerminationTest extends Spri
 
         variables =
             common.getTaskHistoryVariable(caseworkerCredentials.getHeaders(),
-                                          taskId,
-                                          CFT_TASK_STATE.value());
+                taskId,
+                CFT_TASK_STATE.value());
 
         assertTrue(variables.isEmpty());
     }
+
 }

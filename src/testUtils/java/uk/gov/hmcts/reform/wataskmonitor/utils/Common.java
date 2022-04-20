@@ -20,12 +20,14 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.idam.UserInfo;
 import uk.gov.hmcts.reform.wataskmonitor.entities.RoleAssignment;
 import uk.gov.hmcts.reform.wataskmonitor.entities.RoleAssignmentResource;
 import uk.gov.hmcts.reform.wataskmonitor.entities.TestVariables;
+import uk.gov.hmcts.reform.wataskmonitor.entities.camunda.CamundaValue;
 import uk.gov.hmcts.reform.wataskmonitor.services.AuthorizationProvider;
 import uk.gov.hmcts.reform.wataskmonitor.services.IdamService;
 import uk.gov.hmcts.reform.wataskmonitor.services.RoleAssignmentServiceApi;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,7 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.fail;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.AUTHORIZATION;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
+import static uk.gov.hmcts.reform.wataskmonitor.entities.camunda.CamundaValue.stringValue;
 import static uk.gov.hmcts.reform.wataskmonitor.entities.enums.RoleType.CASE;
 import static uk.gov.hmcts.reform.wataskmonitor.entities.enums.RoleType.ORGANISATION;
 import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION;
@@ -392,6 +395,22 @@ public class Common {
     private void deleteProcessInstance(Headers authenticationHeaders, String processId) {
         String deleteRequest = DELETE_REQUEST.replace("{PROCESS_ID}", processId);
         camundaClient.deleteProcessInstance(authenticationHeaders.getValue(SERVICE_AUTHORIZATION), deleteRequest);
+    }
+    
+    public void updateTaskVariable(Headers authenticationHeaders, String taskId) {
+        String path = "task/" + taskId + "/localVariables";
+        HashMap<String, CamundaValue<String>> camundaValueMap = new HashMap<>();
+        HashMap<String, HashMap<String, CamundaValue<String>>> modifications = new HashMap<>();
+
+        camundaValueMap.put("cftTaskState", stringValue("pendingTermination"));
+        modifications.put("modifications", camundaValueMap);
+
+        camundaApiActions.post(
+            path,
+            modifications,
+            authenticationHeaders
+        );
+
     }
 
 }
