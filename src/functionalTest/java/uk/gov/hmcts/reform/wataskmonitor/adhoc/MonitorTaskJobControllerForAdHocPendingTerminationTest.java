@@ -52,7 +52,7 @@ public class MonitorTaskJobControllerForAdHocPendingTerminationTest extends Spri
     public void task_delete_pending_termination_task_job_should_remove_cft_state_from_historic_tasks() {
         TestVariables taskVariables = common.setupTaskAndRetrieveIds();
         caseIds.add(taskVariables.getCaseId());
-        common.updateTaskVariable(caseworkerCredentials.getHeaders(), taskVariables.getTaskId());
+        common.updateCftTaskState(caseworkerCredentials.getHeaders(), taskVariables.getTaskId());
         List<HistoricCamundaTask> oldestTask = common.getTasksFromHistory(caseworkerCredentials.getHeaders());
 
         assertNotNull(oldestTask);

@@ -396,8 +396,8 @@ public class Common {
         String deleteRequest = DELETE_REQUEST.replace("{PROCESS_ID}", processId);
         camundaClient.deleteProcessInstance(authenticationHeaders.getValue(SERVICE_AUTHORIZATION), deleteRequest);
     }
-    
-    public void updateTaskVariable(Headers authenticationHeaders, String taskId) {
+
+    public void updateCftTaskState(Headers authenticationHeaders, String taskId) {
         String path = "task/" + taskId + "/localVariables";
         HashMap<String, CamundaValue<String>> camundaValueMap = new HashMap<>();
         HashMap<String, HashMap<String, CamundaValue<String>>> modifications = new HashMap<>();
