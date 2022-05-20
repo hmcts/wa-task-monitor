@@ -6,4 +6,9 @@
    ]]></notes>
     <cve>CVE-GOES-HERE</cve>
   </suppress>-->
+  <suppress>
+    <notes>This project doesn't use HttpInvokerServiceExporter
+      https://github.com/spring-projects/spring-framework/issues/24434#issuecomment-579669626</notes>
+    <cve>CVE-2016-1000027</cve>
+  </suppress>
 </suppressions>
