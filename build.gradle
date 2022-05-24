@@ -13,7 +13,7 @@ plugins {
   id 'pmd'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-  id 'org.springframework.boot' version '2.6.7'
+  id 'org.springframework.boot' version '2.7.0'
   id 'org.owasp.dependencycheck' version '7.1.0.1'
   id 'uk.gov.hmcts.java' version '0.12.5'
   id 'com.github.ben-manes.versions' version '0.38.0'
@@ -312,8 +312,8 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
-  implementation 'org.springframework.boot:spring-boot-starter-security:2.6.4'
-  implementation 'org.springframework.boot:spring-boot-starter-validation:2.6.4'
+  implementation 'org.springframework.boot:spring-boot-starter-security:2.7.0'
+  implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.0'
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: versions.springFrameworkCloud
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.1'
