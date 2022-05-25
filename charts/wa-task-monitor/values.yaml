@@ -32,6 +32,7 @@ java:
     TERMINATION_TIME_LIMIT: 120
 
     PENDING_TERMINATION_CAMUNDA_MAX_RESULTS: 1
+    ENVIRONMENT: "{{ .Values.global.environment }}"
 
   keyVaults:
     wa:
