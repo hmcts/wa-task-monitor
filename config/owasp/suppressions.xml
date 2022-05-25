@@ -15,5 +15,4 @@
     <notes>False positive spring-security-crypto-5.7.1.jar</notes>
     <cve>CVE-2020-5408</cve>
   </suppress>
-
 </suppressions>
