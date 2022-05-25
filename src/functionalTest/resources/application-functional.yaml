@@ -33,4 +33,4 @@ spring:
             client-id: ${WA_IDAM_CLIENT_ID:wa}
             client-secret: ${WA_IDAM_CLIENT_SECRET:something}
 
-environment: ${ENVIRONMENT:local}
+enable_initiation_trigger_flag: ${ENABLE_INITIATION_TRIGGER_FLAG:false}

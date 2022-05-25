@@ -39,8 +39,9 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
     public void setUp() {
         caseworkerCredentials = authorizationProvider.getNewTribunalCaseworker("wa-ft-test-r2-");
         caseIds = new ArrayList<>();
-        log.info("isLocalEnvironment : '{}'", isLocalEnvironment());
-        assumeTrue(isLocalEnvironment());
+
+        //to avoid initiation job run on non-local environment
+        assumeTrue(isInitiationTriggerFlagEnabled());
     }
 
     @After

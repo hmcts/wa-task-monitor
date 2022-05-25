@@ -57,8 +57,8 @@ public class SpringBootFunctionalBaseTest {
     private String testUrl;
     @Value("${targets.task-management.url}")
     private String taskManagementUrl;
-    @Value("${environment}")
-    private String environment;
+    @Value("${enable_initiation_trigger_flag}")
+    private boolean enableInitiationTriggerFlag;
     @Autowired
     private CamundaClient camundaClient;
     @Autowired
@@ -104,9 +104,9 @@ public class SpringBootFunctionalBaseTest {
             .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
-    protected boolean isLocalEnvironment() {
-        log.info("environment : '{}'", environment);
-        return "local".equalsIgnoreCase(environment);
+    protected boolean isInitiationTriggerFlagEnabled() {
+        log.info("enableInitiationTriggerFlag : '{}'", enableInitiationTriggerFlag);
+        return enableInitiationTriggerFlag;
     }
 
 }
