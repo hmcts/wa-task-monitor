@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor;
 
 import io.restassured.RestAssured;
+import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +29,7 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategy.SNAKE_CASE;
 import static net.serenitybdd.rest.SerenityRest.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles({"functional"})
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -55,7 +57,8 @@ public class SpringBootFunctionalBaseTest {
     private String testUrl;
     @Value("${targets.task-management.url}")
     private String taskManagementUrl;
-
+    @Value("${enable_initiation_trigger_flag}")
+    private boolean enableInitiationTriggerFlag;
     @Autowired
     private CamundaClient camundaClient;
     @Autowired
@@ -99,6 +102,11 @@ public class SpringBootFunctionalBaseTest {
             .post("/monitor/tasks/jobs")
             .then()
             .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    protected boolean isInitiationTriggerFlagEnabled() {
+        log.info("enableInitiationTriggerFlag : '{}'", enableInitiationTriggerFlag);
+        return enableInitiationTriggerFlag;
     }
 
 }
