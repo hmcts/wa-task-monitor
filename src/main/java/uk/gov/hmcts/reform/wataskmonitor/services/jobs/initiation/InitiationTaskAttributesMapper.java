@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.Tas
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUNDA_DATA_TIME_FORMATTER;
@@ -45,6 +46,7 @@ public class InitiationTaskAttributesMapper {
     public InitiationTaskAttributesMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
+
 
     public List<TaskAttribute> mapTaskAttributes(CamundaTask camundaTask, Map<String, CamundaVariable> variables) {
         // Camunda Attributes
@@ -129,6 +131,26 @@ public class InitiationTaskAttributesMapper {
             new TaskAttribute(TaskAttributeDefinition.TASK_WORK_TYPE, null),
             new TaskAttribute(TaskAttributeDefinition.TASK_NOTES, null)
         );
+    }
+
+    public Map<String, Object> mapTaskAttributes(Map<String, CamundaVariable> variables) {
+        return variables.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> getCamundaVariableValue(entry.getValue())));
+
+    }
+
+    private Object getCamundaVariableValue(CamundaVariable variable){
+        switch (variable.getType()){
+
+            case "String":
+                return getVariableValue(variable, String.class, null);
+            case "Boolean":
+                return getVariableValue(variable, Boolean.class, null);
+            case "Integer":
+                return getVariableValue(variable, Integer.class, null);
+            default:
+                return variable.getValue();
+        }
     }
 
     private CFTTaskState extractTaskState(Map<String, CamundaVariable> variables) {

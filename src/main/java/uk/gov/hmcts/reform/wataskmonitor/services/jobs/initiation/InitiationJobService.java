@@ -84,10 +84,8 @@ public class InitiationJobService {
                     serviceToken,
                     task.getId()
                 );
-                List<TaskAttribute> taskAttributes = initiationTaskAttributesMapper.mapTaskAttributes(
-                    task,
-                    variables
-                );
+
+                Map<String, Object> taskAttributes = initiationTaskAttributesMapper.mapTaskAttributes(variables);
                 log.debug("-> Initiating task with id: '{}'", task.getId());
                 taskManagementClient.initiateTask(
                     serviceToken,
