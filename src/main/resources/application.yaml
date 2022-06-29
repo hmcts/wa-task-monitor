@@ -98,12 +98,12 @@ job:
     camunda-max-results: ${INITIATION_CAMUNDA_MAX_RESULTS:100}
     camunda-time-limit-flag: ${INITIATION_TIME_LIMIT_FLAG:true}
     #number of minutes
-    camunda-time-limit: ${INITIATION_TIME_LIMIT:1}
+    camunda-time-limit: ${INITIATION_TIME_LIMIT:120}
   termination:
     camunda-max-results: ${TERMINATION_CAMUNDA_MAX_RESULTS:100}
     camunda-time-limit-flag: ${TERMINATION_TIME_LIMIT_FLAG:true}
     #number of minutes
-    camunda-time-limit: ${TERMINATION_TIME_LIMIT:1}
+    camunda-time-limit: ${TERMINATION_TIME_LIMIT:120}
   pendingtermination:
     camunda-max-results: ${PENDING_TERMINATION_CAMUNDA_MAX_RESULTS:1}
 
