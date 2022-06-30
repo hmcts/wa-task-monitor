@@ -13,6 +13,7 @@
     }
   ],
   "createdAfter": "*",
+  "createdBefore": "*",
   "sorting": [
     {
       "sortBy": "created",
