@@ -313,6 +313,9 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-security:2.7.0'
   implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.0'
 
@@ -340,8 +343,8 @@ dependencies {
     exclude group: 'junit', module: 'junit'
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
-  testImplementation "org.junit.vintage:junit-vintage-engine:${versions.junit}"
-  testImplementation 'org.springframework.security:spring-security-test:5.6.2'
+  testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine', version: versions.junit
+  testImplementation group: 'org.springframework.security', name: 'spring-security-test', version: '5.6.2'
 
   testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
@@ -349,15 +352,15 @@ dependencies {
   testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
 
   testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
-  testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.6.0'
-  testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
+  testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.6.0'
+  testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: '0.5'
 
   testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8', version: '2.29.1', {
     exclude group: 'com.github.jknack.handlebars.java'
   }
   testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
   testImplementation group: 'pl.pojo', name: 'pojo-tester', version: '0.7.6'
-  testImplementation 'com.github.hmcts:fortify-client:1.2.1:all'
+  testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.2.1'
 
   testImplementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
 
@@ -365,9 +368,9 @@ dependencies {
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pactVersion
 
-  contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
-  contractTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.2')
+  contractTestImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit)
+  contractTestRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit)
+  contractTestImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit)
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
