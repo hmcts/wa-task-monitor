@@ -7,14 +7,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "job.initiation")
+@ConfigurationProperties(prefix = "job.pendingtermination")
 @Getter
 @Setter
 @ToString
-public class InitiationJobConfig {
+public class PendingTerminationJobConfig {
 
     private String camundaMaxResults;
-    private boolean camundaTimeLimitFlag;
-    private Long camundaTimeLimit;
 
 }

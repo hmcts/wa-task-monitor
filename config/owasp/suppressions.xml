@@ -1,64 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-  <suppress until="2030-01-01">
+ <!-- <suppress until="2022-03-01">
     <notes><![CDATA[
-     Suppressing as it's a false positive (see: https://pivotal.io/security/cve-2018-1258)
+    Reason for suppression here, eg false positive
    ]]></notes>
-    <gav regex="true">^org\.springframework\.security:spring-security-crypto:5.4.[0-5]</gav>
-    <cpe>cpe:/a:pivotal_software:spring_security</cpe>
-    <cve>CVE-2018-1258</cve>
-  </suppress>
-  <suppress until="2022-03-01">
-    <notes><![CDATA[
-     Suppressing as our spring boot version needs to be updated
-   ]]></notes>
-    <cve>CVE-2021-22060</cve>
-  </suppress>
-  <suppress until="2022-03-01">
-    <notes><![CDATA[
-     Suppressing as our spring boot version needs to be updated
-   ]]></notes>
-    <cve>CVE-2018-1258</cve>
-  </suppress>
-  <suppress until="2022-03-01">
-    <notes><![CDATA[
-     Suppressing as our spring security version needs to be updated
-   ]]></notes>
-    <cve>CVE-2021-22112</cve>
-  </suppress>
-  <suppress until="2022-03-01">
-    <notes><![CDATA[
-     Suppressing as our open feign version needs to be updated
-   ]]></notes>
-    <cve>CVE-2021-22044</cve>
+    <cve>CVE-GOES-HERE</cve>
+  </suppress>-->
+  <suppress>
+    <notes>This project doesn't use HttpInvokerServiceExporter
+      https://github.com/spring-projects/spring-framework/issues/24434#issuecomment-579669626</notes>
+    <cve>CVE-2016-1000027</cve>
   </suppress>
   <suppress>
-    <notes><![CDATA[
-     Suppressing as netty http version needs to be updated
-   ]]></notes>
-    <cve>CVE-2021-43797</cve>
+    <notes>False positive spring-security-crypto-5.7.1.jar</notes>
+    <cve>CVE-2020-5408</cve>
   </suppress>
   <suppress>
-    <notes><![CDATA[
-   file name: spring-security-core-5.4.9.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
-    <vulnerabilityName>CWE-862: Missing Authorization</vulnerabilityName>
+    <notes>This project doesn't use BCrypt / BCryptPasswordEncoder class
+        https://nvd.nist.gov/vuln/detail/CVE-2022-22976
+        https://tanzu.vmware.com/security/cve-2022-22976
+    </notes>
+    <cve>CVE-2022-22976</cve>
   </suppress>
   <suppress>
-    <notes>Additional Log Injection in Spring Framework</notes>
-    <cve>CVE-2021-22060</cve>
-  </suppress>
-  <suppress>
-    <notes>Unauthorized Access with Spring Security Method Security</notes>
-    <cve>CVE-2018-1258</cve>
-  </suppress>
-  <suppress>
-    <notes>Changing SecurityContext More Than Once in Single Request Can Fail to Save</notes>
-    <cve>CVE-2021-22112</cve>
-  </suppress>
-  <suppress>
-    <notes>Spring Cloud OpenFeign Client Endpoint Exposure</notes>
-    <cve>CVE-2021-22044</cve>
+    <notes>false positive</notes>
+    <cve>CVE-2022-22978</cve>
   </suppress>
 </suppressions>

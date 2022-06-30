@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor.clients;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoryVariableInstance;
 
 import java.util.List;
 import java.util.Map;
@@ -77,6 +79,22 @@ public interface CamundaClient {
     @ResponseBody
     Map<String, CamundaVariable> getVariables(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
                                               @PathVariable("task-id") String id);
+
+    @DeleteMapping(
+        value = "/history/variable-instance/{variable-instance-id}",
+        consumes = APPLICATION_JSON_VALUE
+    )
+    void deleteVariableFromHistory(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+                                   @PathVariable("variable-instance-id") String variableInstanceId);
+
+
+    @PostMapping(
+        value = "/history/variable-instance",
+        produces = APPLICATION_JSON_VALUE,
+        consumes = APPLICATION_JSON_VALUE
+    )
+    List<HistoryVariableInstance> searchHistory(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+                                                @RequestBody Map<String, Object> body);
 
 }
 

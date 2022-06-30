@@ -10,11 +10,17 @@ public class HistoricCamundaTask {
 
     private final String id;
     private final String deleteReason;
+    private final String startTime;
+    private final String endTime;
 
     public HistoricCamundaTask(@JsonProperty("id") String id,
-                               @JsonProperty("deleteReason") String deleteReason) {
+                               @JsonProperty("deleteReason") String deleteReason,
+                               @JsonProperty("startTime") String startTime,
+                               @JsonProperty("endTime") String endTime) {
         this.id = id;
         this.deleteReason = deleteReason;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     public String getId() {
@@ -23,5 +29,13 @@ public class HistoricCamundaTask {
 
     public String getDeleteReason() {
         return deleteReason;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
     }
 }

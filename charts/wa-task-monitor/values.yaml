@@ -3,6 +3,12 @@ java:
   image: 'hmctspublic.azurecr.io/wa/task-monitor:latest'
   ingressHost: wa-task-monitor-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   aadIdentityName: wa
+  autoscaling:
+    enabled: true
+    maxReplicas: 4
+    minReplicas: 2
+    targetCPUUtilizationPercentage: 80 # Default is 80% target CPU utilization
+    targetMemoryUtilizationPercentage: 80 # Default is 80% target Memory utilization
   environment:
     S2S_URL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CAMUNDA_URL: "http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest"
@@ -13,12 +19,20 @@ java:
     OPEN_ID_IDAM_URL: "https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net"
     IDAM_URL: "https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net"
     ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    CONFIGURATION_CAMUNDA_MAX_RESULTS: 100
     CONFIGURATION_TIME_LIMIT_FLAG: true
-    CONFIGURATION_TIME_LIMIT: 60
+    CONFIGURATION_TIME_LIMIT: 1440
+
+    INITIATION_CAMUNDA_MAX_RESULTS: 100
     INITIATION_TIME_LIMIT_FLAG: true
     INITIATION_TIME_LIMIT: 120
+
+    TERMINATION_CAMUNDA_MAX_RESULTS: 100
     TERMINATION_TIME_LIMIT_FLAG: true
     TERMINATION_TIME_LIMIT: 120
+
+    PENDING_TERMINATION_CAMUNDA_MAX_RESULTS: 1
+
   keyVaults:
     wa:
       secrets:

@@ -1,0 +1,18 @@
+{
+  "taskDefinitionKey": "processTask",
+  "processDefinitionKey": "wa-task-initiation-ia-asylum",
+  "taskVariables": [
+    {
+      "name": "cftTaskState",
+      "operator": "eq",
+      "value": "pendingTermination"
+    }
+  ],
+  "finishedBefore": "*",
+  "sorting": [
+    {
+      "sortBy": "endTime",
+      "sortOrder": "desc"
+    }
+  ]
+}
