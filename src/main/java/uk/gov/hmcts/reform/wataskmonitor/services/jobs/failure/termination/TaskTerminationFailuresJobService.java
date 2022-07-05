@@ -47,7 +47,8 @@ public class TaskTerminationFailuresJobService {
         if (camundaTasks.isEmpty()) {
             log.info("{} There was no task", TASK_TERMINATION_FAILURES.name());
         } else {
-            List<String> processIds = camundaTasks.stream().map(HistoricCamundaTask::getId).collect(Collectors.toList());
+            List<String> processIds = camundaTasks.stream().map(HistoricCamundaTask::getId)
+                .collect(Collectors.toList());
             log.warn("{} There are some unterminated tasks. Process Ids: {}",
                 TASK_TERMINATION_FAILURES.name(),
                 String.join(", ", processIds)
