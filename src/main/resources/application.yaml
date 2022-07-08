@@ -114,4 +114,4 @@ job:
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}
 
-environment: ${ENVIRONMENT:local}
+environment: ${REFORM_ENVIRONMENT:local}
