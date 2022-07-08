@@ -58,7 +58,7 @@ public class CleanUpJobService {
                 TASK_CLEAN_UP.name(), cleanUpJobConfig.getEnvironment());
             return false;
         }
-        
+
         log.info("{} is enabled for this environment: {}", TASK_CLEAN_UP.name(), cleanUpJobConfig.getEnvironment());
         return true;
     }
@@ -73,7 +73,8 @@ public class CleanUpJobService {
         return historyTasks;
     }
 
-    public GenericJobReport deleteHistoricProcesses(List<HistoricCamundaTask> historicCamundaTasks, String serviceToken) {
+    public GenericJobReport deleteHistoricProcesses(List<HistoricCamundaTask> historicCamundaTasks,
+                                                    String serviceToken) {
         if (historicCamundaTasks == null || historicCamundaTasks.isEmpty()) {
             log.info("There was no task(s) to delete.");
             return new GenericJobReport(0, emptyList());
