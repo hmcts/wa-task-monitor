@@ -24,13 +24,17 @@ public class ReconfigurationJobService {
     private static final String RECONFIGURE_REQUEST_TIME = "reconfigureRequestTime";
     private final TaskReconfigurationClient taskReconfigurationClient;
     private final OffsetDateTime reconfigureRequestTime;
+    private final long reconfigureMaxTimeLimitSeconds;
 
     @Autowired
     public ReconfigurationJobService(TaskReconfigurationClient taskReconfigurationClient,
                                      @Value("${job.reconfiguration.reconfigure_request_time_hours}")
-                                         long reconfigureRequestTimeHours) {
+                                            long reconfigureRequestTimeHours,
+                                     @Value("${job.reconfiguration.reconfiguration_max_time_limit_seconds}")
+                                            long reconfigureMaxTimeLimitSeconds) {
         this.taskReconfigurationClient = taskReconfigurationClient;
         this.reconfigureRequestTime = OffsetDateTime.now().minus(Duration.ofHours(reconfigureRequestTimeHours));
+        this.reconfigureMaxTimeLimitSeconds = reconfigureMaxTimeLimitSeconds;
     }
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
@@ -41,7 +45,8 @@ public class ReconfigurationJobService {
                                                                 TaskFilterOperator.AFTER);
         String operationId = UUID.randomUUID().toString();
         TaskOperation operation = new TaskOperation(TaskOperationName.EXECUTE_RECONFIGURE,
-                                                    operationId);
+                                                    operationId,
+                                                    reconfigureMaxTimeLimitSeconds);
         TaskOperationRequest taskOperationRequest = new TaskOperationRequest(operation, List.of(filter));
 
         taskReconfigurationClient.executeReconfigure(serviceToken, taskOperationRequest);
