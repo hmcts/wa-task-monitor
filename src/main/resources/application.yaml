@@ -107,9 +107,9 @@ job:
   clean-up:
     camunda-max-results: ${CLEAN_UP_CAMUNDA_MAX_RESULTS:50}
     #number of days before today
-    started-before-days: ${STARTED_BEFORE_DAYS:0}
+    started-before-days: ${STARTED_BEFORE_DAYS:7}
   pendingtermination:
-    camunda-max-results: ${PENDING_TERMINATION_CAMUNDA_MAX_RESULTS:7}
+    camunda-max-results: ${PENDING_TERMINATION_CAMUNDA_MAX_RESULTS:1}
 
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}

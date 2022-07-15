@@ -99,6 +99,11 @@ public class CleanUpJobService {
     }
 
     public GenericJobReport deleteActiveProcesses(List<HistoricCamundaTask> historicCamundaTasks, String serviceToken) {
+
+        if (!isCleanActiveTaskAllowed()) {
+            return new GenericJobReport(0, emptyList());
+        }
+
         if (historicCamundaTasks == null || historicCamundaTasks.isEmpty()) {
             log.info("There was no active task(s) to delete.");
             return new GenericJobReport(0, emptyList());
@@ -140,7 +145,7 @@ public class CleanUpJobService {
                 objectMapper.writeValueAsString(camundaHistoryRemoveRequest)
             );
             isSuccess = true;
-            log.info("{} History tasks successfully deleted", historicProcessInstanceIds.size());
+            log.info("History tasks successfully deleted");
         } catch (Exception e) {
             log.error("An error occurred when deleting history tasks : {}", e.getMessage());
         }
@@ -169,7 +174,7 @@ public class CleanUpJobService {
                 objectMapper.writeValueAsString(camundaHistoryRemoveRequest)
             );
             isSuccess = true;
-            log.info("{} Active tasks successfully deleted", processInstanceIds.size());
+            log.info("Active tasks successfully deleted");
         } catch (Exception e) {
             log.error("An error occurred when deleting active tasks : {}", e.getMessage());
         }
@@ -219,6 +224,19 @@ public class CleanUpJobService {
             .successful(isSuccess)
             .jobType(TASK_CLEAN_UP.name())
             .build();
+    }
+
+    private boolean isCleanActiveTaskAllowed() {
+
+        if (!cleanUpJobConfig.getEnvironment().equalsIgnoreCase("aat")) {
+            log.info("{} clean active task is not enabled for this environment: {}",
+                TASK_CLEAN_UP.name(), cleanUpJobConfig.getEnvironment());
+            return false;
+        }
+
+        log.info("{} clean active task is enabled for this environment: {}",
+            TASK_CLEAN_UP.name(), cleanUpJobConfig.getEnvironment());
+        return true;
     }
 
 }

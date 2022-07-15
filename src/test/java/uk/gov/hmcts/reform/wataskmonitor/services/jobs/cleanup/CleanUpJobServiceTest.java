@@ -27,10 +27,12 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -66,10 +68,11 @@ class CleanUpJobServiceTest extends UnitBaseTest {
         );
         lenient().when(cleanUpJobConfig.getCamundaMaxResults()).thenReturn("50");
         lenient().when(cleanUpJobConfig.getStartedBeforeDays()).thenReturn(7L);
+        lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("aat");
     }
 
     @Test
-    void when_no_tasks_should_generate_report() {
+    void when_no_tasks_exist_should_generate_report() {
 
         GenericJobReport actualActiveTaskReport = cleanUpJobService
             .deleteActiveProcesses(emptyList(), SOME_SERVICE_TOKEN);
@@ -80,6 +83,17 @@ class CleanUpJobServiceTest extends UnitBaseTest {
         GenericJobReport expectation = new GenericJobReport(0, emptyList());
         assertEquals(expectation, actualActiveTaskReport);
         assertEquals(expectation, actualHistoricTaskReport);
+    }
+
+    @Test
+    void when_environment_not_aat_should_return_empty_generate_report_for_active_tasks() {
+
+        GenericJobReport actualActiveTaskReport = cleanUpJobService
+            .deleteActiveProcesses(emptyList(), SOME_SERVICE_TOKEN);
+
+        GenericJobReport expectation = new GenericJobReport(0, emptyList());
+        assertEquals(expectation, actualActiveTaskReport);
+
     }
 
     @Test
@@ -244,6 +258,36 @@ class CleanUpJobServiceTest extends UnitBaseTest {
         GenericJobReport expectedReport = new GenericJobReport(1, singletonList(outcome));
         assertEquals(expectedReport, actualReport);
 
+        await().atMost(10, TimeUnit.SECONDS)
+            .untilAsserted(() -> assertThat(cleanUpJobService.deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN))
+                .isNotNull());
+
+    }
+
+    @Test
+    void should_not_delete_active_tasks_when_environment_apart_from_aat() {
+        lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("local");
+
+        cleanUpJobService = new CleanUpJobService(
+            camundaClient,
+            cleanUpJobConfig,
+            new ObjectMapper()
+        );
+
+        HistoricCamundaTask camundaTask = new HistoricCamundaTask(
+            "ac365ec0-4220-412e-bd0c-4cc56e71f64e",
+            null,
+            null,
+            null
+        );
+
+        List<HistoricCamundaTask> tasks = singletonList(camundaTask);
+
+        GenericJobReport actualReport = cleanUpJobService.deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
+
+        GenericJobReport expectedReport = new GenericJobReport(0, emptyList());
+        assertEquals(expectedReport, actualReport);
+
     }
 
     @Test
@@ -351,6 +395,25 @@ class CleanUpJobServiceTest extends UnitBaseTest {
         assertThat(output.getOut().contains(enabledMessage));
 
     }
+
+    @Test
+    void should_log_not_allowed_to_clean_task_when_environment_apart_from_aat(CapturedOutput output) {
+        when(cleanUpJobConfig.getEnvironment())
+            .thenReturn("demo");
+
+        GenericJobReport expectedReport = new GenericJobReport(0, emptyList());
+        List<HistoricCamundaTask> tasks = null;
+
+        GenericJobReport actualReport = cleanUpJobService.deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
+
+        assertEquals(expectedReport, actualReport);
+
+        assertThat(output.getOut().contains(
+            String.format("%s clean active task is not enabled for this environment: %s",
+                TASK_CLEAN_UP.name(), cleanUpJobConfig.getEnvironment())
+        ));
+    }
+
 
     private void assertQuery() throws JSONException {
         JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
