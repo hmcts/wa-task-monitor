@@ -90,9 +90,12 @@ class MonitorTaskJobControllerForTerminationJobTest extends SpringBootIntegratio
             any()
         )).thenReturn(
             List.of(
-                new HistoricCamundaTask(CAMUNDA_TASK_ID_FOR_CANCELLATION, "cancelled"),
-                new HistoricCamundaTask(CAMUNDA_TASK_ID_FOR_COMPLETION, "completed"),
-                new HistoricCamundaTask(CAMUNDA_TASK_ID_FOR_DELETED, "deleted")
+                new HistoricCamundaTask(CAMUNDA_TASK_ID_FOR_CANCELLATION, "cancelled",
+                    null, null),
+                new HistoricCamundaTask(CAMUNDA_TASK_ID_FOR_COMPLETION, "completed",
+                    null, null),
+                new HistoricCamundaTask(CAMUNDA_TASK_ID_FOR_DELETED, "deleted",
+                    null, null)
             )
         );
 
