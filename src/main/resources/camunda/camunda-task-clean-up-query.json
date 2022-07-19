@@ -1,0 +1,46 @@
+{
+  "startedBefore": "STARTED_BEFORE_PLACE_HOLDER",
+  "orQueries": [
+    {
+      "processVariables": [
+        {
+          "active": true
+        }
+      ]
+    },
+    {
+      "processVariables": [
+        {
+          "completed": true
+        }
+      ]
+    },
+    {
+      "processVariables": [
+        {
+          "suspended": true
+        }
+      ]
+    },
+    {
+      "processVariables": [
+        {
+          "externallyTerminated": true
+        }
+      ]
+    },
+    {
+      "processVariables": [
+        {
+          "internallyTerminated": true
+        }
+      ]
+    }
+  ],
+  "sorting": [
+    {
+      "sortBy": "startTime",
+      "sortOrder": "asc"
+    }
+  ]
+}
