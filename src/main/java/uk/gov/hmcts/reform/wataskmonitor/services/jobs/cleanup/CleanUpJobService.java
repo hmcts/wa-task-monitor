@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.cleanup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -47,7 +46,7 @@ public class CleanUpJobService {
                              ObjectMapper objectMapper) {
         this.camundaClient = camundaClient;
         this.cleanUpJobConfig = cleanUpJobConfig;
-        this.objectMapper = objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
+        this.objectMapper = objectMapper;
     }
 
     public boolean isAllowedEnvironment() {
