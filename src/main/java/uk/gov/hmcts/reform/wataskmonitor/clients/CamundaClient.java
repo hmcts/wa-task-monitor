@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTaskCount;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoryVariableInstance;
@@ -24,10 +25,11 @@ import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SER
     name = "camunda",
     url = "${camunda.url}"
 )
-@SuppressWarnings("PMD.UseObjectForClearerAPI")
+@SuppressWarnings({"PMD.UseObjectForClearerAPI", "PMD.AvoidDuplicateLiterals"})
 public interface CamundaClient {
 
-    @PostMapping(value = "/task",
+    @PostMapping(
+        value = "/task",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
@@ -40,7 +42,8 @@ public interface CamundaClient {
     );
 
 
-    @PostMapping(value = "/process-instance/delete",
+    @PostMapping(
+        value = "/process-instance/delete",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
@@ -48,7 +51,8 @@ public interface CamundaClient {
     String deleteProcessInstance(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
                                  @RequestBody String body);
 
-    @GetMapping(value = "/task",
+    @GetMapping(
+        value = "/task",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
@@ -60,7 +64,8 @@ public interface CamundaClient {
         @RequestParam(value = "sortOrder", defaultValue = "desc", required = false) String sortOrder
     );
 
-    @PostMapping(value = "/history/task",
+    @PostMapping(
+        value = "/history/task",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
@@ -95,6 +100,56 @@ public interface CamundaClient {
     )
     List<HistoryVariableInstance> searchHistory(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
                                                 @RequestBody Map<String, Object> body);
+
+    @GetMapping(
+        value = "/process-instance/count",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    CamundaTaskCount getActiveProcessCount(
+        @RequestParam("startedBefore") String startedBefore
+    );
+
+    @PostMapping(
+        value = "/process-instance/delete",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    void deleteActiveProcesses(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+                               @RequestBody String body);
+
+    @PostMapping(
+        value = "/history/process-instance",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    List<HistoricCamundaTask> getHistoryProcesses(
+        @RequestParam(value = "firstResult", required = false, defaultValue = "0") String firstResult,
+        @RequestParam(value = "maxResults", required = false, defaultValue = "100") String maxResults,
+        @RequestBody String body
+    );
+
+    @GetMapping(
+        value = "/history/process-instance/count",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    CamundaTaskCount getHistoryProcessCount(
+        @RequestParam("startedBefore") String startedBefore
+    );
+
+    @PostMapping(
+        value = "/history/process-instance/delete",
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    void deleteHistoryProcesses(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+                                @RequestBody String body);
 
 }
 
