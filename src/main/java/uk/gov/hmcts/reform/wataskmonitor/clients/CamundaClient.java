@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import uk.gov.hmcts.reform.wataskmonitor.config.CamelCaseFeignConfiguration;
+import uk.gov.hmcts.reform.wataskmonitor.config.CamundaClientFeignConfiguration;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTaskCount;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SER
 @FeignClient(
     name = "camunda",
     url = "${camunda.url}",
-    configuration = CamelCaseFeignConfiguration.class
+    configuration = CamundaClientFeignConfiguration.class
 )
 @SuppressWarnings({"PMD.UseObjectForClearerAPI", "PMD.AvoidDuplicateLiterals"})
 public interface CamundaClient {

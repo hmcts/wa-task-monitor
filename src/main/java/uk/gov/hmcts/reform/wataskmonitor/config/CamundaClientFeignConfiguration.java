@@ -17,12 +17,12 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 
 @Configuration
 @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-public class CamelCaseFeignConfiguration {
+public class CamundaClientFeignConfiguration {
 
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public CamelCaseFeignConfiguration(ObjectMapper objectMapper) {
+    public CamundaClientFeignConfiguration(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -45,5 +45,5 @@ public class CamelCaseFeignConfiguration {
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
         return objectMapper;
     }
-    
+
 }

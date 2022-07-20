@@ -5,13 +5,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
+import uk.gov.hmcts.reform.wataskmonitor.config.SnakeCaseFeignConfiguration;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
 
 @FeignClient(
     name = "taskConfiguration",
-    url = "${task-management.url}"
+    url = "${task-management.url}",
+    configuration = SnakeCaseFeignConfiguration.class
 )
 public interface TaskConfigurationClient {
 
