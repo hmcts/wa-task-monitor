@@ -45,11 +45,5 @@ public class CamelCaseFeignConfiguration {
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
         return objectMapper;
     }
-
-    @Override
-    public String toString() {
-        return "CamelCaseFeignConfiguration{" +
-               "objectMapper=" + objectMapper +
-               '}';
-    }
+    
 }
