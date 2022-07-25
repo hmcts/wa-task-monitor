@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
+import uk.gov.hmcts.reform.wataskmonitor.config.SnakeCaseFeignConfiguration;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.ElasticSearchCaseList;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -14,7 +15,8 @@ import static uk.gov.hmcts.reform.wataskmonitor.clients.CaseEventHandlerClient.S
 
 @FeignClient(
     name = "ccd-client",
-    url = "${core_case_data.api.search.url}"
+    url = "${core_case_data.api.search.url}",
+    configuration = SnakeCaseFeignConfiguration.class
 )
 @SuppressWarnings("PMD.UseObjectForClearerAPI")
 public interface CcdClient {

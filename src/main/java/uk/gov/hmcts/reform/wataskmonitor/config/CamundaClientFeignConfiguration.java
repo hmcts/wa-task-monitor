@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import org.springframework.beans.factory.ObjectFactory;
@@ -17,12 +17,12 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 
 @Configuration
 @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-public class CamelCaseFeignConfiguration {
+public class CamundaClientFeignConfiguration {
 
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public CamelCaseFeignConfiguration(ObjectMapper objectMapper) {
+    public CamundaClientFeignConfiguration(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -42,7 +42,8 @@ public class CamelCaseFeignConfiguration {
 
     public ObjectMapper camelCasedObjectMapper() {
         //Override naming strategy for this class only
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CAMEL_CASE);
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
         return objectMapper;
     }
+
 }
