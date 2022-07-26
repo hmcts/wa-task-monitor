@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
-import uk.gov.hmcts.reform.wataskmonitor.config.SnakeCaseFeignConfiguration;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.InitiateTaskRequest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TerminateTaskRequest;
 
@@ -16,8 +15,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SER
 
 @FeignClient(
     name = "taskManagement",
-    url = "${task-management.url}",
-    configuration = SnakeCaseFeignConfiguration.class
+    url = "${task-management.url}"
 )
 public interface TaskManagementClient {
 

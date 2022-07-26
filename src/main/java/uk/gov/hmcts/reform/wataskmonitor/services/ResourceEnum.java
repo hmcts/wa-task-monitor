@@ -19,9 +19,7 @@ public enum ResourceEnum {
     CAMUNDA_HISTORIC_TASKS_PENDING_TERMINATION(
         "camunda/camunda-historic-task-pending-termination-query.json"),
     CAMUNDA_TASKS_TERMINATION_FAILURES(
-        "camunda/camunda-historic-task-unterminated-query.json"),
-    CAMUNDA_CLEAN_UP_TASK_QUERY(
-        "camunda/camunda-task-clean-up-query.json");
+        "camunda/camunda-historic-task-unterminated-query.json");
 
     private final String resourcePath;
 
