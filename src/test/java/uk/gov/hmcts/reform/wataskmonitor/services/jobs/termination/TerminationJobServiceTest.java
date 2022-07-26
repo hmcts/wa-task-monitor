@@ -93,9 +93,9 @@ class TerminationJobServiceTest extends UnitBaseTest {
             );
 
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
-            new HistoricCamundaTask("1", "cancelled"),
-            new HistoricCamundaTask("2", "completed"),
-            new HistoricCamundaTask("3", "deleted")
+            new HistoricCamundaTask("1", "cancelled", null, null),
+            new HistoricCamundaTask("2", "completed", null, null),
+            new HistoricCamundaTask("3", "deleted", null, null)
         );
 
         when(camundaClient.getTasksFromHistory(
@@ -141,9 +141,9 @@ class TerminationJobServiceTest extends UnitBaseTest {
             terminationJobConfig
         );
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
-            new HistoricCamundaTask("1", "cancelled"),
-            new HistoricCamundaTask("2", "completed"),
-            new HistoricCamundaTask("3", "deleted")
+            new HistoricCamundaTask("1", "cancelled", null, null),
+            new HistoricCamundaTask("2", "completed", null, null),
+            new HistoricCamundaTask("3", "deleted", null, null)
         );
 
         when(camundaClient.getTasksFromHistory(
@@ -170,7 +170,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
             terminationJobConfig
         );
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
-            new HistoricCamundaTask("1", "cancelled")
+            new HistoricCamundaTask("1", "cancelled", null, null)
         );
 
         when(camundaClient.getTasksFromHistory(
@@ -198,7 +198,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         );
 
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
-            new HistoricCamundaTask("1", "completed")
+            new HistoricCamundaTask("1", "completed", null, null)
         );
 
         when(terminationJobConfig.getCamundaMaxResults()).thenReturn("100");
@@ -230,7 +230,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         lenient().when(terminationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeFlag);
 
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
-            new HistoricCamundaTask("1", "deleted")
+            new HistoricCamundaTask("1", "deleted", null, null)
         );
 
         when(camundaClient.getTasksFromHistory(
@@ -254,7 +254,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
         boolean timeFlag) throws JSONException {
 
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
-            new HistoricCamundaTask("1", "deleted")
+            new HistoricCamundaTask("1", "deleted", null, null)
         );
 
         when(camundaClient.getTasksFromHistory(
