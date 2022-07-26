@@ -47,7 +47,6 @@ public class InitiationTaskAttributesMapper {
         this.objectMapper = objectMapper;
     }
 
-
     public List<TaskAttribute> mapTaskAttributes(CamundaTask camundaTask, Map<String, CamundaVariable> variables) {
         // Camunda Attributes
         String name = camundaTask.getName();
