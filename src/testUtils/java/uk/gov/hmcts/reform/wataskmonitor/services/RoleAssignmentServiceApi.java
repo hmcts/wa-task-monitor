@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import uk.gov.hmcts.reform.wataskmonitor.config.CamundaClientFeignConfiguration;
+import uk.gov.hmcts.reform.wataskmonitor.config.CamelCaseFeignConfiguration;
 import uk.gov.hmcts.reform.wataskmonitor.entities.RoleAssignmentResource;
 
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.AUTHORIZATION;
@@ -17,11 +17,11 @@ import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SER
 @FeignClient(
     name = "role-assignment-api",
     url = "${role-assignment-service.url}",
-    configuration = CamundaClientFeignConfiguration.class
+    configuration = CamelCaseFeignConfiguration.class
 )
 @SuppressWarnings("checkstyle:LineLength")
 public interface RoleAssignmentServiceApi {
-
+    
     @GetMapping(
         value = "/am/role-assignments/actors/{user-id}",
         produces = "application/vnd.uk.gov.hmcts.role-assignment-service.get-assignments+json;charset=UTF-8;version=1.0"
