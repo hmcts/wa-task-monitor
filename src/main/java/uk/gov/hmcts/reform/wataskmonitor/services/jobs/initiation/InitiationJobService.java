@@ -85,7 +85,7 @@ public class InitiationJobService {
                     task.getId()
                 );
 
-                Map<String, Object> taskAttributes = initiationTaskAttributesMapper.mapTaskAttributes(variables);
+                Map<String, Object> taskAttributes = initiationTaskAttributesMapper.mapTaskVariables(task, variables);
                 log.debug("-> Initiating task with id: '{}'", task.getId());
                 taskManagementClient.initiateTask(
                     serviceToken,

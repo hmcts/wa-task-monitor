@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskAttri
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.CFTTaskState;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TaskAttributeDefinition;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -132,9 +133,41 @@ public class InitiationTaskAttributesMapper {
         );
     }
 
-    public Map<String, Object> mapTaskAttributes(Map<String, CamundaVariable> variables) {
-        return variables.entrySet().stream()
+    public Map<String, Object> mapTaskVariables(CamundaTask camundaTask, Map<String, CamundaVariable> variables) {
+        // Camunda Attributes
+        String name = camundaTask.getName();
+        String createdDate = CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getCreated());
+        String dueDate = CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getDue());
+        String assignee = camundaTask.getAssignee();
+        String description = camundaTask.getDescription();
+        // Local Variables
+        String type = getVariableValue(variables.get(TASK_TYPE.value()), String.class, null);
+
+        if (type == null) {
+            String taskId = getVariableValue(variables.get(TASK_ID.value()), String.class, null);
+            /*
+             * In some R1 tasks the taskType does not exist which will cause it to fail when attempting to initate
+             * a task to allow for R1 to R2 migration we attempt to use the taskId instead who's value should be
+             * the same as taskType.
+             */
+            log.info(
+                "Task '{}' did not have a 'taskType' defaulting to 'taskId' with value '{}'",
+                camundaTask.getId(), taskId
+            );
+            type = taskId;
+        }
+
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("dueDateTime", dueDate);
+        attributes.put("created", createdDate);
+        attributes.put("assignee", assignee);
+        attributes.put("description", description);
+        attributes.put("taskName", name);
+        attributes.put("taskType", type);
+        Map<String, Object> variableAttributes = variables.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, entry -> getCamundaVariableValue(entry.getValue())));
+        attributes.putAll(variableAttributes);
+        return attributes;
 
     }
 
