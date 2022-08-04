@@ -158,7 +158,7 @@ public class InitiationTaskAttributesMapper {
         }
 
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put("dueDateTime", dueDate);
+        attributes.put("dueDate", dueDate);
         attributes.put("created", createdDate);
         attributes.put("assignee", assignee);
         attributes.put("description", description);
