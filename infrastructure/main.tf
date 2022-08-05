@@ -1,5 +1,13 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 2.25"
+    }
+  }
+}
+
 provider "azurerm" {
-  version = "~> 2.25"
   features {}
 }
 
@@ -15,7 +23,7 @@ data "azurerm_key_vault" "s2s_key_vault" {
 
 data "azurerm_key_vault_secret" "s2s_secret" {
   key_vault_id = data.azurerm_key_vault.s2s_key_vault.id
-  name        = "microservicekey-wa-task-monitor"
+  name         = "microservicekey-wa-task-monitor"
 }
 
 resource "azurerm_key_vault_secret" "s2s_secret_task_monitor" {
