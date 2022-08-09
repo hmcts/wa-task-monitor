@@ -110,6 +110,9 @@ job:
     started-before-days: ${STARTED_BEFORE_DAYS:7}
   pendingtermination:
     camunda-max-results: ${PENDING_TERMINATION_CAMUNDA_MAX_RESULTS:1}
+  reconfiguration:
+    reconfigure_request_time_hours: ${RECONFIGURE_REQUEST_TIME_HOURS:2}
+    reconfiguration_max_time_limit_seconds: ${RECONFIGURATION_MAX_TIME_LIMIT_SECONDS:120}
 
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}

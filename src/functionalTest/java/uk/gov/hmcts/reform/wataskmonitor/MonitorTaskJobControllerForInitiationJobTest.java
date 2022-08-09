@@ -137,11 +137,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         caseIds.add(defaultTaskVariables.getCaseId());
 
         TestVariables delayedTaskVariables = common.setupDelayedTaskAndRetrieveIds();
-
-        //initiateTask(caseworkerCredentials.getHeaders(), delayedTaskVariables,
-        //    "followUpOverdueReasonsForAppeal", "task name", "task title"
-        //);
-
+        
         assertNotNull(delayedTaskVariables);
         assertNotNull(delayedTaskVariables.getCaseId());
         assertNotNull(delayedTaskVariables.getTaskId());
