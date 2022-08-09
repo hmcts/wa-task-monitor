@@ -1,18 +1,15 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.cleanup;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.config.job.CleanUpJobConfig;
-import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaHistoryRemoveRequest;
-import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaRemoveRequest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTaskCount;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
+import uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum;
 import uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
@@ -27,7 +24,9 @@ import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_CLEAN_UP;
+import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.ACTIVE_PROCESS_DELETE_REQUEST;
 import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_CLEAN_UP_TASK_QUERY;
+import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.HISTORIC_PROCESS_DELETE_REQUEST;
 
 @Component
 @Slf4j
@@ -39,15 +38,12 @@ public class CleanUpJobService {
 
     private final CamundaClient camundaClient;
     private final CleanUpJobConfig cleanUpJobConfig;
-    private final ObjectMapper objectMapper;
 
     @Autowired
     public CleanUpJobService(CamundaClient camundaClient,
-                             CleanUpJobConfig cleanUpJobConfig,
-                             ObjectMapper objectMapper) {
+                             CleanUpJobConfig cleanUpJobConfig) {
         this.camundaClient = camundaClient;
         this.cleanUpJobConfig = cleanUpJobConfig;
-        this.objectMapper = objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
     }
 
     public boolean isAllowedEnvironment() {
@@ -135,14 +131,13 @@ public class CleanUpJobService {
         List<String> historicProcessInstanceIds = historicCamundaTasks.stream()
             .map(HistoricCamundaTask::getId).collect(Collectors.toList());
 
-        CamundaHistoryRemoveRequest camundaHistoryRemoveRequest = new CamundaHistoryRemoveRequest(
-            "Timeout", historicProcessInstanceIds
-        );
+
+        String body = prepareRequestBody(HISTORIC_PROCESS_DELETE_REQUEST, historicProcessInstanceIds);
 
         try {
             camundaClient.deleteHistoryProcesses(
                 serviceToken,
-                objectMapper.writeValueAsString(camundaHistoryRemoveRequest)
+                body
             );
             isSuccess = true;
             log.info("History tasks successfully deleted");
@@ -163,15 +158,13 @@ public class CleanUpJobService {
         List<String> processInstanceIds = activeCamundaTasks.stream()
             .map(HistoricCamundaTask::getId).collect(Collectors.toList());
 
-        CamundaRemoveRequest camundaHistoryRemoveRequest = new CamundaRemoveRequest(
-            "Completed",
-            processInstanceIds
-        );
+        String body = prepareRequestBody(ACTIVE_PROCESS_DELETE_REQUEST, processInstanceIds);
 
         try {
+
             camundaClient.deleteActiveProcesses(
                 serviceToken,
-                objectMapper.writeValueAsString(camundaHistoryRemoveRequest)
+                body
             );
             isSuccess = true;
             log.info("Active tasks successfully deleted");
@@ -215,6 +208,12 @@ public class CleanUpJobService {
             .minusDays(cleanUpJobConfig.getStartedBeforeDays());
 
         return startedBeforeDateTime.format(formatter);
+    }
+
+    private String prepareRequestBody(ResourceEnum resourceEnum, List<String> ids) {
+        return ResourceUtility.getResource(resourceEnum)
+            .replace("PROCESS_INSTANCE_ID_PLACEHOLDER",
+                String.join("\",\"", ids));
     }
 
     private GenericJobOutcome createJobOutCome(List<String> historicProcessInstanceIds, boolean isSuccess) {

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.cleanup;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -63,8 +62,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
     void setUp() {
         cleanUpJobService = new CleanUpJobService(
             camundaClient,
-            cleanUpJobConfig,
-            new ObjectMapper()
+            cleanUpJobConfig
         );
         lenient().when(cleanUpJobConfig.getCamundaMaxResults()).thenReturn("50");
         lenient().when(cleanUpJobConfig.getStartedBeforeDays()).thenReturn(7L);
@@ -100,8 +98,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
     void should_retrieve_history_tasks(CapturedOutput output) throws JSONException {
         cleanUpJobService = new CleanUpJobService(
             camundaClient,
-            cleanUpJobConfig,
-            new ObjectMapper()
+            cleanUpJobConfig
         );
 
         HistoricCamundaTask camundaTask = new HistoricCamundaTask(
@@ -135,8 +132,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
     void should_delete_history_tasks() {
         cleanUpJobService = new CleanUpJobService(
             camundaClient,
-            cleanUpJobConfig,
-            new ObjectMapper()
+            cleanUpJobConfig
         );
 
         HistoricCamundaTask camundaTask = new HistoricCamundaTask(
@@ -224,8 +220,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
     void should_delete_active_tasks() {
         cleanUpJobService = new CleanUpJobService(
             camundaClient,
-            cleanUpJobConfig,
-            new ObjectMapper()
+            cleanUpJobConfig
         );
 
         HistoricCamundaTask camundaTask = new HistoricCamundaTask(
@@ -270,8 +265,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
         cleanUpJobService = new CleanUpJobService(
             camundaClient,
-            cleanUpJobConfig,
-            new ObjectMapper()
+            cleanUpJobConfig
         );
 
         HistoricCamundaTask camundaTask = new HistoricCamundaTask(
