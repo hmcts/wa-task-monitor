@@ -4,14 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
-import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.JobService;
 
 import java.util.List;
 
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_CLEAN_UP;
-import static uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility.logPrettyPrint;
 
 @Slf4j
 @Component
@@ -39,11 +37,12 @@ public class CleanUpJob implements JobService {
         log.info("Starting task {} job.", TASK_CLEAN_UP);
         List<HistoricCamundaTask> tasks = cleanUpJobService.retrieveProcesses();
 
-        GenericJobReport report = cleanUpJobService.deleteActiveProcesses(tasks, serviceToken);
-        log.info("{} active process deletion finished successfully: {}", TASK_CLEAN_UP, logPrettyPrint(report));
+        cleanUpJobService.deleteActiveProcesses(tasks, serviceToken);
+        log.info("{} active process deletion finished successfully", TASK_CLEAN_UP);
 
-        report = cleanUpJobService.deleteHistoricProcesses(tasks, serviceToken);
-        log.info("{} history process deletion finished successfully: {}", TASK_CLEAN_UP, logPrettyPrint(report));
+        cleanUpJobService.deleteHistoricProcesses(tasks, serviceToken);
+        log.info("{} history process deletion finished successfully", TASK_CLEAN_UP);
+        log.info("{} job finished successfully", TASK_CLEAN_UP);
 
     }
 }

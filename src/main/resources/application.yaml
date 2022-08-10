@@ -105,7 +105,8 @@ job:
     #number of minutes
     camunda-time-limit: ${TERMINATION_TIME_LIMIT:120}
   clean-up:
-    camunda-max-results: ${CLEAN_UP_CAMUNDA_MAX_RESULTS:500}
+    allowed-environment: local, aat
+    camunda-max-results: ${CLEAN_UP_CAMUNDA_MAX_RESULTS:1000}
     #number of days before today
     started-before-days: ${STARTED_BEFORE_DAYS:7}
   pendingtermination:
@@ -117,4 +118,4 @@ job:
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}
 
-environment: ${REFORM_ENVIRONMENT:aat}
+environment: ${REFORM_ENVIRONMENT:local}

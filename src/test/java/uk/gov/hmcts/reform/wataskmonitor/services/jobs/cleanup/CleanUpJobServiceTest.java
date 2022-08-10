@@ -19,7 +19,6 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.config.job.CleanUpJobConfig;
-import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTaskCount;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
@@ -67,6 +66,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
         lenient().when(cleanUpJobConfig.getCamundaMaxResults()).thenReturn("50");
         lenient().when(cleanUpJobConfig.getStartedBeforeDays()).thenReturn(7L);
         lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("aat");
+        lenient().when(cleanUpJobConfig.getAllowedEnvironment()).thenReturn(List.of("local", "aat"));
     }
 
     @Test
@@ -144,13 +144,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
         List<HistoricCamundaTask> tasks = singletonList(camundaTask);
 
-        when(camundaClient.getHistoryProcessCount(any()))
-            .thenReturn(new CamundaTaskCount(1L));
-
         GenericJobReport actualReport = cleanUpJobService.deleteHistoricProcesses(tasks, SOME_SERVICE_TOKEN);
-
-        verify(camundaClient, times(2))
-            .getHistoryProcessCount(anyString());
 
         verify(camundaClient, times(1))
             .deleteHistoryProcesses(anyString(), anyString());
@@ -199,9 +193,6 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
         GenericJobReport expectedReport = new GenericJobReport(1, singletonList(outcome));
 
-        when(camundaClient.getHistoryProcessCount(any()))
-            .thenReturn(new CamundaTaskCount(1L));
-
         doThrow(FeignException.class)
             .when(camundaClient)
             .deleteHistoryProcesses(
@@ -232,13 +223,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
         List<HistoricCamundaTask> tasks = singletonList(camundaTask);
 
-        when(camundaClient.getActiveProcessCount(any()))
-            .thenReturn(new CamundaTaskCount(1L));
-
         GenericJobReport actualReport = cleanUpJobService.deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
-
-        verify(camundaClient, times(2))
-            .getActiveProcessCount(anyString());
 
         verify(camundaClient, times(1))
             .deleteActiveProcesses(anyString(), anyString());
@@ -260,8 +245,8 @@ class CleanUpJobServiceTest extends UnitBaseTest {
     }
 
     @Test
-    void should_not_delete_active_tasks_when_environment_apart_from_aat() {
-        lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("local");
+    void should_not_delete_active_tasks_when_environment_is_not_allowed() {
+        lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("demo");
 
         cleanUpJobService = new CleanUpJobService(
             camundaClient,
@@ -316,9 +301,6 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
         GenericJobReport expectedReport = new GenericJobReport(1, singletonList(outcome));
 
-        when(camundaClient.getActiveProcessCount(any()))
-            .thenReturn(new CamundaTaskCount(1L));
-
         doThrow(FeignException.class)
             .when(camundaClient)
             .deleteActiveProcesses(
@@ -339,7 +321,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
         "PROD, false",
         "local, true",
         "aat, true",
-        "demo, true"
+        "demo, false"
     })
     void should_return_a_boolean_according_to_environment(String environment, boolean expectedIsAllowedEnvironment) {
 
@@ -352,10 +334,13 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
     }
 
-    @Test
-    void should_log_a_message_when_environment_is_allowed(CapturedOutput output) {
+    @ParameterizedTest(name = "jobName: {0} expected: {1}")
+    @CsvSource({
+        "local",
+        "aat",
+    })
+    void should_log_a_message_when_environment_is_allowed(String environment, CapturedOutput output) {
 
-        String environment = "local";
         String enabledMessage = String.format("%s is enabled for this environment: %s",
             TASK_CLEAN_UP.name(), environment);
 
@@ -371,10 +356,14 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
     }
 
-    @Test
-    void should_log_a_message_when_environment_is_not_allowed(CapturedOutput output) {
+    @ParameterizedTest(name = "jobName: {0} expected: {1}")
+    @CsvSource({
+        "prod",
+        "demo",
+        "dummy"
+    })
+    void should_log_a_message_when_environment_is_not_allowed(String environment, CapturedOutput output) {
 
-        String environment = "prod";
         String enabledMessage = String.format("%s is not enabled for this environment: %s",
             TASK_CLEAN_UP.name(), environment);
 
@@ -388,24 +377,6 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
         assertThat(output.getOut().contains(enabledMessage));
 
-    }
-
-    @Test
-    void should_log_not_allowed_to_clean_task_when_environment_apart_from_aat(CapturedOutput output) {
-        when(cleanUpJobConfig.getEnvironment())
-            .thenReturn("demo");
-
-        GenericJobReport expectedReport = new GenericJobReport(0, emptyList());
-        List<HistoricCamundaTask> tasks = null;
-
-        GenericJobReport actualReport = cleanUpJobService.deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
-
-        assertEquals(expectedReport, actualReport);
-
-        assertThat(output.getOut().contains(
-            String.format("%s clean active task is not enabled for this environment: %s",
-                TASK_CLEAN_UP.name(), cleanUpJobConfig.getEnvironment())
-        ));
     }
 
 
