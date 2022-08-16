@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.InitiateTaskRequest;
-import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskAttribute;
 import uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
@@ -85,7 +84,7 @@ public class InitiationJobService {
                     task.getId()
                 );
 
-                Map<String, Object> taskAttributes = initiationTaskAttributesMapper.mapTaskVariables(task, variables);
+                Map<String, Object> taskAttributes = initiationTaskAttributesMapper.mapTaskAttributes(task, variables);
                 log.debug("-> Initiating task with id: '{}'", task.getId());
                 taskManagementClient.initiateTask(
                     serviceToken,
@@ -95,10 +94,12 @@ public class InitiationJobService {
                 log.info("Task with id: '{}' initiated successfully.", task.getId());
                 outcomeList.add(buildJobOutcome(task, true));
             } catch (Exception e) {
-                log.error("Error while initiating taskId({}) and processId({})",
+                log.error(
+                    "Error while initiating taskId({}) and processId({})",
                     task.getId(),
                     task.getProcessInstanceId(),
-                    e);
+                    e
+                );
                 outcomeList.add(buildJobOutcome(task, false));
             }
         });
