@@ -104,11 +104,11 @@ job:
     camunda-time-limit-flag: ${TERMINATION_TIME_LIMIT_FLAG:true}
     #number of minutes
     camunda-time-limit: ${TERMINATION_TIME_LIMIT:120}
-  clean-up:
+  maintenance-camunda-task-clean-up:
     allowed-environment: local, aat
-    camunda-max-results: ${CLEAN_UP_CAMUNDA_MAX_RESULTS:1000}
+    clean-up-camunda-max-results: ${CLEAN_UP_CAMUNDA_MAX_RESULTS:1000}
     #number of days before today
-    started-before-days: ${STARTED_BEFORE_DAYS:7}
+    clean-up-started-days-before: ${CLEAN_UP_STARTED_DAYS_BEFORE:7}
   pendingtermination:
     camunda-max-results: ${PENDING_TERMINATION_CAMUNDA_MAX_RESULTS:1}
   reconfiguration:

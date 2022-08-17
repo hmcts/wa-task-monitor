@@ -43,10 +43,10 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_CLEAN_UP;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.MAINTENANCE_CAMUNDA_TASK_CLEAN_UP;
 
 @ExtendWith(OutputCaptureExtension.class)
-class CleanUpJobServiceTest extends UnitBaseTest {
+class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends UnitBaseTest {
 
     @Mock
     private CamundaClient camundaClient;
@@ -55,16 +55,16 @@ class CleanUpJobServiceTest extends UnitBaseTest {
     @Captor
     private ArgumentCaptor<String> actualQueryParametersCaptor;
 
-    private CleanUpJobService cleanUpJobService;
+    private MaintenanceCamundaTaskCleanUpJobService maintenanceCamundaTaskCleanUpJobService;
 
     @BeforeEach
     void setUp() {
-        cleanUpJobService = new CleanUpJobService(
+        maintenanceCamundaTaskCleanUpJobService = new MaintenanceCamundaTaskCleanUpJobService(
             camundaClient,
             cleanUpJobConfig
         );
-        lenient().when(cleanUpJobConfig.getCamundaMaxResults()).thenReturn("50");
-        lenient().when(cleanUpJobConfig.getStartedBeforeDays()).thenReturn(7L);
+        lenient().when(cleanUpJobConfig.getCleanUpCamundaMaxResults()).thenReturn("50");
+        lenient().when(cleanUpJobConfig.getCleanUpStartedDaysBefore()).thenReturn(7L);
         lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("aat");
         lenient().when(cleanUpJobConfig.getAllowedEnvironment()).thenReturn(List.of("local", "aat"));
     }
@@ -72,10 +72,10 @@ class CleanUpJobServiceTest extends UnitBaseTest {
     @Test
     void when_no_tasks_exist_should_generate_report() {
 
-        GenericJobReport actualActiveTaskReport = cleanUpJobService
+        GenericJobReport actualActiveTaskReport = maintenanceCamundaTaskCleanUpJobService
             .deleteActiveProcesses(emptyList(), SOME_SERVICE_TOKEN);
 
-        GenericJobReport actualHistoricTaskReport = cleanUpJobService
+        GenericJobReport actualHistoricTaskReport = maintenanceCamundaTaskCleanUpJobService
             .deleteHistoricProcesses(emptyList(), SOME_SERVICE_TOKEN);
 
         GenericJobReport expectation = new GenericJobReport(0, emptyList());
@@ -86,7 +86,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
     @Test
     void when_environment_not_aat_should_return_empty_generate_report_for_active_tasks() {
 
-        GenericJobReport actualActiveTaskReport = cleanUpJobService
+        GenericJobReport actualActiveTaskReport = maintenanceCamundaTaskCleanUpJobService
             .deleteActiveProcesses(emptyList(), SOME_SERVICE_TOKEN);
 
         GenericJobReport expectation = new GenericJobReport(0, emptyList());
@@ -96,7 +96,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
     @Test
     void should_retrieve_history_tasks(CapturedOutput output) throws JSONException {
-        cleanUpJobService = new CleanUpJobService(
+        maintenanceCamundaTaskCleanUpJobService = new MaintenanceCamundaTaskCleanUpJobService(
             camundaClient,
             cleanUpJobConfig
         );
@@ -116,7 +116,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
             actualQueryParametersCaptor.capture()
         )).thenReturn(tasks);
 
-        List<HistoricCamundaTask> actualTaskList = cleanUpJobService.retrieveProcesses();
+        List<HistoricCamundaTask> actualTaskList = maintenanceCamundaTaskCleanUpJobService.retrieveProcesses();
 
         verify(camundaClient, times(1))
             .getHistoryProcesses(anyString(), any(), any());
@@ -130,7 +130,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
     @Test
     void should_delete_history_tasks() {
-        cleanUpJobService = new CleanUpJobService(
+        maintenanceCamundaTaskCleanUpJobService = new MaintenanceCamundaTaskCleanUpJobService(
             camundaClient,
             cleanUpJobConfig
         );
@@ -144,7 +144,8 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
         List<HistoricCamundaTask> tasks = singletonList(camundaTask);
 
-        GenericJobReport actualReport = cleanUpJobService.deleteHistoricProcesses(tasks, SOME_SERVICE_TOKEN);
+        GenericJobReport actualReport = maintenanceCamundaTaskCleanUpJobService
+            .deleteHistoricProcesses(tasks, SOME_SERVICE_TOKEN);
 
         verify(camundaClient, times(1))
             .deleteHistoryProcesses(anyString(), anyString());
@@ -153,7 +154,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
             .taskId(null)
             .processInstanceId(camundaTask.getId())
             .successful(true)
-            .jobType(TASK_CLEAN_UP.name())
+            .jobType(MAINTENANCE_CAMUNDA_TASK_CLEAN_UP.name())
             .build();
 
         GenericJobReport expectedReport = new GenericJobReport(1, singletonList(outcome));
@@ -167,7 +168,8 @@ class CleanUpJobServiceTest extends UnitBaseTest {
         GenericJobReport expectedReport = new GenericJobReport(0, emptyList());
         List<HistoricCamundaTask> tasks = null;
 
-        GenericJobReport actualReport = cleanUpJobService.deleteHistoricProcesses(tasks, SOME_SERVICE_TOKEN);
+        GenericJobReport actualReport = maintenanceCamundaTaskCleanUpJobService
+            .deleteHistoricProcesses(tasks, SOME_SERVICE_TOKEN);
 
         assertEquals(expectedReport, actualReport);
         assertThat(output.getOut().contains("There was no task(s) to delete."));
@@ -188,7 +190,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
             .taskId(null)
             .processInstanceId(camundaTask.getId())
             .successful(false)
-            .jobType(TASK_CLEAN_UP.name())
+            .jobType(MAINTENANCE_CAMUNDA_TASK_CLEAN_UP.name())
             .build();
 
         GenericJobReport expectedReport = new GenericJobReport(1, singletonList(outcome));
@@ -201,7 +203,8 @@ class CleanUpJobServiceTest extends UnitBaseTest {
             );
 
 
-        GenericJobReport actualReport = cleanUpJobService.deleteHistoricProcesses(tasks, SOME_SERVICE_TOKEN);
+        GenericJobReport actualReport = maintenanceCamundaTaskCleanUpJobService
+            .deleteHistoricProcesses(tasks, SOME_SERVICE_TOKEN);
 
         assertEquals(expectedReport, actualReport);
         assertThat(output.getOut().contains("An error occurred when deleting history tasks :"));
@@ -209,7 +212,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
     @Test
     void should_delete_active_tasks() {
-        cleanUpJobService = new CleanUpJobService(
+        maintenanceCamundaTaskCleanUpJobService = new MaintenanceCamundaTaskCleanUpJobService(
             camundaClient,
             cleanUpJobConfig
         );
@@ -223,7 +226,8 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
         List<HistoricCamundaTask> tasks = singletonList(camundaTask);
 
-        GenericJobReport actualReport = cleanUpJobService.deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
+        GenericJobReport actualReport = maintenanceCamundaTaskCleanUpJobService
+            .deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
 
         verify(camundaClient, times(1))
             .deleteActiveProcesses(anyString(), anyString());
@@ -232,14 +236,15 @@ class CleanUpJobServiceTest extends UnitBaseTest {
             .taskId(null)
             .processInstanceId(camundaTask.getId())
             .successful(true)
-            .jobType(TASK_CLEAN_UP.name())
+            .jobType(MAINTENANCE_CAMUNDA_TASK_CLEAN_UP.name())
             .build();
 
         GenericJobReport expectedReport = new GenericJobReport(1, singletonList(outcome));
         assertEquals(expectedReport, actualReport);
 
         await().atMost(10, TimeUnit.SECONDS)
-            .untilAsserted(() -> assertThat(cleanUpJobService.deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN))
+            .untilAsserted(() -> assertThat(maintenanceCamundaTaskCleanUpJobService
+                .deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN))
                 .isNotNull());
 
     }
@@ -248,7 +253,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
     void should_not_delete_active_tasks_when_environment_is_not_allowed() {
         lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("demo");
 
-        cleanUpJobService = new CleanUpJobService(
+        maintenanceCamundaTaskCleanUpJobService = new MaintenanceCamundaTaskCleanUpJobService(
             camundaClient,
             cleanUpJobConfig
         );
@@ -262,7 +267,8 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
         List<HistoricCamundaTask> tasks = singletonList(camundaTask);
 
-        GenericJobReport actualReport = cleanUpJobService.deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
+        GenericJobReport actualReport = maintenanceCamundaTaskCleanUpJobService
+            .deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
 
         GenericJobReport expectedReport = new GenericJobReport(0, emptyList());
         assertEquals(expectedReport, actualReport);
@@ -275,7 +281,8 @@ class CleanUpJobServiceTest extends UnitBaseTest {
         GenericJobReport expectedReport = new GenericJobReport(0, emptyList());
         List<HistoricCamundaTask> tasks = null;
 
-        GenericJobReport actualReport = cleanUpJobService.deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
+        GenericJobReport actualReport = maintenanceCamundaTaskCleanUpJobService
+            .deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
 
         assertEquals(expectedReport, actualReport);
         assertThat(output.getOut().contains("There was no active task(s) to delete."));
@@ -296,7 +303,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
             .taskId(null)
             .processInstanceId(camundaTask.getId())
             .successful(false)
-            .jobType(TASK_CLEAN_UP.name())
+            .jobType(MAINTENANCE_CAMUNDA_TASK_CLEAN_UP.name())
             .build();
 
         GenericJobReport expectedReport = new GenericJobReport(1, singletonList(outcome));
@@ -309,7 +316,8 @@ class CleanUpJobServiceTest extends UnitBaseTest {
             );
 
 
-        GenericJobReport actualReport = cleanUpJobService.deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
+        GenericJobReport actualReport = maintenanceCamundaTaskCleanUpJobService
+            .deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
 
         assertEquals(expectedReport, actualReport);
         assertThat(output.getOut().contains("An error occurred when deleting history tasks :"));
@@ -328,7 +336,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
         when(cleanUpJobConfig.getEnvironment())
             .thenReturn(environment);
 
-        boolean actualIsAllowedEnvironment = cleanUpJobService.isAllowedEnvironment();
+        boolean actualIsAllowedEnvironment = maintenanceCamundaTaskCleanUpJobService.isAllowedEnvironment();
 
         assertEquals(expectedIsAllowedEnvironment, actualIsAllowedEnvironment);
 
@@ -342,13 +350,13 @@ class CleanUpJobServiceTest extends UnitBaseTest {
     void should_log_a_message_when_environment_is_allowed(String environment, CapturedOutput output) {
 
         String enabledMessage = String.format("%s is enabled for this environment: %s",
-            TASK_CLEAN_UP.name(), environment);
+            MAINTENANCE_CAMUNDA_TASK_CLEAN_UP.name(), environment);
 
 
         when(cleanUpJobConfig.getEnvironment())
             .thenReturn(environment);
 
-        boolean isAllowedEnvironment = cleanUpJobService.isAllowedEnvironment();
+        boolean isAllowedEnvironment = maintenanceCamundaTaskCleanUpJobService.isAllowedEnvironment();
 
         assertTrue(isAllowedEnvironment);
 
@@ -365,13 +373,13 @@ class CleanUpJobServiceTest extends UnitBaseTest {
     void should_log_a_message_when_environment_is_not_allowed(String environment, CapturedOutput output) {
 
         String enabledMessage = String.format("%s is not enabled for this environment: %s",
-            TASK_CLEAN_UP.name(), environment);
+            MAINTENANCE_CAMUNDA_TASK_CLEAN_UP.name(), environment);
 
 
         when(cleanUpJobConfig.getEnvironment())
             .thenReturn(environment);
 
-        boolean isAllowedEnvironment = cleanUpJobService.isAllowedEnvironment();
+        boolean isAllowedEnvironment = maintenanceCamundaTaskCleanUpJobService.isAllowedEnvironment();
 
         assertFalse(isAllowedEnvironment);
 
@@ -385,7 +393,7 @@ class CleanUpJobServiceTest extends UnitBaseTest {
 
         String startedBefore = query.getString("startedBefore");
 
-        assertDoesNotThrow(() -> ZonedDateTime.parse(startedBefore, cleanUpJobService.formatter));
+        assertDoesNotThrow(() -> ZonedDateTime.parse(startedBefore, maintenanceCamundaTaskCleanUpJobService.formatter));
 
         JSONAssert.assertEquals(
             getExpectedQueryParameters(startedBefore),

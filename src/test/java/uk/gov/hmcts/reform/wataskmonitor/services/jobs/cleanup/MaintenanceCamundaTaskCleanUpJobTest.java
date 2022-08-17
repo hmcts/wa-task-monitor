@@ -24,16 +24,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-class CleanUpJobTest extends UnitBaseTest {
+class MaintenanceCamundaTaskCleanUpJobTest extends UnitBaseTest {
 
     public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN);
 
     @Mock
-    private CleanUpJobService cleanUpJobService;
+    private MaintenanceCamundaTaskCleanUpJobService maintenanceCamundaTaskCleanUpJobService;
 
     @InjectMocks
-    private CleanUpJob cleanUpJob;
+    private MaintenanceCamundaTaskCleanUpJob maintenanceCamundaTaskCleanUpJob;
 
     @ParameterizedTest(name = "jobName: {0} expected: {1}")
     @CsvSource({
@@ -41,11 +41,11 @@ class CleanUpJobTest extends UnitBaseTest {
         "INITIATION, false",
         "CONFIGURATION, false",
         "AD_HOC_DELETE_PROCESS_INSTANCES, false",
-        "TASK_CLEAN_UP, true",
+        "MAINTENANCE_CAMUNDA_TASK_CLEAN_UP, true",
     })
     void canRun(JobName jobName, boolean expectedResult) {
 
-        assertThat(cleanUpJob.canRun(jobName)).isEqualTo(expectedResult);
+        assertThat(maintenanceCamundaTaskCleanUpJob.canRun(jobName)).isEqualTo(expectedResult);
     }
 
     @Test
@@ -65,10 +65,10 @@ class CleanUpJobTest extends UnitBaseTest {
         );
         List<HistoricCamundaTask> taskList = singletonList(historicCamundaTask);
 
-        when(cleanUpJobService.isAllowedEnvironment())
+        when(maintenanceCamundaTaskCleanUpJobService.isAllowedEnvironment())
             .thenReturn(true);
 
-        when(cleanUpJobService.retrieveProcesses())
+        when(maintenanceCamundaTaskCleanUpJobService.retrieveProcesses())
             .thenReturn(taskList);
 
         GenericJobReport jobReport = new GenericJobReport(
@@ -81,30 +81,30 @@ class CleanUpJobTest extends UnitBaseTest {
                 .build())
         );
 
-        when(cleanUpJobService.deleteActiveProcesses(taskList, SOME_SERVICE_TOKEN))
+        when(maintenanceCamundaTaskCleanUpJobService.deleteActiveProcesses(taskList, SOME_SERVICE_TOKEN))
             .thenReturn(jobReport);
 
-        when(cleanUpJobService.deleteHistoricProcesses(taskList, SOME_SERVICE_TOKEN))
+        when(maintenanceCamundaTaskCleanUpJobService.deleteHistoricProcesses(taskList, SOME_SERVICE_TOKEN))
             .thenReturn(jobReport);
 
-        cleanUpJob.run(SOME_SERVICE_TOKEN);
+        maintenanceCamundaTaskCleanUpJob.run(SOME_SERVICE_TOKEN);
 
-        verify(cleanUpJobService).retrieveProcesses();
-        verify(cleanUpJobService).deleteActiveProcesses(taskList, SOME_SERVICE_TOKEN);
-        verify(cleanUpJobService).deleteHistoricProcesses(taskList, SOME_SERVICE_TOKEN);
+        verify(maintenanceCamundaTaskCleanUpJobService).retrieveProcesses();
+        verify(maintenanceCamundaTaskCleanUpJobService).deleteActiveProcesses(taskList, SOME_SERVICE_TOKEN);
+        verify(maintenanceCamundaTaskCleanUpJobService).deleteHistoricProcesses(taskList, SOME_SERVICE_TOKEN);
     }
 
     @Test
     void should_not_run_when_environment_is_prod() {
 
-        when(cleanUpJobService.isAllowedEnvironment())
+        when(maintenanceCamundaTaskCleanUpJobService.isAllowedEnvironment())
             .thenReturn(false);
 
-        cleanUpJob.run(SOME_SERVICE_TOKEN);
+        maintenanceCamundaTaskCleanUpJob.run(SOME_SERVICE_TOKEN);
 
-        verify(cleanUpJobService, times(1)).isAllowedEnvironment();
-        verify(cleanUpJobService, never()).retrieveProcesses();
-        verify(cleanUpJobService, never()).deleteActiveProcesses(any(), any());
-        verify(cleanUpJobService, never()).deleteHistoricProcesses(any(), any());
+        verify(maintenanceCamundaTaskCleanUpJobService, times(1)).isAllowedEnvironment();
+        verify(maintenanceCamundaTaskCleanUpJobService, never()).retrieveProcesses();
+        verify(maintenanceCamundaTaskCleanUpJobService, never()).deleteActiveProcesses(any(), any());
+        verify(maintenanceCamundaTaskCleanUpJobService, never()).deleteHistoricProcesses(any(), any());
     }
 }

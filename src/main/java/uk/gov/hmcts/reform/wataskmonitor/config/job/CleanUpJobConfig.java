@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-@ConfigurationProperties(prefix = "job.clean-up")
+@ConfigurationProperties(prefix = "job.maintenance-camunda-task-clean-up")
 @Getter
 @Setter
 @ToString
@@ -18,8 +18,8 @@ public class CleanUpJobConfig {
 
     @Value("${environment}")
     private String environment;
-    private String camundaMaxResults;
-    private Long startedBeforeDays;
+    private String cleanUpCamundaMaxResults;
+    private Long cleanUpStartedDaysBefore;
     private List<String> allowedEnvironment;
 
 }

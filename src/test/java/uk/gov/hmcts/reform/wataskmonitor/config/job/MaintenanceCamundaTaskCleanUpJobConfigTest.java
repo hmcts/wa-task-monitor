@@ -5,7 +5,7 @@ import pl.pojo.tester.api.assertion.Method;
 
 import static pl.pojo.tester.api.assertion.Assertions.assertPojoMethodsFor;
 
-class CleanUpJobConfigTest {
+class MaintenanceCamundaTaskCleanUpJobConfigTest {
 
     @Test
     void isWellImplemented() {
