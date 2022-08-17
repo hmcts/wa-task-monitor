@@ -53,8 +53,12 @@ public class InitiationTaskAttributesMapper {
         attributes.put(TASK_TYPE.value(), type);
         attributes.put(DUE_DATE.value(), CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getDue()));
         attributes.put(CREATED.value(), CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getCreated()));
-        attributes.put(ASSIGNEE.value(), camundaTask.getAssignee());
-        attributes.put(DESCRIPTION.value(), camundaTask.getDescription());
+        if (camundaTask.getAssignee() != null) {
+            attributes.put(ASSIGNEE.value(), camundaTask.getAssignee());
+        }
+        if (camundaTask.getDescription() != null) {
+            attributes.put(DESCRIPTION.value(), camundaTask.getDescription());
+        }
         attributes.put(TASK_NAME.value(), camundaTask.getName());
         variables.entrySet().stream()
             .filter(variable -> !variable.getKey().equals(DUE_DATE.value()))
