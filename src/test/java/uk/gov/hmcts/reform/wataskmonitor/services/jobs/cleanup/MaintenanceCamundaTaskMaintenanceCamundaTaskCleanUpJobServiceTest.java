@@ -40,6 +40,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -95,6 +96,17 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
     }
 
     @Test
+    void when_environment_is_prod_should_return_empty_generate_report_for_active_tasks() {
+        lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("prod");
+        GenericJobReport actualActiveTaskReport = maintenanceCamundaTaskCleanUpJobService
+            .deleteActiveProcesses(emptyList(), SOME_SERVICE_TOKEN);
+
+        GenericJobReport expectation = new GenericJobReport(0, emptyList());
+        assertEquals(expectation, actualActiveTaskReport);
+
+    }
+
+    @Test
     void should_retrieve_history_tasks(CapturedOutput output) throws JSONException {
         maintenanceCamundaTaskCleanUpJobService = new MaintenanceCamundaTaskCleanUpJobService(
             camundaClient,
@@ -125,6 +137,26 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
         assertThat(output.getOut().contains("cleanUpJobConfig:"));
         assertThat(output.getOut().contains("task(s) retrieved successfully from history"));
         assertQuery();
+
+    }
+
+    @Test
+    void should_return_empty_list_when_environment_is_prod(CapturedOutput output) throws JSONException {
+        maintenanceCamundaTaskCleanUpJobService = new MaintenanceCamundaTaskCleanUpJobService(
+            camundaClient,
+            cleanUpJobConfig
+        );
+
+        lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("prod");
+        lenient().when(cleanUpJobConfig.getAllowedEnvironment()).thenReturn(List.of("local", "aat", "prod"));
+
+        List<HistoricCamundaTask> actualTaskList = maintenanceCamundaTaskCleanUpJobService.retrieveProcesses();
+
+        verify(camundaClient, never())
+            .getHistoryProcesses(anyString(), any(), any());
+
+        assertEquals(emptyList(), actualTaskList);
+        assertThat(output.getOut().contains("is not enabled for this environment: prod"));
 
     }
 
@@ -276,6 +308,37 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
     }
 
     @Test
+    void should_not_delete_active_tasks_when_environment_is_prod() {
+        lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("prod");
+        lenient().when(cleanUpJobConfig.getAllowedEnvironment()).thenReturn(List.of("local", "aat", "prod"));
+
+        maintenanceCamundaTaskCleanUpJobService = new MaintenanceCamundaTaskCleanUpJobService(
+            camundaClient,
+            cleanUpJobConfig
+        );
+
+        HistoricCamundaTask camundaTask = new HistoricCamundaTask(
+            "ac365ec0-4220-412e-bd0c-4cc56e71f64e",
+            null,
+            null,
+            null
+        );
+
+        List<HistoricCamundaTask> tasks = singletonList(camundaTask);
+
+        GenericJobReport actualReport = maintenanceCamundaTaskCleanUpJobService
+            .deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
+
+        GenericJobReport expectedReport = new GenericJobReport(0, emptyList());
+
+        verify(camundaClient, never())
+            .deleteActiveProcesses(anyString(), any());
+
+        assertEquals(expectedReport, actualReport);
+
+    }
+
+    @Test
     void should_log_exception_when_an_error_occurred_in_delete_active_tasks(CapturedOutput output) {
 
         GenericJobReport expectedReport = new GenericJobReport(0, emptyList());
@@ -387,6 +450,17 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
 
     }
 
+    @Test
+    void should_return_false_even_if_allowed_environment_contains_prod() {
+
+        lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("prod");
+        lenient().when(cleanUpJobConfig.getAllowedEnvironment()).thenReturn(List.of("local", "aat", "prod"));
+
+        boolean actualIsAllowedEnvironment = maintenanceCamundaTaskCleanUpJobService.isAllowedEnvironment();
+
+        assertFalse(actualIsAllowedEnvironment);
+
+    }
 
     private void assertQuery() throws JSONException {
         JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
