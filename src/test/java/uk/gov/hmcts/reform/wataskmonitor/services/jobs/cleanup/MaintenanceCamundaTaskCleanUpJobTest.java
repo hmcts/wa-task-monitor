@@ -39,7 +39,6 @@ class MaintenanceCamundaTaskCleanUpJobTest extends UnitBaseTest {
     @CsvSource({
         "TERMINATION, false",
         "INITIATION, false",
-        "CONFIGURATION, false",
         "AD_HOC_DELETE_PROCESS_INSTANCES, false",
         "MAINTENANCE_CAMUNDA_TASK_CLEAN_UP, true",
     })
