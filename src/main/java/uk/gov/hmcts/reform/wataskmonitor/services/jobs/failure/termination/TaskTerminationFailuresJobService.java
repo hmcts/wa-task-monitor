@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_TERMINATION_FAILURES;
 import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_TASKS_TERMINATION_FAILURES;
@@ -34,30 +35,39 @@ public class TaskTerminationFailuresJobService {
     public void checkUnTerminatedTasks(String serviceToken) {
         log.info("{} terminationJobConfig: {}", TASK_TERMINATION_FAILURES.name(), terminationJobConfig.toString());
 
-        List<HistoricCamundaTask> camundaTasks = camundaClient.getTasksFromHistory(
-            serviceToken,
-            "0",
-            terminationJobConfig.getCamundaMaxResults(),
-            buildHistoricTasksPendingTerminationRequest()
-        );
+        if (terminationJobConfig.isCamundaTimeLimitFlag()) {
+            List<HistoricCamundaTask> camundaTasks = camundaClient.getTasksFromHistory(
+                serviceToken,
+                "0",
+                terminationJobConfig.getCamundaMaxResults(),
+                buildHistoricTasksPendingTerminationRequest()
+            );
 
-        log.info("{} {} task(s) retrieved successfully.", TASK_TERMINATION_FAILURES.name(), camundaTasks.size());
+            log.info("{} {} task(s) retrieved successfully.", TASK_TERMINATION_FAILURES.name(), camundaTasks.size());
 
-        if (camundaTasks.isEmpty()) {
-            log.info("{} There was no task", TASK_TERMINATION_FAILURES.name());
-        } else {
-            log.warn("{} There are some unterminated tasks", TASK_TERMINATION_FAILURES.name());
-
-            camundaTasks.forEach(task -> {
-                log.warn("{} -> taskId:{} deleteReason:{} startTime:{} endTime:{}",
-                    TASK_TERMINATION_FAILURES.name(),
-                    task.getId(),
-                    task.getDeleteReason(),
-                    task.getStartTime(),
-                    task.getEndTime()
+            if (camundaTasks.isEmpty()) {
+                log.info("{} There was no task", TASK_TERMINATION_FAILURES.name());
+            } else {
+                List<String> processIds = camundaTasks.stream().map(HistoricCamundaTask::getId)
+                    .collect(Collectors.toList());
+                log.warn("{} There are some unterminated tasks. Process Ids: {}",
+                         TASK_TERMINATION_FAILURES.name(),
+                         String.join(", ", processIds)
                 );
-            });
 
+                camundaTasks.forEach(task -> {
+                    log.warn("{} -> taskId:{} deleteReason:{} startTime:{} endTime:{}",
+                             TASK_TERMINATION_FAILURES.name(),
+                             task.getId(),
+                             task.getDeleteReason(),
+                             task.getStartTime(),
+                             task.getEndTime()
+                    );
+                });
+
+            }
+        } else {
+            log.info("{} Time limit flag is set to false", TASK_TERMINATION_FAILURES.name());
         }
 
     }
@@ -65,17 +75,12 @@ public class TaskTerminationFailuresJobService {
     private String buildHistoricTasksPendingTerminationRequest() {
         String query = ResourceUtility.getResource(CAMUNDA_TASKS_TERMINATION_FAILURES);
 
-        if (terminationJobConfig.isCamundaTimeLimitFlag()) {
-            ZonedDateTime endTime = ZonedDateTime.now()
-                .minusMinutes(terminationJobConfig.getCamundaTimeLimit());
-            String finishedBefore = endTime.format(formatter);
-            query = query
-                .replace("\"finishedBefore\": \"*\",", "\"finishedBefore\": \""
-                                                       + finishedBefore + "\",");
-        } else {
-            query = query
-                .replace("\"finishedBefore\": \"*\",", "");
-        }
+        ZonedDateTime endTime = ZonedDateTime.now()
+            .minusMinutes(terminationJobConfig.getCamundaTimeLimit());
+        String finishedBefore = endTime.format(formatter);
+        query = query
+            .replace("\"finishedBefore\": \"*\",", "\"finishedBefore\": \""
+                                                   + finishedBefore + "\",");
 
         log.info("{} build query : {}", TASK_TERMINATION_FAILURES.name(), LoggingUtility.logPrettyPrint(query));
         return query;

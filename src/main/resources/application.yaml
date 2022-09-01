@@ -104,8 +104,18 @@ job:
     camunda-time-limit-flag: ${TERMINATION_TIME_LIMIT_FLAG:true}
     #number of minutes
     camunda-time-limit: ${TERMINATION_TIME_LIMIT:120}
+  maintenance-camunda-task-clean-up:
+    allowed-environment: local, aat
+    clean-up-camunda-max-results: ${CLEAN_UP_CAMUNDA_MAX_RESULTS:1000}
+    #number of days before today
+    clean-up-started-days-before: ${CLEAN_UP_STARTED_DAYS_BEFORE:7}
   pendingtermination:
     camunda-max-results: ${PENDING_TERMINATION_CAMUNDA_MAX_RESULTS:1}
+  reconfiguration:
+    reconfigure_request_time_hours: ${RECONFIGURE_REQUEST_TIME_HOURS:2}
+    reconfiguration_max_time_limit_seconds: ${RECONFIGURATION_MAX_TIME_LIMIT_SECONDS:120}
 
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}
+
+environment: ${REFORM_ENVIRONMENT:local}

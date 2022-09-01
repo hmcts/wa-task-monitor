@@ -7,8 +7,6 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -30,6 +28,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
@@ -53,7 +53,7 @@ class TaskTerminationFailuresJobServiceTest extends UnitBaseTest {
             camundaClient,
             terminationJobConfig
         );
-        when(terminationJobConfig.getCamundaMaxResults()).thenReturn("100");
+        lenient().when(terminationJobConfig.getCamundaMaxResults()).thenReturn("100");
         lenient().when(terminationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
         lenient().when(terminationJobConfig.getCamundaTimeLimit()).thenReturn(120L);
     }
@@ -75,14 +75,13 @@ class TaskTerminationFailuresJobServiceTest extends UnitBaseTest {
             .hasNoCause();
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void should_succeed_when_no_tasks_returned(boolean timeFlag) throws JSONException {
+    @Test
+    void should_succeed_when_no_tasks_returned() throws JSONException {
         taskTerminationFailuresJobService = new TaskTerminationFailuresJobService(
             camundaClient,
             terminationJobConfig
         );
-        lenient().when(terminationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeFlag);
+        lenient().when(terminationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
 
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
@@ -93,13 +92,12 @@ class TaskTerminationFailuresJobServiceTest extends UnitBaseTest {
 
         taskTerminationFailuresJobService.checkUnTerminatedTasks(SOME_SERVICE_TOKEN);
 
-        assertQuery(timeFlag);
+        assertQuery();
 
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void should_fetch_tasks(boolean timeFlag) throws JSONException {
+    @Test
+    void should_fetch_tasks() throws JSONException {
         taskTerminationFailuresJobService = new TaskTerminationFailuresJobService(
             camundaClient,
             terminationJobConfig
@@ -120,8 +118,22 @@ class TaskTerminationFailuresJobServiceTest extends UnitBaseTest {
 
         taskTerminationFailuresJobService.checkUnTerminatedTasks(SOME_SERVICE_TOKEN);
 
-        assertQuery(timeFlag);
+        assertQuery();
 
+    }
+
+    @Test
+    void should_not_create_alert_if_time_limit_flag_is_false() {
+        taskTerminationFailuresJobService = new TaskTerminationFailuresJobService(
+            camundaClient,
+            terminationJobConfig
+        );
+
+        lenient().when(terminationJobConfig.isCamundaTimeLimitFlag()).thenReturn(false);
+
+        taskTerminationFailuresJobService.checkUnTerminatedTasks(SOME_SERVICE_TOKEN);
+
+        verify(camundaClient, never()).getTasksFromHistory(any(), any(), any(), any());
     }
 
     @Test
@@ -171,22 +183,14 @@ class TaskTerminationFailuresJobServiceTest extends UnitBaseTest {
         assertThat(output.getOut().contains("TASK_TERMINATION_FAILURES There are some unterminated tasks"));
     }
 
-    private void assertQuery(boolean timeFlag) throws JSONException {
+    private void assertQuery() throws JSONException {
         JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
-        if (timeFlag) {
-            String finishedBefore = query.getString("finishedBefore");
-            JSONAssert.assertEquals(
-                getExpectedQueryParameters(finishedBefore),
-                actualQueryParametersCaptor.getValue(),
-                JSONCompareMode.LENIENT
-            );
-        } else {
-            JSONAssert.assertEquals(
-                getExpectedQueryParameters(),
-                actualQueryParametersCaptor.getValue(),
-                JSONCompareMode.LENIENT
-            );
-        }
+        String finishedBefore = query.getString("finishedBefore");
+        JSONAssert.assertEquals(
+            getExpectedQueryParameters(finishedBefore),
+            actualQueryParametersCaptor.getValue(),
+            JSONCompareMode.LENIENT
+        );
     }
 
     @NotNull

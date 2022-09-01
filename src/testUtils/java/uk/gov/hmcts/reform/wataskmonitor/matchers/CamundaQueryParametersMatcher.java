@@ -10,10 +10,9 @@ import org.mockito.ArgumentMatcher;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.configuration.ConfigurationJobService.CAMUNDA_DATE_REQUEST_PATTERN;
-
 @Slf4j
 public class CamundaQueryParametersMatcher implements ArgumentMatcher<String> {
+    public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private final String expectedCamundaQueryParameters;
 
     public CamundaQueryParametersMatcher(String expectedCamundaQueryParameters) {

@@ -1,0 +1,9 @@
+{
+  "deleteReason": "clean up running process instances",
+  "historicProcessInstanceIds": [
+    "PROCESS_INSTANCE_ID_PLACEHOLDER"
+  ],
+  "skipCustomListeners": true,
+  "skipSubprocesses": true,
+  "failIfNotExists": false
+}

@@ -25,7 +25,6 @@ class DeleteProcessInstancesJobTest extends UnitBaseTest {
     @CsvSource({
         "TERMINATION, false",
         "INITIATION, false",
-        "CONFIGURATION, false",
         "AD_HOC_DELETE_PROCESS_INSTANCES, true"
     })
     void canRun(JobName jobName, boolean expectedResult) {
