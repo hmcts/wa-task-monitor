@@ -27,7 +27,7 @@ public interface TaskManagementClient {
                        @PathVariable("task-id") String taskId,
                        @RequestBody TerminateTaskRequest body);
 
-    @PostMapping(value = "/task/{task-id}/new",
+    @PostMapping(value = "/task/{task-id}/initiation",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
