@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVari
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.LOCATION;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.LOCATION_NAME;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.REGION;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.ROLE_ASSIGNMENT_ID;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.SECURITY_CLASSIFICATION;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.TASK_ID;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.TASK_STATE;
@@ -71,12 +72,16 @@ public class InitiationTaskAttributesMapper {
         }
 
         CFTTaskState taskState = extractTaskState(variables);
-        String executionTypeName = getVariableValue(variables.get(EXECUTION_TYPE.value()),
+        String executionTypeName = getVariableValue(
+            variables.get(EXECUTION_TYPE.value()),
             String.class,
-            null);
-        String securityClassification = getVariableValue(variables.get(SECURITY_CLASSIFICATION.value()),
+            null
+        );
+        String securityClassification = getVariableValue(
+            variables.get(SECURITY_CLASSIFICATION.value()),
             String.class,
-            null);
+            null
+        );
         String taskTitle = getVariableValue(variables.get(TITLE.value()), String.class, null);
 
         boolean autoAssigned = getVariableValue(variables.get(AUTO_ASSIGNED.value()), Boolean.class, false);
@@ -90,9 +95,12 @@ public class InitiationTaskAttributesMapper {
         String caseName = getVariableValue(variables.get(CASE_NAME.value()), String.class, null);
         Boolean hasWarnings = getVariableValue(variables.get(HAS_WARNINGS.value()), Boolean.class, null);
         String warningList = getVariableValue(variables.get(WARNING_LIST.value()), String.class, null);
-        String caseManagementCategory = getVariableValue(variables.get(CASE_MANAGEMENT_CATEGORY.value()),
+        String caseManagementCategory = getVariableValue(
+            variables.get(CASE_MANAGEMENT_CATEGORY.value()),
             String.class,
-            null);
+            null
+        );
+        String roleAssignmentId = getVariableValue(variables.get(ROLE_ASSIGNMENT_ID.value()), String.class, null);
 
         return asList(
             new TaskAttribute(TaskAttributeDefinition.TASK_ASSIGNEE, assignee),
@@ -117,6 +125,7 @@ public class InitiationTaskAttributesMapper {
             new TaskAttribute(TaskAttributeDefinition.TASK_SYSTEM, taskSystem),
             new TaskAttribute(TaskAttributeDefinition.TASK_TITLE, taskTitle),
             new TaskAttribute(TaskAttributeDefinition.TASK_TYPE, type),
+            new TaskAttribute(TaskAttributeDefinition.TASK_ROLE_ASSIGNMENT_ID, roleAssignmentId),
             //Unmapped
             new TaskAttribute(TaskAttributeDefinition.TASK_ASSIGNMENT_EXPIRY, null),
             new TaskAttribute(TaskAttributeDefinition.TASK_BUSINESS_CONTEXT, null),
