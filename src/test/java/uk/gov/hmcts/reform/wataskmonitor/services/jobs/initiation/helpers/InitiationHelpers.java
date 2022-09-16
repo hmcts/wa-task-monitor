@@ -65,7 +65,6 @@ public final class InitiationHelpers {
         variables.put("hasWarnings", new CamundaVariable("true", "Boolean"));
         variables.put("warningList", new CamundaVariable("SomeWarningListValue", "String"));
         variables.put("taskType", new CamundaVariable("someTaskType", "String"));
-        variables.put("roleAssignmentId", new CamundaVariable("someRoleAssignmentId", "String"));
         return variables;
     }
 
