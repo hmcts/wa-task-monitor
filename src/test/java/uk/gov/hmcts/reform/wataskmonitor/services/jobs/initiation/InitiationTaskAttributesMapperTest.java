@@ -125,7 +125,6 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
             new TaskAttribute(TaskAttributeDefinition.TASK_STATE, CFTTaskState.UNCONFIGURED),
             new TaskAttribute(TaskAttributeDefinition.TASK_SYSTEM, "someTaskSystem"),
             new TaskAttribute(TaskAttributeDefinition.TASK_TITLE, "someTitle"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_ROLE_ASSIGNMENT_ID, "someRoleAssignmentId"),
             //Unmapped
             new TaskAttribute(TaskAttributeDefinition.TASK_ASSIGNMENT_EXPIRY, null),
             new TaskAttribute(TaskAttributeDefinition.TASK_BUSINESS_CONTEXT, null),

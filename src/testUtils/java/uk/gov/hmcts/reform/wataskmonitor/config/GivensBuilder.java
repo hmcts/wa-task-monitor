@@ -295,7 +295,6 @@ public class GivensBuilder {
             //.withProcessVariable("warningList", (new WarningValues()).toString())
             .withProcessVariable("caseManagementCategory", "Protection")
             .withProcessVariable("description", "aDescription")
-            .withProcessVariable("roleAssignmentId", "aRoleAssignmentId")
             .build();
 
         return processVariables.getProcessVariablesMap();
