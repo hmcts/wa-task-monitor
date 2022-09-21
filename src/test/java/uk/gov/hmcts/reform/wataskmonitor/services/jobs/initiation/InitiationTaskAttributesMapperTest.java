@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.CFT
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -126,13 +125,9 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
         attributes.put(CamundaVariableDefinition.TASK_SYSTEM.value(), "someTaskSystem");
         attributes.put(CamundaVariableDefinition.TITLE.value(), "someTitle");
         attributes.put(CamundaVariableDefinition.APPEAL_TYPE.value(), "someAppealType");
+        attributes.put(CamundaVariableDefinition.ROLE_ASSIGNMENT_ID.value(), "someRoleAssignmentId");
 
         return attributes;
 
-    }
-
-    private Map<String, Boolean> areEqualKeyValues(Map<String, Object> first, Map<String, Object> second) {
-        return first.entrySet().stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().equals(second.get(e.getKey()))));
     }
 }

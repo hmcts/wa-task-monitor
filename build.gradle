@@ -308,6 +308,9 @@ ext.libraries = [
   ]
 ]
 
+//https://nvd.nist.gov/vuln/detail/CVE-2022-25857
+ext['snakeyaml.version'] = '1.31'
+
 dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
@@ -325,7 +328,6 @@ dependencies {
   implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: versions.springDoc
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
 
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '3.1.2'
   implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '4.7.5'

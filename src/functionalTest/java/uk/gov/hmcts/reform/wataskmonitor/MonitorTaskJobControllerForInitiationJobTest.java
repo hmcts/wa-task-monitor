@@ -118,6 +118,10 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
         common.setupCftOrganisationalRoleAssignment(caseworkerCredentials.getHeaders());
 
+        initiateTask(caseworkerCredentials.getHeaders(), defaultTaskVariables,
+            "followUpOverdueReasonsForAppeal", "task name", "task title"
+        );
+
         common.setupOrganisationalRoleAssignmentWithCustomAttributes(
             caseworkerCredentials.getHeaders(),
             Map.of(
@@ -133,7 +137,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         caseIds.add(defaultTaskVariables.getCaseId());
 
         TestVariables delayedTaskVariables = common.setupDelayedTaskAndRetrieveIds();
-
+        
         assertNotNull(delayedTaskVariables);
         assertNotNull(delayedTaskVariables.getCaseId());
         assertNotNull(delayedTaskVariables.getTaskId());

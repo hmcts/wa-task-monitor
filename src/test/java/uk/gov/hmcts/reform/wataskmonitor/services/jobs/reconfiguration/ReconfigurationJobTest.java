@@ -23,7 +23,6 @@ class ReconfigurationJobTest extends UnitBaseTest {
     @CsvSource({
         "TERMINATION, false",
         "INITIATION, false",
-        "CONFIGURATION, false",
         "RECONFIGURATION, true",
         "AD_HOC_DELETE_PROCESS_INSTANCES, false"
     })

@@ -42,29 +42,35 @@ public class TaskInitiationFailuresJobService {
 
     public GenericJobReport getInitiationFailures(String serviceToken) {
         log.info("{} initiationJobConfig: {}", TASK_INITIATION_FAILURES.name(), initiationJobConfig.toString());
-        List<CamundaTask> camundaTasks = camundaClient.getTasks(
-            serviceToken,
-            "0",
-            initiationJobConfig.getCamundaMaxResults(),
-            buildSearchQuery()
-        );
 
-        log.info("{} {} task(s) retrieved successfully.",
-            TASK_INITIATION_FAILURES.name(), camundaTasks.size());
-
-        if (camundaTasks.isEmpty()) {
-            log.info("{} There was no task", TASK_INITIATION_FAILURES.name());
-            return new GenericJobReport(0, emptyList());
-        } else {
-            List<String> taskIds = camundaTasks.stream().map(CamundaTask::getId).collect(Collectors.toList());
-            log.warn("{} There are some uninitiated tasks. Task Ids: {}",
-                TASK_INITIATION_FAILURES.name(),
-                String.join(", ", taskIds)
+        if (initiationJobConfig.isCamundaTimeLimitFlag()) {
+            List<CamundaTask> camundaTasks = camundaClient.getTasks(
+                serviceToken,
+                "0",
+                initiationJobConfig.getCamundaMaxResults(),
+                buildSearchQuery()
             );
-            List<GenericJobOutcome> outcomesList = prepareInitiationFailureReport(camundaTasks, serviceToken);
-            return new GenericJobReport(camundaTasks.size(), outcomesList);
-        }
 
+            log.info("{} {} task(s) retrieved successfully.",
+                     TASK_INITIATION_FAILURES.name(), camundaTasks.size()
+            );
+
+            if (camundaTasks.isEmpty()) {
+                log.info("{} There was no task", TASK_INITIATION_FAILURES.name());
+                return new GenericJobReport(0, emptyList());
+            } else {
+                List<String> taskIds = camundaTasks.stream().map(CamundaTask::getId).collect(Collectors.toList());
+                log.warn("{} There are some uninitiated tasks. Task Ids: {}",
+                         TASK_INITIATION_FAILURES.name(),
+                         String.join(", ", taskIds)
+                );
+                List<GenericJobOutcome> outcomesList = prepareInitiationFailureReport(camundaTasks, serviceToken);
+                return new GenericJobReport(camundaTasks.size(), outcomesList);
+            }
+        } else {
+            log.info("{} Time limit flag is set to false", TASK_INITIATION_FAILURES.name());
+            return new GenericJobReport(0, emptyList());
+        }
     }
 
     private List<GenericJobOutcome> prepareInitiationFailureReport(List<CamundaTask> camundaTasks,
@@ -114,20 +120,15 @@ public class TaskInitiationFailuresJobService {
         query = query
             .replace("\"createdAfter\": \"*\",", "");
 
-        if (initiationJobConfig.isCamundaTimeLimitFlag()) {
-            ZonedDateTime createdTime = ZonedDateTime.now()
-                .minusMinutes(initiationJobConfig.getCamundaTimeLimit());
+        ZonedDateTime createdTime = ZonedDateTime.now()
+            .minusMinutes(initiationJobConfig.getCamundaTimeLimit());
 
-            String createdBefore = createdTime.format(formatter);
+        String createdBefore = createdTime.format(formatter);
 
-            query = query
-                .replace(
-                    "\"createdBefore\": \"*\",", "\"createdBefore\": \"" + createdBefore + "\","
-                );
-        } else {
-            query = query
-                .replace("\"createdBefore\": \"*\",", "");
-        }
+        query = query
+            .replace(
+                "\"createdBefore\": \"*\",", "\"createdBefore\": \"" + createdBefore + "\","
+            );
 
         log.info("{} build query : {}", TASK_INITIATION_FAILURES.name(), LoggingUtility.logPrettyPrint(query));
         return query;
