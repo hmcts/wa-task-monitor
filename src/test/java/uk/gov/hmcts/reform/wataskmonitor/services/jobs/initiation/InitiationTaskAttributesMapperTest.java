@@ -57,7 +57,9 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
         CamundaTask camundaTask = createMockedCamundaTask(createdDate, dueDate);
 
         Map<String, Object> actual = initiationTaskAttributesMapper.mapTaskAttributes(camundaTask, variables);
-        Map<String, Object> expected = getExpectedTaskAttributes(createdDate, dueDate);
+        Map<String, Object> expected = getExpectedTaskAttributes(createdDate, dueDate,
+                                                                 "someAssignee",
+                                                                 "someCamundaTaskDescription");
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -70,13 +72,23 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
         ZonedDateTime createdDate = ZonedDateTime.now();
         ZonedDateTime dueDate = createdDate.plusDays(1);
 
-        CamundaTask camundaTask = createMockedCamundaTask(createdDate, dueDate);
+        CamundaTask camundaTask = new CamundaTask(
+            "someCamundaTaskId",
+            "someCamundaTaskName",
+            "someProcessInstanceId",
+            "",
+            createdDate,
+            dueDate,
+            "",
+            "someCamundaTaskOwner",
+            "someCamundaTaskFormKey"
+        );
 
         Map<String, Object> actual = initiationTaskAttributesMapper.mapTaskAttributes(
             camundaTask,
             camundaVariablesWithNoTaskType
         );
-        Map<String, Object> expected = getExpectedTaskAttributes(createdDate, dueDate, "someTaskId");
+        Map<String, Object> expected = getExpectedTaskAttributes(createdDate, dueDate, "someTaskId", "", "");
         expected.put("taskId", "someTaskId");
         assertThat(actual).isEqualTo(expected);
     }
@@ -84,25 +96,33 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
 
     private Map<String, Object> getExpectedTaskAttributes(ZonedDateTime createdDate,
                                                           ZonedDateTime dueDate,
-                                                          String customTaskType) {
+                                                          String customTaskType,
+                                                          String assignee,
+                                                          String description) {
 
-        Map<String, Object> attributes = new HashMap<>(getExpectedBaseTaskAttributes(createdDate, dueDate));
+        Map<String, Object> attributes
+            = new HashMap<>(getExpectedBaseTaskAttributes(createdDate, dueDate, assignee, description));
         attributes.put(CamundaVariableDefinition.TASK_TYPE.value(), customTaskType);
 
         return attributes;
     }
 
-    private Map<String, Object> getExpectedTaskAttributes(ZonedDateTime createdDate, ZonedDateTime dueDate) {
-        Map<String, Object> attributes = new HashMap<>(getExpectedBaseTaskAttributes(createdDate, dueDate));
+    private Map<String, Object> getExpectedTaskAttributes(ZonedDateTime createdDate, ZonedDateTime dueDate,
+                                                          String assignee, String description) {
+        Map<String, Object> attributes
+            = new HashMap<>(getExpectedBaseTaskAttributes(createdDate, dueDate, assignee, description));
         attributes.put(CamundaVariableDefinition.TASK_TYPE.value(), "someTaskType");
 
         return attributes;
     }
 
-    private Map<String, Object> getExpectedBaseTaskAttributes(ZonedDateTime createdDate, ZonedDateTime dueDate) {
+    private Map<String, Object> getExpectedBaseTaskAttributes(ZonedDateTime createdDate,
+                                                              ZonedDateTime dueDate,
+                                                              String assignee,
+                                                              String taskDescription) {
         Map<String, Object> attributes = new HashMap<>();
 
-        attributes.put(CamundaVariableDefinition.ASSIGNEE.value(), "someAssignee");
+        attributes.put(CamundaVariableDefinition.ASSIGNEE.value(), assignee);
         attributes.put(CamundaVariableDefinition.AUTO_ASSIGNED.value(), false);
         attributes.put(CamundaVariableDefinition.CASE_MANAGEMENT_CATEGORY.value(), "someCaseCategory");
         attributes.put(CamundaVariableDefinition.CASE_ID.value(), "00000");
@@ -110,7 +130,7 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
         attributes.put(CamundaVariableDefinition.CASE_TYPE_ID.value(), "someCaseType");
         attributes.put(CamundaVariableDefinition.CREATED.value(), CAMUNDA_DATA_TIME_FORMATTER.format(createdDate));
         attributes.put(CamundaVariableDefinition.DUE_DATE.value(), CAMUNDA_DATA_TIME_FORMATTER.format(dueDate));
-        attributes.put(CamundaVariableDefinition.DESCRIPTION.value(), "someCamundaTaskDescription");
+        attributes.put(CamundaVariableDefinition.DESCRIPTION.value(), taskDescription);
         attributes.put(CamundaVariableDefinition.EXECUTION_TYPE.value(), "someExecutionType");
         attributes.put(CamundaVariableDefinition.HAS_WARNINGS.value(), true);
         attributes.put(CamundaVariableDefinition.JURISDICTION.value(), "someJurisdiction");
