@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.CFT
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,10 +77,10 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
             "someCamundaTaskId",
             "someCamundaTaskName",
             "someProcessInstanceId",
-            "",
+            null,
             createdDate,
             dueDate,
-            "",
+            null,
             "someCamundaTaskOwner",
             "someCamundaTaskFormKey"
         );
@@ -88,7 +89,7 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
             camundaTask,
             camundaVariablesWithNoTaskType
         );
-        Map<String, Object> expected = getExpectedTaskAttributes(createdDate, dueDate, "someTaskId", "", "");
+        Map<String, Object> expected = getExpectedTaskAttributes(createdDate, dueDate, "someTaskId", null, null);
         expected.put("taskId", "someTaskId");
         assertThat(actual).isEqualTo(expected);
     }
@@ -122,7 +123,8 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
                                                               String taskDescription) {
         Map<String, Object> attributes = new HashMap<>();
 
-        attributes.put(CamundaVariableDefinition.ASSIGNEE.value(), assignee);
+        Optional.ofNullable(assignee).ifPresent(i -> attributes.put(CamundaVariableDefinition.ASSIGNEE.value(), i));
+
         attributes.put(CamundaVariableDefinition.AUTO_ASSIGNED.value(), false);
         attributes.put(CamundaVariableDefinition.CASE_MANAGEMENT_CATEGORY.value(), "someCaseCategory");
         attributes.put(CamundaVariableDefinition.CASE_ID.value(), "00000");
@@ -130,7 +132,9 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
         attributes.put(CamundaVariableDefinition.CASE_TYPE_ID.value(), "someCaseType");
         attributes.put(CamundaVariableDefinition.CREATED.value(), CAMUNDA_DATA_TIME_FORMATTER.format(createdDate));
         attributes.put(CamundaVariableDefinition.DUE_DATE.value(), CAMUNDA_DATA_TIME_FORMATTER.format(dueDate));
-        attributes.put(CamundaVariableDefinition.DESCRIPTION.value(), taskDescription);
+        Optional.ofNullable(taskDescription)
+            .ifPresent(i -> attributes.put(CamundaVariableDefinition.DESCRIPTION.value(), i));
+
         attributes.put(CamundaVariableDefinition.EXECUTION_TYPE.value(), "someExecutionType");
         attributes.put(CamundaVariableDefinition.HAS_WARNINGS.value(), true);
         attributes.put(CamundaVariableDefinition.JURISDICTION.value(), "someJurisdiction");
