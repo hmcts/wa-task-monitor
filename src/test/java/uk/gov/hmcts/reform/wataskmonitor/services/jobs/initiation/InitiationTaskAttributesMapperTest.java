@@ -114,7 +114,7 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
         attributes.put(CamundaVariableDefinition.EXECUTION_TYPE.value(), "someExecutionType");
         attributes.put(CamundaVariableDefinition.HAS_WARNINGS.value(), true);
         attributes.put(CamundaVariableDefinition.JURISDICTION.value(), "someJurisdiction");
-        attributes.put(CamundaVariableDefinition.LOCATION.value(), "someStaffLocationId");
+        attributes.put(CamundaVariableDefinition.LOCATION.value(), 1234);
         attributes.put(CamundaVariableDefinition.LOCATION_NAME.value(), "someStaffLocationName");
         attributes.put(CamundaVariableDefinition.TASK_NAME.value(), "someCamundaTaskName");
         attributes.put(CamundaVariableDefinition.WARNING_LIST.value(), "SomeWarningListValue");
@@ -126,6 +126,7 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
         attributes.put(CamundaVariableDefinition.TITLE.value(), "someTitle");
         attributes.put(CamundaVariableDefinition.APPEAL_TYPE.value(), "someAppealType");
         attributes.put(CamundaVariableDefinition.ROLE_ASSIGNMENT_ID.value(), "someRoleAssignmentId");
+        attributes.put("newVariable", "someNewVariable");
 
         return attributes;
 

@@ -50,7 +50,7 @@ public final class InitiationHelpers {
         variables.put("caseTypeId", new CamundaVariable("someCaseType", "String"));
         variables.put("taskState", new CamundaVariable("unconfigured", "String"));
         variables.put("cftTaskState", new CamundaVariable("unconfigured", "String"));
-        variables.put("location", new CamundaVariable("someStaffLocationId", "String"));
+        variables.put("location", new CamundaVariable(1234, "Integer"));
         variables.put("locationName", new CamundaVariable("someStaffLocationName", "String"));
         variables.put("securityClassification", new CamundaVariable("SC", "String"));
         variables.put("title", new CamundaVariable("someTitle", "String"));
@@ -65,6 +65,7 @@ public final class InitiationHelpers {
         variables.put("hasWarnings", new CamundaVariable("true", "Boolean"));
         variables.put("warningList", new CamundaVariable("SomeWarningListValue", "String"));
         variables.put("taskType", new CamundaVariable("someTaskType", "String"));
+        variables.put("newVariable", new CamundaVariable("someNewVariable", "someType"));
         variables.put("roleAssignmentId", new CamundaVariable("someRoleAssignmentId", "String"));
         return variables;
     }
