@@ -25,3 +25,4 @@ lombok.config
 .DS_Store
 /target/site/serenity/
 /pacts/
+Fortify Scan/
