@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.InitiateTaskRequest;
-import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskAttribute;
 import uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
@@ -84,10 +83,8 @@ public class InitiationJobService {
                     serviceToken,
                     task.getId()
                 );
-                List<TaskAttribute> taskAttributes = initiationTaskAttributesMapper.mapTaskAttributes(
-                    task,
-                    variables
-                );
+
+                Map<String, Object> taskAttributes = initiationTaskAttributesMapper.mapTaskAttributes(task, variables);
                 log.debug("-> Initiating task with id: '{}'", task.getId());
                 taskManagementClient.initiateTask(
                     serviceToken,
@@ -97,10 +94,12 @@ public class InitiationJobService {
                 log.info("Task with id: '{}' initiated successfully.", task.getId());
                 outcomeList.add(buildJobOutcome(task, true));
             } catch (Exception e) {
-                log.error("Error while initiating taskId({}) and processId({})",
+                log.error(
+                    "Error while initiating taskId({}) and processId({})",
                     task.getId(),
                     task.getProcessInstanceId(),
-                    e);
+                    e
+                );
                 outcomeList.add(buildJobOutcome(task, false));
             }
         });
@@ -120,7 +119,7 @@ public class InitiationJobService {
         String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED);
         query = query
             .replace("\"createdBefore\": \"*\",", "");
-        
+
         if (initiationJobConfig.isCamundaTimeLimitFlag()) {
             ZonedDateTime createdTime = ZonedDateTime.now()
                 .minusMinutes(initiationJobConfig.getCamundaTimeLimit());

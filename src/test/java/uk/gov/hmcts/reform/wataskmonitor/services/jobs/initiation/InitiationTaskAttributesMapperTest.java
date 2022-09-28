@@ -11,17 +11,15 @@ import org.mockito.InjectMocks;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
-import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskAttribute;
+import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.CFTTaskState;
-import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TaskAttributeDefinition;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUNDA_DATA_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.InitiationHelpers.createMockCamundaVariables;
@@ -37,7 +35,7 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
         Map<String, CamundaVariable> camundaVariables = createMockCamundaVariables();
 
         Map<String, CamundaVariable> camundaVariablesWithNoAutoAssigned = createMockCamundaVariables();
-        camundaVariablesWithNoAutoAssigned.remove("autoAssigned");
+        camundaVariablesWithNoAutoAssigned.put("autoAssigned", new CamundaVariable("false", "Boolean"));
 
         return Stream.of(
             Arguments.of("all vars are present", camundaVariables),
@@ -59,10 +57,12 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
 
         CamundaTask camundaTask = createMockedCamundaTask(createdDate, dueDate);
 
-        List<TaskAttribute> actual = initiationTaskAttributesMapper.mapTaskAttributes(camundaTask, variables);
-        List<TaskAttribute> expected = getExpectedTaskAttributes(createdDate, dueDate);
+        Map<String, Object> actual = initiationTaskAttributesMapper.mapTaskAttributes(camundaTask, variables);
+        Map<String, Object> expected = getExpectedTaskAttributes(createdDate, dueDate,
+                                                                 "someAssignee",
+                                                                 "someCamundaTaskDescription");
 
-        assertThat(actual).hasSameElementsAs(expected);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -73,71 +73,86 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
         ZonedDateTime createdDate = ZonedDateTime.now();
         ZonedDateTime dueDate = createdDate.plusDays(1);
 
-        CamundaTask camundaTask = createMockedCamundaTask(createdDate, dueDate);
+        CamundaTask camundaTask = new CamundaTask(
+            "someCamundaTaskId",
+            "someCamundaTaskName",
+            "someProcessInstanceId",
+            null,
+            createdDate,
+            dueDate,
+            null,
+            "someCamundaTaskOwner",
+            "someCamundaTaskFormKey"
+        );
 
-        List<TaskAttribute> actual = initiationTaskAttributesMapper.mapTaskAttributes(
+        Map<String, Object> actual = initiationTaskAttributesMapper.mapTaskAttributes(
             camundaTask,
             camundaVariablesWithNoTaskType
         );
-        List<TaskAttribute> expected = getExpectedTaskAttributes(createdDate, dueDate, "someTaskId");
-        assertThat(actual).hasSameElementsAs(expected);
+        Map<String, Object> expected = getExpectedTaskAttributes(createdDate, dueDate, "someTaskId", null, null);
+        expected.put("taskId", "someTaskId");
+        assertThat(actual).isEqualTo(expected);
     }
 
 
-    private List<TaskAttribute> getExpectedTaskAttributes(ZonedDateTime createdDate,
+    private Map<String, Object> getExpectedTaskAttributes(ZonedDateTime createdDate,
                                                           ZonedDateTime dueDate,
-                                                          String customTaskType) {
+                                                          String customTaskType,
+                                                          String assignee,
+                                                          String description) {
 
-        List<TaskAttribute> attributes = new ArrayList<>(getExpectedBaseTaskAttributes(createdDate, dueDate));
-        attributes.add(new TaskAttribute(TaskAttributeDefinition.TASK_TYPE, customTaskType));
-
-        return attributes;
-    }
-
-    private List<TaskAttribute> getExpectedTaskAttributes(ZonedDateTime createdDate, ZonedDateTime dueDate) {
-        List<TaskAttribute> attributes = new ArrayList<>(getExpectedBaseTaskAttributes(createdDate, dueDate));
-        attributes.add(new TaskAttribute(TaskAttributeDefinition.TASK_TYPE, "someTaskType"));
+        Map<String, Object> attributes
+            = new HashMap<>(getExpectedBaseTaskAttributes(createdDate, dueDate, assignee, description));
+        attributes.put(CamundaVariableDefinition.TASK_TYPE.value(), customTaskType);
 
         return attributes;
     }
 
-    private List<TaskAttribute> getExpectedBaseTaskAttributes(ZonedDateTime createdDate, ZonedDateTime dueDate) {
+    private Map<String, Object> getExpectedTaskAttributes(ZonedDateTime createdDate, ZonedDateTime dueDate,
+                                                          String assignee, String description) {
+        Map<String, Object> attributes
+            = new HashMap<>(getExpectedBaseTaskAttributes(createdDate, dueDate, assignee, description));
+        attributes.put(CamundaVariableDefinition.TASK_TYPE.value(), "someTaskType");
 
-        return asList(
-            new TaskAttribute(TaskAttributeDefinition.TASK_ASSIGNEE, "someAssignee"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_AUTO_ASSIGNED, false),
-            new TaskAttribute(TaskAttributeDefinition.TASK_CASE_CATEGORY, "someCaseCategory"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_CASE_ID, "00000"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_CASE_NAME, "someCaseName"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_CASE_TYPE_ID, "someCaseType"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_CREATED, CAMUNDA_DATA_TIME_FORMATTER.format(createdDate)),
-            new TaskAttribute(TaskAttributeDefinition.TASK_DUE_DATE, CAMUNDA_DATA_TIME_FORMATTER.format(dueDate)),
-            new TaskAttribute(TaskAttributeDefinition.TASK_DESCRIPTION, "someCamundaTaskDescription"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_EXECUTION_TYPE_NAME, "someExecutionType"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_HAS_WARNINGS, true),
-            new TaskAttribute(TaskAttributeDefinition.TASK_JURISDICTION, "someJurisdiction"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_LOCATION, "someStaffLocationId"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_LOCATION_NAME, "someStaffLocationName"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_NAME, "someCamundaTaskName"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_WARNINGS, "SomeWarningListValue"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_REGION, "someRegion"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_SECURITY_CLASSIFICATION, "SC"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_STATE, CFTTaskState.UNCONFIGURED),
-            new TaskAttribute(TaskAttributeDefinition.TASK_SYSTEM, "someTaskSystem"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_TITLE, "someTitle"),
-            new TaskAttribute(TaskAttributeDefinition.TASK_ROLE_ASSIGNMENT_ID, "someRoleAssignmentId"),
-            //Unmapped
-            new TaskAttribute(TaskAttributeDefinition.TASK_ASSIGNMENT_EXPIRY, null),
-            new TaskAttribute(TaskAttributeDefinition.TASK_BUSINESS_CONTEXT, null),
-            new TaskAttribute(TaskAttributeDefinition.TASK_MAJOR_PRIORITY, null),
-            new TaskAttribute(TaskAttributeDefinition.TASK_MINOR_PRIORITY, null),
-            new TaskAttribute(TaskAttributeDefinition.TASK_ROLES, null),
-            new TaskAttribute(TaskAttributeDefinition.TASK_ROLE_CATEGORY, null),
-            new TaskAttribute(TaskAttributeDefinition.TASK_REGION_NAME, null),
-            new TaskAttribute(TaskAttributeDefinition.TASK_TERMINATION_REASON, null),
-            new TaskAttribute(TaskAttributeDefinition.TASK_WORK_TYPE, null),
-            new TaskAttribute(TaskAttributeDefinition.TASK_NOTES, null)
-        );
+        return attributes;
     }
 
+    private Map<String, Object> getExpectedBaseTaskAttributes(ZonedDateTime createdDate,
+                                                              ZonedDateTime dueDate,
+                                                              String assignee,
+                                                              String taskDescription) {
+        Map<String, Object> attributes = new HashMap<>();
+
+        Optional.ofNullable(assignee).ifPresent(i -> attributes.put(CamundaVariableDefinition.ASSIGNEE.value(), i));
+
+        attributes.put(CamundaVariableDefinition.AUTO_ASSIGNED.value(), false);
+        attributes.put(CamundaVariableDefinition.CASE_MANAGEMENT_CATEGORY.value(), "someCaseCategory");
+        attributes.put(CamundaVariableDefinition.CASE_ID.value(), "00000");
+        attributes.put(CamundaVariableDefinition.CASE_NAME.value(), "someCaseName");
+        attributes.put(CamundaVariableDefinition.CASE_TYPE_ID.value(), "someCaseType");
+        attributes.put(CamundaVariableDefinition.CREATED.value(), CAMUNDA_DATA_TIME_FORMATTER.format(createdDate));
+        attributes.put(CamundaVariableDefinition.DUE_DATE.value(), CAMUNDA_DATA_TIME_FORMATTER.format(dueDate));
+        Optional.ofNullable(taskDescription)
+            .ifPresent(i -> attributes.put(CamundaVariableDefinition.DESCRIPTION.value(), i));
+
+        attributes.put(CamundaVariableDefinition.EXECUTION_TYPE.value(), "someExecutionType");
+        attributes.put(CamundaVariableDefinition.HAS_WARNINGS.value(), true);
+        attributes.put(CamundaVariableDefinition.JURISDICTION.value(), "someJurisdiction");
+        attributes.put(CamundaVariableDefinition.LOCATION.value(), 1234);
+        attributes.put(CamundaVariableDefinition.LOCATION_NAME.value(), "someStaffLocationName");
+        attributes.put(CamundaVariableDefinition.TASK_NAME.value(), "someCamundaTaskName");
+        attributes.put(CamundaVariableDefinition.WARNING_LIST.value(), "SomeWarningListValue");
+        attributes.put(CamundaVariableDefinition.REGION.value(), "someRegion");
+        attributes.put(CamundaVariableDefinition.SECURITY_CLASSIFICATION.value(), "SC");
+        attributes.put(CamundaVariableDefinition.TASK_STATE.value(), CFTTaskState.UNCONFIGURED.getValue());
+        attributes.put(CamundaVariableDefinition.CFT_TASK_STATE.value(), CFTTaskState.UNCONFIGURED.getValue());
+        attributes.put(CamundaVariableDefinition.TASK_SYSTEM.value(), "someTaskSystem");
+        attributes.put(CamundaVariableDefinition.TITLE.value(), "someTitle");
+        attributes.put(CamundaVariableDefinition.APPEAL_TYPE.value(), "someAppealType");
+        attributes.put(CamundaVariableDefinition.ROLE_ASSIGNMENT_ID.value(), "someRoleAssignmentId");
+        attributes.put("newVariable", "someNewVariable");
+
+        return attributes;
+
+    }
 }
