@@ -94,6 +94,8 @@ job:
     camunda-time-limit-flag: ${CONFIGURATION_TIME_LIMIT_FLAG:true}
     #number of minutes
     camunda-time-limit: ${CONFIGURATION_TIME_LIMIT:60}
+    outcome-service-timeout: 60
+    outcome-service-pollInterval: 5
   initiation:
     camunda-max-results: ${INITIATION_CAMUNDA_MAX_RESULTS:100}
     camunda-time-limit-flag: ${INITIATION_TIME_LIMIT_FLAG:true}

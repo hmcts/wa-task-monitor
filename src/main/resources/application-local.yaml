@@ -13,3 +13,8 @@ idam:
 
 document_management:
   url: ${DM_STORE_URL:http://local-dm-store}
+
+job:
+  configuration:
+    outcome-service-timeout: 6
+    outcome-service-pollInterval: 2
