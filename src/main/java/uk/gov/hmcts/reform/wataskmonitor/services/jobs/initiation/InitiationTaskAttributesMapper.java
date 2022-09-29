@@ -15,10 +15,10 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVari
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.CREATED;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.DESCRIPTION;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.DUE_DATE;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.PRIORITY_DATE;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.TASK_ID;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.TASK_NAME;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.TASK_TYPE;
-
 
 @Slf4j
 @Service
@@ -63,6 +63,7 @@ public class InitiationTaskAttributesMapper {
         variables.entrySet().stream()
             .filter(variable -> !variable.getKey().equals(DUE_DATE.value()))
             .filter(variable -> !variable.getKey().equals(ASSIGNEE.value()))
+            .filter(variable -> !variable.getKey().equals(PRIORITY_DATE.value()))
             .filter(variable -> !variable.getKey().equals(DESCRIPTION.value()))
             .filter(variable -> !variable.getKey().equals(TASK_NAME.value()))
             .forEach(entry -> attributes.put(entry.getKey(), getCamundaVariableValue(entry.getValue())));
