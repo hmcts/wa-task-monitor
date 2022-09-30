@@ -155,7 +155,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
             .body(is(expectedResponse.apply(JobName.INITIATION.name())));
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
