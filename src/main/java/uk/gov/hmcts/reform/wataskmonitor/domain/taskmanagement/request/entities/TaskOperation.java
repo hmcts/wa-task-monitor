@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.entities;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,15 +16,18 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.Tas
 public class TaskOperation {
 
     @Schema(required = true)
+    @JsonProperty("name")
     private final TaskOperationName name;
 
+    @JsonProperty("run_id")
     private final String runId;
 
+    @JsonProperty("max_time_limit")
     private final long maxTimeLimit;
 
     @JsonCreator
-    public TaskOperation(TaskOperationName name, @JsonProperty("runId") @JsonAlias("run_id") String runId,
-                         @JsonProperty("maxTimeLimit") @JsonAlias("maxTimeLimit") long maxTimeLimit) {
+    public TaskOperation(@JsonProperty("name") TaskOperationName name, @JsonProperty("run_id")  String runId,
+                         @JsonProperty("max_time_limit") long maxTimeLimit) {
         this.name = name;
         this.runId = runId;
         this.maxTimeLimit = maxTimeLimit;
