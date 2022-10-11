@@ -7,6 +7,9 @@ public enum CamundaVariableDefinition {
     CASE_ID("caseId"),
     CASE_NAME("caseName"),
     CASE_TYPE_ID("caseTypeId"),
+    CREATED("created"),
+    DUE_DATE("dueDate"),
+    DESCRIPTION("description"),
     EXECUTION_TYPE("executionType"),
     FORM_KEY("formKey"),
     JURISDICTION("jurisdiction"),
@@ -23,8 +26,9 @@ public enum CamundaVariableDefinition {
     HAS_WARNINGS("hasWarnings"),
     WARNING_LIST("warningList"),
     CFT_TASK_STATE("cftTaskState"),
-    CASE_MANAGEMENT_CATEGORY("caseManagementCategory");
-
+    PRIORITY_DATE("priorityDate"),
+    CASE_MANAGEMENT_CATEGORY("caseManagementCategory"),
+    ROLE_ASSIGNMENT_ID("roleAssignmentId");
 
     private final String value;
 

@@ -29,7 +29,6 @@ class InitiationJobTest extends UnitBaseTest {
     @CsvSource({
         "TERMINATION, false",
         "INITIATION, true",
-        "CONFIGURATION, false",
         "AD_HOC_DELETE_PROCESS_INSTANCES, false"
     })
     void canRun(JobName jobName, boolean expectedResult) {

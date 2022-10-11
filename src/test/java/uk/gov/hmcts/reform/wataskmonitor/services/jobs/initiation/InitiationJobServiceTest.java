@@ -136,6 +136,43 @@ class InitiationJobServiceTest extends UnitBaseTest {
         assertEquals(expectation, actual);
     }
 
+    @Test
+    void should_return_job_outcome_unsuccessful_when_get_tasks_fails() {
+        initiationJobService = new InitiationJobService(
+            camundaClient,
+            taskManagementClient,
+            initiationTaskAttributesMapper,
+            initiationJobConfig
+        );
+
+        lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(false);
+
+        ZonedDateTime createdDate = ZonedDateTime.now();
+        ZonedDateTime dueDate = ZonedDateTime.now().plusDays(1);
+        CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(
+            createdDate,
+            dueDate
+        );
+        List<CamundaTask> tasks = singletonList(camundaTask);
+
+        when(camundaClient.getVariables(
+            SOME_SERVICE_TOKEN,
+            camundaTask.getId()
+        )).thenThrow(new RuntimeException("Couldn't get task"));
+
+        GenericJobReport actual = initiationJobService.initiateTasks(tasks, SOME_SERVICE_TOKEN);
+
+        GenericJobOutcome outcome = GenericJobOutcome.builder()
+            .taskId(camundaTask.getId())
+            .processInstanceId(camundaTask.getProcessInstanceId())
+            .successful(false)
+            .jobType("Task Initiation")
+            .build();
+
+        GenericJobReport expectation = new GenericJobReport(1, singletonList(outcome));
+        assertEquals(expectation, actual);
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void should_createdAfter_exists_or_not_in_query_according_to_initiation_flag(
@@ -148,6 +185,8 @@ class InitiationJobServiceTest extends UnitBaseTest {
             dueDate
         );
         List<CamundaTask> camundaTasks = singletonList(camundaTask);
+
+        when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeFlag);
 
         when(initiationJobConfig.getCamundaMaxResults()).thenReturn("10");
 
@@ -170,7 +209,7 @@ class InitiationJobServiceTest extends UnitBaseTest {
         assertQuery(timeFlag);
 
     }
-    
+
     private void assertQuery(boolean timeFlag) throws JSONException {
         JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
         if (timeFlag) {
@@ -200,52 +239,52 @@ class InitiationJobServiceTest extends UnitBaseTest {
     @NotNull
     private String getExpectedQueryParameters(String createdAfter) {
         return "{\n"
-               + "  \"orQueries\": [\n"
-               + "    {\n"
-               + "      \"taskVariables\": [\n"
-               + "        {\n"
-               + "          \"name\": \"cftTaskState\",\n"
-               + "          \"operator\": \"eq\",\n"
-               + "          \"value\": \"unconfigured\"\n"
-               + "        }\n"
-               + "      ]\n"
-               + "    }\n"
-               + "  ],\n"
-               + " \"createdAfter\": \"" + createdAfter + "\",\n"
-               + "  \"taskDefinitionKey\": \"processTask\",\n"
-               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
-               + "  \"sorting\": [\n"
-               + "    {\n"
-               + "      \"sortBy\": \"created\",\n"
-               + "      \"sortOrder\": \"desc\"\n"
-               + "    }\n"
-               + "  ]"
-               + "}\n";
+            + "  \"orQueries\": [\n"
+            + "    {\n"
+            + "      \"taskVariables\": [\n"
+            + "        {\n"
+            + "          \"name\": \"cftTaskState\",\n"
+            + "          \"operator\": \"eq\",\n"
+            + "          \"value\": \"unconfigured\"\n"
+            + "        }\n"
+            + "      ]\n"
+            + "    }\n"
+            + "  ],\n"
+            + " \"createdAfter\": \"" + createdAfter + "\",\n"
+            + "  \"taskDefinitionKey\": \"processTask\",\n"
+            + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
+            + "  \"sorting\": [\n"
+            + "    {\n"
+            + "      \"sortBy\": \"created\",\n"
+            + "      \"sortOrder\": \"desc\"\n"
+            + "    }\n"
+            + "  ]"
+            + "}\n";
     }
 
     @NotNull
     private String getExpectedQueryParameters() {
         return "{\n"
-               + "  \"orQueries\": [\n"
-               + "    {\n"
-               + "      \"taskVariables\": [\n"
-               + "        {\n"
-               + "          \"name\": \"cftTaskState\",\n"
-               + "          \"operator\": \"eq\",\n"
-               + "          \"value\": \"unconfigured\"\n"
-               + "        }\n"
-               + "      ]\n"
-               + "    }\n"
-               + "  ],\n"
-               + "  \"taskDefinitionKey\": \"processTask\",\n"
-               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
-               + "  \"sorting\": [\n"
-               + "    {\n"
-               + "      \"sortBy\": \"created\",\n"
-               + "      \"sortOrder\": \"desc\"\n"
-               + "    }\n"
-               + "  ]"
-               + "}\n";
+            + "  \"orQueries\": [\n"
+            + "    {\n"
+            + "      \"taskVariables\": [\n"
+            + "        {\n"
+            + "          \"name\": \"cftTaskState\",\n"
+            + "          \"operator\": \"eq\",\n"
+            + "          \"value\": \"unconfigured\"\n"
+            + "        }\n"
+            + "      ]\n"
+            + "    }\n"
+            + "  ],\n"
+            + "  \"taskDefinitionKey\": \"processTask\",\n"
+            + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
+            + "  \"sorting\": [\n"
+            + "    {\n"
+            + "      \"sortBy\": \"created\",\n"
+            + "      \"sortOrder\": \"desc\"\n"
+            + "    }\n"
+            + "  ]"
+            + "}\n";
     }
 
 }

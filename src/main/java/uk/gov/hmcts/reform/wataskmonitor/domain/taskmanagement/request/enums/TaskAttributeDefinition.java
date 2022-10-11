@@ -21,6 +21,7 @@ public enum TaskAttributeDefinition {
     TASK_MINOR_PRIORITY("task_minor_priority"),
     TASK_NAME("task_name"),
     TASK_NOTES("task_notes"),
+    TASK_ROLE_ASSIGNMENT_ID("task_role_assignment_id"),
     TASK_WARNINGS("task_warnings"),
     TASK_REGION("task_region"),
     TASK_REGION_NAME("task_region_name"),

@@ -13,19 +13,19 @@ import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SER
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
-public class MonitorTaskJobControllerForConfigurationJobTest extends SpringBootFunctionalBaseTest {
+public class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootFunctionalBaseTest {
 
     @Test
     public void givenMonitorTaskJobRequestShouldReturnStatus200AndExpectedResponse() {
         given()
             .contentType(APPLICATION_JSON_VALUE)
             .header(SERVICE_AUTHORIZATION, serviceToken)
-            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(JobName.CONFIGURATION))))
+            .body(TestUtility.asJsonString(new MonitorTaskJobRequest(new JobDetails(JobName.RECONFIGURATION))))
             .when()
             .post("/monitor/tasks/jobs")
             .then()
             .statusCode(HttpStatus.OK.value())
-            .body(is(expectedResponse.apply(JobName.CONFIGURATION.name())));
+            .body(is(expectedResponse.apply(JobName.RECONFIGURATION.name())));
     }
 
 }

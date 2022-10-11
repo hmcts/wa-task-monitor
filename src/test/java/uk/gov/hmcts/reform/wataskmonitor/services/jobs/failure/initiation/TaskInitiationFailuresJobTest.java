@@ -28,7 +28,6 @@ class TaskInitiationFailuresJobTest extends UnitBaseTest {
     @CsvSource({
         "TERMINATION, false",
         "INITIATION, false",
-        "CONFIGURATION, false",
         "AD_HOC_DELETE_PROCESS_INSTANCES, false",
         "TASK_INITIATION_FAILURES, true",
         "TASK_TERMINATION_FAILURES, false"
