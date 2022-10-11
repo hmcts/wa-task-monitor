@@ -21,7 +21,7 @@ import java.util.UUID;
 @Slf4j
 public class ReconfigurationJobService {
 
-    private static final String RECONFIGURE_REQUEST_TIME = "reconfigureRequestTime";
+    private static final String RECONFIGURE_REQUEST_TIME = "reconfigure_request_time";
     private final TaskReconfigurationClient taskReconfigurationClient;
     private final OffsetDateTime reconfigureRequestTime;
     private final long reconfigureMaxTimeLimitSeconds;
@@ -47,6 +47,7 @@ public class ReconfigurationJobService {
         TaskOperation operation = new TaskOperation(TaskOperationName.EXECUTE_RECONFIGURE,
                                                     operationId,
                                                     reconfigureMaxTimeLimitSeconds);
+        log.debug("reconfigureTask for operation: {}",operation);
         TaskOperationRequest taskOperationRequest = new TaskOperationRequest(operation, List.of(filter));
 
         taskReconfigurationClient.executeReconfigure(serviceToken, taskOperationRequest);
