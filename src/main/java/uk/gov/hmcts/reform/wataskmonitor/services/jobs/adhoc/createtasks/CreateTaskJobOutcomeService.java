@@ -18,10 +18,10 @@ import static org.awaitility.Awaitility.await;
 public class CreateTaskJobOutcomeService implements JobOutcomeService {
 
     @Value("${job.configuration.outcome-service-timeout}")
-    public Integer timeout;
+    private Integer timeout;
 
     @Value("${job.configuration.outcome-service-pollInterval}")
-    public Integer pollInterval;
+    private Integer pollInterval;
 
     private final CamundaClient camundaClient;
 

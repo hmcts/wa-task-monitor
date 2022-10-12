@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.adhoc.createtasks;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
@@ -26,6 +28,12 @@ class CreateTaskJobOutcomeServiceTest extends UnitBaseTest {
 
     @InjectMocks
     private CreateTaskJobOutcomeService createTaskJobOutcomeService;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(createTaskJobOutcomeService, "timeout", 6);
+        ReflectionTestUtils.setField(createTaskJobOutcomeService, "pollInterval", 2);
+    }
 
     @Test
     void givenCamundaClientThrowsExceptionShouldGetJobOutcome() {
