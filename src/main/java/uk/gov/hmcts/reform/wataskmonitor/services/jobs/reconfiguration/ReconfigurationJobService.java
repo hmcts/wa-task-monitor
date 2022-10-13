@@ -25,16 +25,20 @@ public class ReconfigurationJobService {
     private final TaskReconfigurationClient taskReconfigurationClient;
     private final OffsetDateTime reconfigureRequestTime;
     private final long reconfigureMaxTimeLimitSeconds;
+    private final long reconfigureRetryWindowTimeLimitSeconds;
 
     @Autowired
     public ReconfigurationJobService(TaskReconfigurationClient taskReconfigurationClient,
                                      @Value("${job.reconfiguration.reconfigure_request_time_hours}")
                                             long reconfigureRequestTimeHours,
                                      @Value("${job.reconfiguration.reconfiguration_max_time_limit_seconds}")
-                                            long reconfigureMaxTimeLimitSeconds) {
+                                            long reconfigureMaxTimeLimitSeconds,
+                                     @Value("${job.reconfiguration.reconfiguration_retry_window_time_hours}")
+                                            long reconfigureRetryWindowTimeLimitSeconds) {
         this.taskReconfigurationClient = taskReconfigurationClient;
         this.reconfigureRequestTime = OffsetDateTime.now().minus(Duration.ofHours(reconfigureRequestTimeHours));
         this.reconfigureMaxTimeLimitSeconds = reconfigureMaxTimeLimitSeconds;
+        this.reconfigureRetryWindowTimeLimitSeconds = reconfigureRetryWindowTimeLimitSeconds;
     }
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
@@ -46,7 +50,8 @@ public class ReconfigurationJobService {
         String operationId = UUID.randomUUID().toString();
         TaskOperation operation = new TaskOperation(TaskOperationName.EXECUTE_RECONFIGURE,
                                                     operationId,
-                                                    reconfigureMaxTimeLimitSeconds);
+                                                    reconfigureMaxTimeLimitSeconds,
+                                                    reconfigureRetryWindowTimeLimitSeconds);
         log.debug("reconfigureTask for operation: {}",operation);
         TaskOperationRequest taskOperationRequest = new TaskOperationRequest(operation, List.of(filter));
 
