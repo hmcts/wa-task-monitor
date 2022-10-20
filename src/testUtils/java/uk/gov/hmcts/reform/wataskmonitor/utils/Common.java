@@ -126,7 +126,7 @@ public class Common {
             "region", "1",
             //This value must match the camunda task location variable for the permission check to pass
             "baseLocation", "765324",
-            "jurisdiction", "IA"
+            "jurisdiction", "WA"
         );
 
         //Clean/Reset user
@@ -154,7 +154,7 @@ public class Common {
             "region", "1",
             //This value must match the camunda task location variable for the permission check to pass
             "baseLocation", "765324",
-            "jurisdiction", "IA"
+            "jurisdiction", "WA"
         );
 
         //Clean/Reset user

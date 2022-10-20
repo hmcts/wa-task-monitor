@@ -126,7 +126,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
             caseworkerCredentials.getHeaders(),
             Map.of(
                 "primaryLocation", "765324",
-                "jurisdiction", "IA"
+                "jurisdiction", "WA"
             )
         );
 
