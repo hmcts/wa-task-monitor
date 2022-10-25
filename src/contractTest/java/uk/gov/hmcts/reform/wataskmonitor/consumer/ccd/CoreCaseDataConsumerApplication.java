@@ -6,12 +6,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
-import uk.gov.hmcts.reform.wataskmonitor.clients.CcdClient;
 
 @SpringBootApplication
 @EnableFeignClients(clients = {
-    CoreCaseDataApi.class,
-    CcdClient.class
+    CoreCaseDataApi.class
 })
 public class CoreCaseDataConsumerApplication {
 
