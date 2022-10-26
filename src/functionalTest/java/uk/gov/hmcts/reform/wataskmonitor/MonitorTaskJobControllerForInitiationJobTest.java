@@ -116,7 +116,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
     @Test
     public void task_initiation_job_should_initiate_only_default_task_and_not_initiate_delayed_task() {
         TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
-        common.setupCftOrganisationalRoleAssignment(caseworkerCredentials.getHeaders());
+        common.setupOrganisationalRoleAssignment(caseworkerCredentials.getHeaders());
 
         initiateTask(caseworkerCredentials.getHeaders(), defaultTaskVariables,
             "followUpOverdueReasonsForAppeal", "task name", "task title"
@@ -126,7 +126,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
             caseworkerCredentials.getHeaders(),
             Map.of(
                 "primaryLocation", "765324",
-                "jurisdiction", "IA"
+                "jurisdiction", "WA"
             )
         );
 
