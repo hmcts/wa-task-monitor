@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor;
 
+import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -16,9 +17,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static net.serenitybdd.rest.SerenityRest.given;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assume.assumeTrue;
@@ -186,6 +190,21 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         assertEquals("unconfigured", actualDefaultTaskTaskState);
         assertEquals("unconfigured", actualDelayedTaskTaskState);
 
+    }
+
+    @Test
+    public void should_return_a_503_if_task_already_initiated_however_handled_gracefully() {
+        TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
+        caseIds.add(defaultTaskVariables.getCaseId());
+        common.setupOrganisationalRoleAssignment(caseworkerCredentials.getHeaders());
+
+        initiateTask(caseworkerCredentials.getHeaders(), defaultTaskVariables,
+                     "followUpOverdueReasonsForAppeal", "task name", "task title"
+        );
+        //Expect to get 503 for database conflict
+        initiateTask(caseworkerCredentials.getHeaders(), defaultTaskVariables,
+                     "followUpOverdueReasonsForAppeal", "task name", "task title"
+        );
     }
 
 }
