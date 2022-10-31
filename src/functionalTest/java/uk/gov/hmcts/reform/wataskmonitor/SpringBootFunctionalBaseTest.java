@@ -160,6 +160,8 @@ public class SpringBootFunctionalBaseTest {
     }
 
     private void assertResponse(Response response, TestVariables testVariables) {
+        response.prettyPrint();
+
         int statusCode = response.getStatusCode();
         switch (statusCode) {
             case 503:
