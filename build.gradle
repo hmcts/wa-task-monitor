@@ -250,7 +250,6 @@ dependencyManagement {
 
     //CVE-2021-28170
     dependency group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
-
   }
 }
 
@@ -313,6 +312,7 @@ dependencies {
 
   implementation group: 'org.awaitility', name: 'awaitility', version: '4.1.0'
 
+  //CVE-2022-31692, CVE-2022-31690
   implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.7.5'
   implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.7.5'
   implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.7.5'
