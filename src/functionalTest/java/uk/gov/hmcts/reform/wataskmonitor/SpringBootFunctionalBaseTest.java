@@ -36,6 +36,7 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE
 import static net.serenitybdd.rest.SerenityRest.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUNDA_DATA_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.CASE_ID;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.CREATED;
@@ -81,6 +82,7 @@ public class SpringBootFunctionalBaseTest {
     private AuthTokenGenerator authTokenGenerator;
 
     private static final String TASK_INITIATION_ENDPOINT = "task/{task-id}/initiation";
+    private static final String TASK_GET_ENDPOINT = "task/{task-id}";
 
     @Before
     public void setUpGivens() throws IOException {
@@ -152,12 +154,42 @@ public class SpringBootFunctionalBaseTest {
                 authenticationHeaders
         );
 
-        result.then().assertThat()
-                .statusCode(HttpStatus.CREATED.value())
-                .and()
-                .contentType(APPLICATION_JSON_VALUE)
-                .body("task_id", equalTo(testVariables.getTaskId()))
-                .body("case_id", equalTo(testVariables.getCaseId()));
+        //Note: Since tasks can be initiated directly by task monitor, we will have database conflicts for
+        // second initiation request, so we are by-passing 503 and 201 response statuses.
+        assertResponse(result, testVariables);
     }
 
+    private void assertResponse(Response response, TestVariables testVariables) {
+        response.prettyPrint();
+
+        int statusCode = response.getStatusCode();
+        switch (statusCode) {
+            case 503:
+                log.info("Initiation failed due to Database Conflict Error, so handling gracefully, {}", statusCode);
+
+                response.then().assertThat()
+                    .statusCode(HttpStatus.SERVICE_UNAVAILABLE.value())
+                    .contentType(APPLICATION_PROBLEM_JSON_VALUE)
+                    .body("type", equalTo(
+                        "https://github.com/hmcts/wa-task-management-api/problem/database-conflict"))
+                    .body("title", equalTo("Database Conflict Error"))
+                    .body("status", equalTo(503))
+                    .body("detail", equalTo(
+                        "Database Conflict Error: The action could not be completed because "
+                            + "there was a conflict in the database."));
+                break;
+            case 201:
+                log.info("task Initiation got successfully with status, {}", statusCode);
+                response.then().assertThat()
+                    .statusCode(HttpStatus.CREATED.value())
+                    .and()
+                    .contentType(APPLICATION_JSON_VALUE)
+                    .body("task_id", equalTo(testVariables.getTaskId()))
+                    .body("case_id", equalTo(testVariables.getCaseId()));
+                break;
+            default:
+                log.info("task Initiation failed with status, {}", statusCode);
+                throw new RuntimeException("Invalid status received for task initiation " + statusCode);
+        }
+    }
 }
