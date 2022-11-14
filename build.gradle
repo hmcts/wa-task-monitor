@@ -13,7 +13,7 @@ plugins {
   id 'io.freefair.lombok' version '5.3.3.3'
   id 'info.solidsoft.pitest' version '1.9.0'
   id 'net.serenity-bdd.serenity-gradle-plugin' version '3.2.0'
-  id 'au.com.dius.pact' version '4.1.0'
+  id 'au.com.dius.pact' version '4.3.17'
 }
 
 group = 'uk.gov.hmcts.reform'
