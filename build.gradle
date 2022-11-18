@@ -5,7 +5,7 @@ plugins {
   id 'pmd'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-  id 'org.springframework.boot' version '2.7.4'
+  id 'org.springframework.boot' version '2.7.5'
   id 'org.owasp.dependencycheck' version '7.2.1'
   id 'uk.gov.hmcts.java' version '0.12.5'
   id 'com.github.ben-manes.versions' version '0.38.0'
@@ -87,6 +87,7 @@ tasks.withType(Test) {
 
   testLogging {
     exceptionFormat = 'full'
+    showStandardStreams = true
   }
 }
 
@@ -250,6 +251,30 @@ dependencyManagement {
 
     //CVE-2021-28170
     dependency group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
+
+    //CVE-2022-31692, CVE-2022-31690
+    dependencySet( group: 'org.springframework.security', version: '5.7.5'){
+      entry 'spring-security-core'
+      entry 'spring-security-acl'
+      entry 'spring-security-aspects'
+      entry 'spring-security-cas'
+      entry 'spring-security-config'
+      entry 'spring-security-crypto'
+      entry 'spring-security-data'
+      entry 'spring-security-ldap'
+      entry 'spring-security-messaging'
+      entry 'spring-security-oauth2-client'
+      entry 'spring-security-oauth2-core'
+      entry 'spring-security-oauth2-jose'
+      entry 'spring-security-oauth2-resource-server'
+      entry 'spring-security-openid'
+      entry 'spring-security-remoting'
+      entry 'spring-security-rsocket'
+      entry 'spring-security-saml2-service-provider'
+      entry 'spring-security-taglibs'
+      entry 'spring-security-test'
+      entry 'spring-security-web'
+    }
   }
 }
 
@@ -263,7 +288,7 @@ def versions = [
   junit               : '5.9.1',
   junitPlatform       : '1.9.1',
   reformLogging       : '5.1.9',
-  springDoc           : '1.6.6',
+  springDoc           : '1.6.12',
   serenity            : '3.2.0',
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.9.7',
@@ -307,8 +332,8 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.19.0'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.19.0'
 
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.64'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.64'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.68'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.68'
 
   implementation group: 'org.awaitility', name: 'awaitility', version: '4.1.0'
 

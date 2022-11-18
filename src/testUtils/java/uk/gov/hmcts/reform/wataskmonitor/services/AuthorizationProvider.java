@@ -137,15 +137,14 @@ public class AuthorizationProvider {
     }
 
     private TestAccount getIdamCaseWorkerCredentials(String emailPrefix) {
-        List<RoleCode> requiredRoles = asList(new RoleCode("caseworker-ia"), new RoleCode("caseworker-ia-caseofficer"));
+        List<RoleCode> requiredRoles = asList(new RoleCode("caseworker-wa"), new RoleCode("caseworker-wa-caseofficer"));
         return generateIdamTestAccount(emailPrefix, requiredRoles);
     }
 
     private TestAccount getIdamLawFirmCredentials(String emailPrefix) {
-        List<RoleCode> requiredRoles = asList(new RoleCode("caseworker-ia"),
-            new RoleCode("caseworker-ia-legalrep-solicitor"),
-            new RoleCode("payments")
-        );
+        List<RoleCode> requiredRoles = asList(new RoleCode("caseworker-wa-task-configuration"),
+            new RoleCode("payments"),
+            new RoleCode("caseworker-wa"));
         return generateIdamTestAccount(emailPrefix, requiredRoles);
     }
 

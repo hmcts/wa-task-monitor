@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.wataskmonitor.entities.documents.Document;
 import uk.gov.hmcts.reform.wataskmonitor.services.AuthorizationProvider;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -71,17 +72,21 @@ public class GivensBuilder {
             userToken,
             serviceToken,
             userInfo.getUid(),
-            "IA",
-            "Asylum",
-            "startAppeal"
+            "WA",
+            "WaCaseType",
+            "CREATE"
         );
 
-        String resourceFilename = "requests/ccd/case_data.json";
+        String resourceFilename = "requests/ccd/wa_case_data.json";
 
         Map data = null;
         try {
             String caseDataString =
                 FileUtils.readFileToString(ResourceUtils.getFile("classpath:" + resourceFilename), "UTF-8");
+            caseDataString = caseDataString.replace(
+                "{NEXT_HEARING_DATE}",
+                OffsetDateTime.now().toString()
+            );
             caseDataString = caseDataString.replace(
                 "{NOTICE_OF_DECISION_DOCUMENT_STORE_URL}",
                 document.getDocumentUrl()
@@ -109,14 +114,14 @@ public class GivensBuilder {
                 .build())
             .data(data)
             .build();
-
+        log.info("caseDataContent [" + caseDataContent + "]");
         //Fire submit event
         CaseDetails caseDetails = coreCaseDataApi.submitForCaseworker(
             userToken,
             serviceToken,
             userInfo.getUid(),
-            "IA",
-            "Asylum",
+            "WA",
+            "WaCaseType",
             true,
             caseDataContent
         );
@@ -127,10 +132,10 @@ public class GivensBuilder {
             userToken,
             serviceToken,
             userInfo.getUid(),
-            "IA",
-            "Asylum",
+            "WA",
+            "WaCaseType",
             caseDetails.getId().toString(),
-            "submitAppeal"
+            "START_PROGRESS"
         );
 
         CaseDataContent submitCaseDataContent = CaseDataContent.builder()
@@ -147,8 +152,8 @@ public class GivensBuilder {
             userToken,
             serviceToken,
             userInfo.getUid(),
-            "IA",
-            "Asylum",
+            "WA",
+            "WaCaseType",
             caseDetails.getId().toString(),
             true,
             submitCaseDataContent
@@ -271,18 +276,18 @@ public class GivensBuilder {
     public Map<String, CamundaValue<?>> createDefaultTaskVariables(String caseId) {
         CamundaProcessVariables processVariables = processVariables()
             .withProcessVariable("caseId", caseId)
-            .withProcessVariable("jurisdiction", "IA")
-            .withProcessVariable("caseTypeId", "Asylum")
+            .withProcessVariable("jurisdiction", "WA")
+            .withProcessVariable("caseTypeId", "WaCaseType")
             .withProcessVariable("region", "1")
             .withProcessVariable("location", "765324")
             .withProcessVariable("locationName", "Taylor House")
             .withProcessVariable("staffLocation", "Taylor House")
             .withProcessVariable("securityClassification", "PUBLIC")
             .withProcessVariable("name", "task name")
-            .withProcessVariable("taskId", "reviewTheAppeal")
+            .withProcessVariable("taskId", "processApplication")
             .withProcessVariable("taskAttributes", "")
-            .withProcessVariable("taskType", "reviewTheAppeal")
-            .withProcessVariable("taskCategory", "Case Progression")
+            .withProcessVariable("taskType", "processApplication")
+            .withProcessVariable("taskCategory", "")
             .withProcessVariable("taskState", "unconfigured")
             //for testing-purposes
             .withProcessVariable("dueDate", now().plusDays(10).format(CAMUNDA_DATA_TIME_FORMATTER))
@@ -304,8 +309,8 @@ public class GivensBuilder {
     public Map<String, CamundaValue<?>> createDelayedTaskVariables(String caseId) {
         CamundaProcessVariables processVariables = processVariables()
             .withProcessVariable("caseId", caseId)
-            .withProcessVariable("jurisdiction", "IA")
-            .withProcessVariable("caseTypeId", "Asylum")
+            .withProcessVariable("jurisdiction", "WA")
+            .withProcessVariable("caseTypeId", "WaCaseType")
             .withProcessVariable("region", "1")
             .withProcessVariable("location", "765324")
             .withProcessVariable("locationName", "Taylor House")
@@ -313,10 +318,10 @@ public class GivensBuilder {
             .withProcessVariable("securityClassification", "PUBLIC")
             .withProcessVariable("group", "TCW")
             .withProcessVariable("name", "task name")
-            .withProcessVariable("taskId", "reviewTheAppeal")
+            .withProcessVariable("taskId", "processApplication")
             .withProcessVariable("taskAttributes", "")
-            .withProcessVariable("taskType", "reviewTheAppeal")
-            .withProcessVariable("taskCategory", "Case Progression")
+            .withProcessVariable("taskType", "processApplication")
+            .withProcessVariable("taskCategory", "")
             .withProcessVariable("taskState", "unconfigured")
             //for testing-purposes
             .withProcessVariable("dueDate", now().plusDays(10).format(CAMUNDA_DATA_TIME_FORMATTER))
