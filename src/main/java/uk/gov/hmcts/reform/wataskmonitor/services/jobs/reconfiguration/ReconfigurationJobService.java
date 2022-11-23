@@ -25,7 +25,7 @@ public class ReconfigurationJobService {
     private final TaskReconfigurationClient taskReconfigurationClient;
     private final OffsetDateTime reconfigureRequestTime;
     private final long reconfigureMaxTimeLimitSeconds;
-    private final long reconfigureRetryWindowTimeLimitSeconds;
+    private final long reconfigureRetryWindowTimeLimitHours;
 
     @Autowired
     public ReconfigurationJobService(TaskReconfigurationClient taskReconfigurationClient,
@@ -34,11 +34,11 @@ public class ReconfigurationJobService {
                                      @Value("${job.reconfiguration.reconfiguration_max_time_limit_seconds}")
                                             long reconfigureMaxTimeLimitSeconds,
                                      @Value("${job.reconfiguration.reconfiguration_retry_window_time_hours}")
-                                            long reconfigureRetryWindowTimeLimitSeconds) {
+                                            long reconfigureRetryWindowTimeLimitHours) {
         this.taskReconfigurationClient = taskReconfigurationClient;
         this.reconfigureRequestTime = OffsetDateTime.now().minus(Duration.ofHours(reconfigureRequestTimeHours));
         this.reconfigureMaxTimeLimitSeconds = reconfigureMaxTimeLimitSeconds;
-        this.reconfigureRetryWindowTimeLimitSeconds = reconfigureRetryWindowTimeLimitSeconds;
+        this.reconfigureRetryWindowTimeLimitHours = reconfigureRetryWindowTimeLimitHours;
     }
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
@@ -51,7 +51,7 @@ public class ReconfigurationJobService {
         TaskOperation operation = new TaskOperation(TaskOperationName.EXECUTE_RECONFIGURE,
                                                     operationId,
                                                     reconfigureMaxTimeLimitSeconds,
-                                                    reconfigureRetryWindowTimeLimitSeconds);
+            reconfigureRetryWindowTimeLimitHours);
         log.debug("reconfigureTask for operation: {}",operation);
         TaskOperationRequest taskOperationRequest = new TaskOperationRequest(operation, List.of(filter));
 
