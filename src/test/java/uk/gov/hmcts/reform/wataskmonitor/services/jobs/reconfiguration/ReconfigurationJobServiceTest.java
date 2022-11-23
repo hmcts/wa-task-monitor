@@ -21,7 +21,8 @@ class ReconfigurationJobServiceTest extends UnitBaseTest {
         reconfigurationJobService = new ReconfigurationJobService(
                                             taskReconfigurationClient,
                                             2,
-                                            120);
+                                            120,
+            120);
     }
 
     @Test

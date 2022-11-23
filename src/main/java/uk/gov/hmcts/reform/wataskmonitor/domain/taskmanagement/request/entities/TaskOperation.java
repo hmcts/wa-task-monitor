@@ -25,12 +25,18 @@ public class TaskOperation {
     @JsonProperty("max_time_limit")
     private final long maxTimeLimit;
 
+    @JsonProperty("retry_window_hours")
+    private final long retryWindowHours;
+
     @JsonCreator
-    public TaskOperation(@JsonProperty("name") TaskOperationName name, @JsonProperty("run_id")  String runId,
-                         @JsonProperty("max_time_limit") long maxTimeLimit) {
+    public TaskOperation(@JsonProperty("name") TaskOperationName name,
+                         @JsonProperty("run_id")  String runId,
+                         @JsonProperty("max_time_limit") long maxTimeLimit,
+                         @JsonProperty("retry_window_hours") long retryWindowHours) {
         this.name = name;
         this.runId = runId;
         this.maxTimeLimit = maxTimeLimit;
+        this.retryWindowHours = retryWindowHours;
     }
 
     public TaskOperationName getName() {
@@ -43,5 +49,9 @@ public class TaskOperation {
 
     public long getMaxTimeLimit() {
         return maxTimeLimit;
+    }
+
+    public long getRetryWindowHours() {
+        return retryWindowHours;
     }
 }

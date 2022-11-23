@@ -114,6 +114,7 @@ job:
   reconfiguration:
     reconfigure_request_time_hours: ${RECONFIGURE_REQUEST_TIME_HOURS:2}
     reconfiguration_max_time_limit_seconds: ${RECONFIGURATION_MAX_TIME_LIMIT_SECONDS:120}
+    reconfiguration_retry_window_time_hours: ${RECONFIGURATION_RETRY_WINDOW_TIME_HOURS:2}
 
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}
