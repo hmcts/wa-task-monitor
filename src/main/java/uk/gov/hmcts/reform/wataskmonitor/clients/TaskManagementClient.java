@@ -14,8 +14,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
 
 @FeignClient(
-    name = "taskManagement",
-    url = "${task-management.url}"
+    name = "wa-task-management-api",
+    url = "${wa-task-management-api.url}"
 )
 public interface TaskManagementClient {
 
