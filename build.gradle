@@ -346,7 +346,16 @@ dependencies {
   testImplementation group: 'org.apiguardian', name: 'apiguardian-api', version:'1.1.2'
   testImplementation group: 'org.springframework.security', name: 'spring-security-test', version: '5.7.3'
 
-  testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
+  implementation 'net.serenity-bdd:serenity-core'
+  constraints {
+    implementation('net.serenity-bdd:serenity-core:3.2.0'){
+      because 'previous versions have a bug impacting this application'
+    }
+    implementation('commons-net:commons-net:3.9.0'){
+      because('version 3.8.0 upgraded as CVE issue')
+    }
+  }
+
   testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
