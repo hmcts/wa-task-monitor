@@ -60,24 +60,24 @@ withPipeline(type, product, component) {
   env.RECONFIGURATION_RETRY_WINDOW_TIME_HOURS= 2
   loadVaultSecrets(secrets)
 
-  after('test') {
+  afterSuccess('test') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/integration/**/*'
   }
 
-  after('functionalTest:preview') {
+  afterSuccess('functionalTest:preview') {
     env.ENABLE_TEST_USER_DELETION = true
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
   }
 
-  after('functionalTest:aat') {
+  afterSuccess('functionalTest:aat') {
     env.ENABLE_TEST_USER_DELETION = true
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
   }
 
-  after('pact-provider-verification') {
+  afterSuccess('pact-provider-verification') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
   }
 
