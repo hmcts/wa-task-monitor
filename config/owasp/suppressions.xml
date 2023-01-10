@@ -54,13 +54,13 @@
   </suppress>
   <suppress>
     <notes>
-      org.yaml:snakeyaml:1.33 directly used by org.springframework.boot:spring-boot-starter-web 2.7.5 and there are no higher version then snakeyaml 1.33
+      org.yaml:snakeyaml:1.33 directly used by org.springframework.boot:spring-boot-starter-web 2.7.5 and there are no higher version than snakeyaml 1.33
     </notes>
     <cve>CVE-2022-3064</cve>
   </suppress>
   <suppress>
     <notes>
-      org.yaml:snakeyaml:1.33 directly used by org.springframework.boot:spring-boot-starter-web 2.7.5 and there are no higher version then snakeyaml 1.33
+      org.yaml:snakeyaml:1.33 directly used by org.springframework.boot:spring-boot-starter-web 2.7.5 and there are no higher version than snakeyaml 1.33
     </notes>
     <cve>CVE-2021-4235</cve>
   </suppress>
