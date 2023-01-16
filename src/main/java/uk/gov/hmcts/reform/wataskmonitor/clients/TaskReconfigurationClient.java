@@ -12,7 +12,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SER
 
 @FeignClient(
     name = "taskReconfiguration",
-    url = "${task-management.url}"
+    url = "${wa-task-management-api.url}"
 )
 public interface TaskReconfigurationClient {
 
