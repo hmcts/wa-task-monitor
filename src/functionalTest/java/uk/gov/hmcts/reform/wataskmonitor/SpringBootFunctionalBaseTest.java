@@ -72,7 +72,7 @@ public class SpringBootFunctionalBaseTest {
     private String camundaUrl;
     @Value("${targets.instance}")
     private String testUrl;
-    @Value("${targets.task-management.url}")
+    @Value("${targets.wa-task-management-api.url}")
     private String taskManagementUrl;
     @Value("${enable_initiation_trigger_flag}")
     private boolean enableInitiationTriggerFlag;

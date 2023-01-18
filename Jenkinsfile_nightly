@@ -53,7 +53,7 @@ withNightlyPipeline(type, product, component) {
   env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
   env.CCD_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
   env.CAMUNDA_URL = "http://camunda-api-aat.service.core-compute-aat.internal/engine-rest"
-  env.TASK_MANAGEMENT_SERVICE_URL = "http://wa-task-management-api-aat.service.core-compute-aat.internal"
+  env.WA_TASK_MANAGEMENT_API_URL = "http://wa-task-management-api-aat.service.core-compute-aat.internal"
   env.CONFIGURATION_CAMUNDA_MAX_RESULTS = 100
   env.CONFIGURATION_TIME_LIMIT_FLAG = true
   env.CONFIGURATION_TIME_LIMIT = 60
