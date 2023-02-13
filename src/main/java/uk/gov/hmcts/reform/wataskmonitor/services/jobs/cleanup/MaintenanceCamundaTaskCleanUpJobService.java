@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.MAINTENANCE_CAMUNDA_TASK_CLEAN_UP;
 import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.ACTIVE_PROCESS_DELETE_REQUEST;
-import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_CLEAN_UP_TASK_QUERY;
 import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.HISTORIC_PROCESS_DELETE_REQUEST;
 
 @Component
@@ -62,7 +61,7 @@ public class MaintenanceCamundaTaskCleanUpJobService {
         return true;
     }
 
-    public List<HistoricCamundaTask> retrieveProcesses() {
+    public List<HistoricCamundaTask> retrieveHistoricProcesses() {
         if (!isAllowedEnvironment()) {
             return emptyList();
         }
@@ -70,10 +69,24 @@ public class MaintenanceCamundaTaskCleanUpJobService {
         List<HistoricCamundaTask> historyTasks = camundaClient.getHistoryProcesses(
             "0",
             cleanUpJobConfig.getCleanUpCamundaMaxResults(),
-            buildSearchQuery()
+            buildSearchQuery(ResourceEnum.CAMUNDA_HISTORY_CLEAN_UP_TASK_QUERY)
         );
         log.info("{} task(s) retrieved successfully from history", historyTasks.size());
         return historyTasks;
+    }
+
+    public List<HistoricCamundaTask> retrieveActiveProcesses() {
+        if (!isAllowedEnvironment()) {
+            return emptyList();
+        }
+
+        List<HistoricCamundaTask> activeProcesses = camundaClient.getActiveProcesses(
+            "0",
+            cleanUpJobConfig.getCleanUpCamundaMaxResults(),
+            buildSearchQuery(ResourceEnum.CAMUNDA_ACTIVE_CLEAN_UP_TASK_QUERY)
+        );
+        log.info("{} active processes retrieved successfully", activeProcesses.size());
+        return activeProcesses;
     }
 
     public GenericJobReport deleteHistoricProcesses(List<HistoricCamundaTask> historicCamundaTasks,
@@ -160,8 +173,8 @@ public class MaintenanceCamundaTaskCleanUpJobService {
         return outcomeList;
     }
 
-    private String buildSearchQuery() {
-        return ResourceUtility.getResource(CAMUNDA_CLEAN_UP_TASK_QUERY)
+    private String buildSearchQuery(ResourceEnum resource) {
+        return ResourceUtility.getResource(resource)
             .replace("STARTED_BEFORE_PLACE_HOLDER", getStartedBefore());
     }
 

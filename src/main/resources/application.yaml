@@ -106,7 +106,7 @@ job:
     camunda-time-limit: ${TERMINATION_TIME_LIMIT:120}
   maintenance-camunda-task-clean-up:
     allowed-environment: local, aat
-    clean-up-camunda-max-results: ${CLEAN_UP_CAMUNDA_MAX_RESULTS:1000}
+    clean-up-camunda-max-results: ${CLEAN_UP_CAMUNDA_MAX_RESULTS:100}
     #number of days before today
     clean-up-started-days-before: ${CLEAN_UP_STARTED_DAYS_BEFORE:7}
   pendingtermination:
