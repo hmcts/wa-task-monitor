@@ -21,32 +21,39 @@ import java.util.UUID;
 @Slf4j
 public class ReconfigurationJobService {
 
-    private static final String RECONFIGURE_REQUEST_TIME = "reconfigureRequestTime";
+    private static final String RECONFIGURE_REQUEST_TIME = "reconfigure_request_time";
     private final TaskReconfigurationClient taskReconfigurationClient;
-    private final OffsetDateTime reconfigureRequestTime;
     private final long reconfigureMaxTimeLimitSeconds;
+    private final long reconfigureRetryWindowTimeLimitHours;
+    private final long reconfigureRequestTimeHours;
 
     @Autowired
     public ReconfigurationJobService(TaskReconfigurationClient taskReconfigurationClient,
                                      @Value("${job.reconfiguration.reconfigure_request_time_hours}")
                                             long reconfigureRequestTimeHours,
                                      @Value("${job.reconfiguration.reconfiguration_max_time_limit_seconds}")
-                                            long reconfigureMaxTimeLimitSeconds) {
+                                            long reconfigureMaxTimeLimitSeconds,
+                                     @Value("${job.reconfiguration.reconfiguration_retry_window_time_hours}")
+                                            long reconfigureRetryWindowTimeLimitHours) {
+        this.reconfigureRequestTimeHours = reconfigureRequestTimeHours;
         this.taskReconfigurationClient = taskReconfigurationClient;
-        this.reconfigureRequestTime = OffsetDateTime.now().minus(Duration.ofHours(reconfigureRequestTimeHours));
         this.reconfigureMaxTimeLimitSeconds = reconfigureMaxTimeLimitSeconds;
+        this.reconfigureRetryWindowTimeLimitHours = reconfigureRetryWindowTimeLimitHours;
     }
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public String reconfigureTask(String serviceToken) {
-
+        OffsetDateTime reconfigureRequestTime = OffsetDateTime.now()
+            .minus(Duration.ofHours(reconfigureRequestTimeHours));
         TaskFilter<?> filter = new ExecuteReconfigureTaskFilter(RECONFIGURE_REQUEST_TIME,
                                                                 reconfigureRequestTime,
                                                                 TaskFilterOperator.AFTER);
         String operationId = UUID.randomUUID().toString();
         TaskOperation operation = new TaskOperation(TaskOperationName.EXECUTE_RECONFIGURE,
                                                     operationId,
-                                                    reconfigureMaxTimeLimitSeconds);
+                                                    reconfigureMaxTimeLimitSeconds,
+            reconfigureRetryWindowTimeLimitHours);
+        log.debug("reconfigureTask for operation: {}",operation);
         TaskOperationRequest taskOperationRequest = new TaskOperationRequest(operation, List.of(filter));
 
         taskReconfigurationClient.executeReconfigure(serviceToken, taskOperationRequest);

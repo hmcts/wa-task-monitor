@@ -116,17 +116,17 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
     @Test
     public void task_initiation_job_should_initiate_only_default_task_and_not_initiate_delayed_task() {
         TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
-        common.setupCftOrganisationalRoleAssignment(caseworkerCredentials.getHeaders());
+        common.setupOrganisationalRoleAssignment(caseworkerCredentials.getHeaders());
 
         initiateTask(caseworkerCredentials.getHeaders(), defaultTaskVariables,
-            "followUpOverdueReasonsForAppeal", "task name", "task title"
+                     "followUpOverdueReasonsForAppeal", "task name", "task title"
         );
 
         common.setupOrganisationalRoleAssignmentWithCustomAttributes(
             caseworkerCredentials.getHeaders(),
             Map.of(
                 "primaryLocation", "765324",
-                "jurisdiction", "IA"
+                "jurisdiction", "WA"
             )
         );
 
@@ -186,6 +186,21 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         assertEquals("unconfigured", actualDefaultTaskTaskState);
         assertEquals("unconfigured", actualDelayedTaskTaskState);
 
+    }
+
+    @Test
+    public void should_return_a_503_if_task_already_initiated_however_handled_gracefully() {
+        TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
+        caseIds.add(defaultTaskVariables.getCaseId());
+        common.setupOrganisationalRoleAssignment(caseworkerCredentials.getHeaders());
+
+        initiateTask(caseworkerCredentials.getHeaders(), defaultTaskVariables,
+                     "followUpOverdueReasonsForAppeal", "task name", "task title"
+        );
+        //Expect to get 503 for database conflict
+        initiateTask(caseworkerCredentials.getHeaders(), defaultTaskVariables,
+                     "followUpOverdueReasonsForAppeal", "task name", "task title"
+        );
     }
 
 }

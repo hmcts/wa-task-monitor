@@ -13,3 +13,4 @@ idam:
 
 document_management:
   url: ${DM_STORE_URL:http://local-dm-store}
+

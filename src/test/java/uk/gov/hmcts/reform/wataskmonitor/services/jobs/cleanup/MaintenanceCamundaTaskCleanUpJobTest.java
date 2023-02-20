@@ -67,7 +67,10 @@ class MaintenanceCamundaTaskCleanUpJobTest extends UnitBaseTest {
         when(maintenanceCamundaTaskCleanUpJobService.isAllowedEnvironment())
             .thenReturn(true);
 
-        when(maintenanceCamundaTaskCleanUpJobService.retrieveProcesses())
+        when(maintenanceCamundaTaskCleanUpJobService.retrieveHistoricProcesses())
+            .thenReturn(taskList);
+
+        when(maintenanceCamundaTaskCleanUpJobService.retrieveActiveProcesses())
             .thenReturn(taskList);
 
         GenericJobReport jobReport = new GenericJobReport(
@@ -88,7 +91,8 @@ class MaintenanceCamundaTaskCleanUpJobTest extends UnitBaseTest {
 
         maintenanceCamundaTaskCleanUpJob.run(SOME_SERVICE_TOKEN);
 
-        verify(maintenanceCamundaTaskCleanUpJobService).retrieveProcesses();
+        verify(maintenanceCamundaTaskCleanUpJobService).retrieveHistoricProcesses();
+        verify(maintenanceCamundaTaskCleanUpJobService).retrieveActiveProcesses();
         verify(maintenanceCamundaTaskCleanUpJobService).deleteActiveProcesses(taskList, SOME_SERVICE_TOKEN);
         verify(maintenanceCamundaTaskCleanUpJobService).deleteHistoricProcesses(taskList, SOME_SERVICE_TOKEN);
     }
@@ -102,7 +106,8 @@ class MaintenanceCamundaTaskCleanUpJobTest extends UnitBaseTest {
         maintenanceCamundaTaskCleanUpJob.run(SOME_SERVICE_TOKEN);
 
         verify(maintenanceCamundaTaskCleanUpJobService, times(1)).isAllowedEnvironment();
-        verify(maintenanceCamundaTaskCleanUpJobService, never()).retrieveProcesses();
+        verify(maintenanceCamundaTaskCleanUpJobService, never()).retrieveHistoricProcesses();
+        verify(maintenanceCamundaTaskCleanUpJobService, never()).retrieveActiveProcesses();
         verify(maintenanceCamundaTaskCleanUpJobService, never()).deleteActiveProcesses(any(), any());
         verify(maintenanceCamundaTaskCleanUpJobService, never()).deleteHistoricProcesses(any(), any());
     }

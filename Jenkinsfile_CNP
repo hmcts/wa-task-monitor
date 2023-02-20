@@ -46,7 +46,7 @@ withPipeline(type, product, component) {
   env.ROLE_ASSIGNMENT_URL = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
   env.CCD_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
   env.CAMUNDA_URL = "http://camunda-api-aat.service.core-compute-aat.internal/engine-rest"
-  env.TASK_MANAGEMENT_SERVICE_URL = "http://wa-task-management-api-aat.service.core-compute-aat.internal"
+  env.WA_TASK_MANAGEMENT_API_URL = "http://wa-task-management-api-aat.service.core-compute-aat.internal"
   env.CONFIGURATION_CAMUNDA_MAX_RESULTS = 100
   env.CONFIGURATION_TIME_LIMIT_FLAG = true
   env.CONFIGURATION_TIME_LIMIT = 60
@@ -57,26 +57,27 @@ withPipeline(type, product, component) {
   env.TERMINATION_TIME_LIMIT_FLAG = true
   env.TERMINATION_TIME_LIMIT = 120
   env.RECONFIGURATION_MAX_TIME_LIMIT_SECONDS = 120
+  env.RECONFIGURATION_RETRY_WINDOW_TIME_HOURS= 2
   loadVaultSecrets(secrets)
 
-  after('test') {
+  afterSuccess('test') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/integration/**/*'
   }
 
-  after('functionalTest:preview') {
+  afterSuccess('functionalTest:preview') {
     env.ENABLE_TEST_USER_DELETION = true
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
   }
 
-  after('functionalTest:aat') {
+  afterSuccess('functionalTest:aat') {
     env.ENABLE_TEST_USER_DELETION = true
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
   }
 
-  after('pact-provider-verification') {
+  afterSuccess('pact-provider-verification') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
   }
 
