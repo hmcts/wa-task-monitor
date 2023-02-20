@@ -36,13 +36,15 @@ public class MaintenanceCamundaTaskCleanUpJob implements JobService {
         }
 
         log.info("Starting task {} job.", MAINTENANCE_CAMUNDA_TASK_CLEAN_UP);
-        List<HistoricCamundaTask> tasks = maintenanceCamundaTaskCleanUpJobService.retrieveProcesses();
 
-        maintenanceCamundaTaskCleanUpJobService.deleteActiveProcesses(tasks, serviceToken);
+        List<HistoricCamundaTask> historicTasks = maintenanceCamundaTaskCleanUpJobService.retrieveHistoricProcesses();
+        maintenanceCamundaTaskCleanUpJobService.deleteHistoricProcesses(historicTasks, serviceToken);
+        log.info("{} history process deletion finished successfully", MAINTENANCE_CAMUNDA_TASK_CLEAN_UP);
+
+        List<HistoricCamundaTask> activeTasks = maintenanceCamundaTaskCleanUpJobService.retrieveActiveProcesses();
+        maintenanceCamundaTaskCleanUpJobService.deleteActiveProcesses(activeTasks, serviceToken);
         log.info("{} active process deletion finished successfully", MAINTENANCE_CAMUNDA_TASK_CLEAN_UP);
 
-        maintenanceCamundaTaskCleanUpJobService.deleteHistoricProcesses(tasks, serviceToken);
-        log.info("{} history process deletion finished successfully", MAINTENANCE_CAMUNDA_TASK_CLEAN_UP);
         log.info("{} job finished successfully", MAINTENANCE_CAMUNDA_TASK_CLEAN_UP);
 
     }
