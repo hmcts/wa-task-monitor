@@ -51,7 +51,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
     }
 
     @Test
-    public void task_initiation_job_should_initiate_task_and_taskState_should_be_unassigned() {
+    public void task_initiation_job_should_initiate_task_and_taskState_should_be_unconfigured() {
 
         TestVariables taskVariables = common.setupTaskAndRetrieveIds();
 
@@ -75,7 +75,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
             common.getTaskVariables(caseworkerCredentials.getHeaders(), taskVariables.getTaskId());
 
         assertEquals(taskVariables.getCaseId(), camundaVariableMap.get("caseId").getValue());
-        assertEquals("unassigned", camundaVariableMap.get("taskState").getValue());
+        assertEquals("unconfigured", camundaVariableMap.get("taskState").getValue());
 
     }
 
@@ -116,17 +116,17 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
     @Test
     public void task_initiation_job_should_initiate_only_default_task_and_not_initiate_delayed_task() {
         TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
-        common.setupCftOrganisationalRoleAssignment(caseworkerCredentials.getHeaders());
+        common.setupOrganisationalRoleAssignment(caseworkerCredentials.getHeaders());
 
         initiateTask(caseworkerCredentials.getHeaders(), defaultTaskVariables,
-            "followUpOverdueReasonsForAppeal", "task name", "task title"
+                     "followUpOverdueReasonsForAppeal", "task name", "task title"
         );
 
         common.setupOrganisationalRoleAssignmentWithCustomAttributes(
             caseworkerCredentials.getHeaders(),
             Map.of(
                 "primaryLocation", "765324",
-                "jurisdiction", "IA"
+                "jurisdiction", "WA"
             )
         );
 
@@ -137,7 +137,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         caseIds.add(defaultTaskVariables.getCaseId());
 
         TestVariables delayedTaskVariables = common.setupDelayedTaskAndRetrieveIds();
-        
+
         assertNotNull(delayedTaskVariables);
         assertNotNull(delayedTaskVariables.getCaseId());
         assertNotNull(delayedTaskVariables.getTaskId());
@@ -155,7 +155,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
             .body(is(expectedResponse.apply(JobName.INITIATION.name())));
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -183,9 +183,24 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         String actualDelayedTaskTaskState = ((HashMap) (((HashMap) delayedTaskCamundaVariables)
             .get("taskState"))).get("value").toString();
 
-        assertEquals("unassigned", actualDefaultTaskTaskState);
+        assertEquals("unconfigured", actualDefaultTaskTaskState);
         assertEquals("unconfigured", actualDelayedTaskTaskState);
 
+    }
+
+    @Test
+    public void should_return_a_503_if_task_already_initiated_however_handled_gracefully() {
+        TestVariables defaultTaskVariables = common.setupTaskAndRetrieveIds();
+        caseIds.add(defaultTaskVariables.getCaseId());
+        common.setupOrganisationalRoleAssignment(caseworkerCredentials.getHeaders());
+
+        initiateTask(caseworkerCredentials.getHeaders(), defaultTaskVariables,
+                     "followUpOverdueReasonsForAppeal", "task name", "task title"
+        );
+        //Expect to get 503 for database conflict
+        initiateTask(caseworkerCredentials.getHeaders(), defaultTaskVariables,
+                     "followUpOverdueReasonsForAppeal", "task name", "task title"
+        );
     }
 
 }

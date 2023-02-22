@@ -5,17 +5,17 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.InitiateTaskOperation;
 
-import java.util.List;
+import java.util.Map;
 
 @EqualsAndHashCode
 @ToString
 public class InitiateTaskRequest {
 
     private final InitiateTaskOperation operation;
-    private final List<TaskAttribute> taskAttributes;
+    private final Map<String, Object> taskAttributes;
 
     @JsonCreator
-    public InitiateTaskRequest(InitiateTaskOperation operation, List<TaskAttribute> taskAttributes) {
+    public InitiateTaskRequest(InitiateTaskOperation operation, Map<String, Object> taskAttributes) {
         this.operation = operation;
         this.taskAttributes = taskAttributes;
     }
@@ -24,7 +24,7 @@ public class InitiateTaskRequest {
         return operation;
     }
 
-    public List<TaskAttribute> getTaskAttributes() {
+    public Map<String, Object> getTaskAttributes() {
         return taskAttributes;
     }
 }

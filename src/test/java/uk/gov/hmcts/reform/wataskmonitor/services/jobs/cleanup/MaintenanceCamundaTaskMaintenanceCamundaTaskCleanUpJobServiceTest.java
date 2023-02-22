@@ -128,7 +128,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
             actualQueryParametersCaptor.capture()
         )).thenReturn(tasks);
 
-        List<HistoricCamundaTask> actualTaskList = maintenanceCamundaTaskCleanUpJobService.retrieveProcesses();
+        List<HistoricCamundaTask> actualTaskList = maintenanceCamundaTaskCleanUpJobService.retrieveHistoricProcesses();
 
         verify(camundaClient, times(1))
             .getHistoryProcesses(anyString(), any(), any());
@@ -136,12 +136,46 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
         assertEquals(tasks, actualTaskList);
         assertThat(output.getOut().contains("cleanUpJobConfig:"));
         assertThat(output.getOut().contains("task(s) retrieved successfully from history"));
-        assertQuery();
+        assertQueryForHistoric();
 
     }
 
     @Test
-    void should_return_empty_list_when_environment_is_prod(CapturedOutput output) throws JSONException {
+    void should_retrieve_active_processes(CapturedOutput output) throws JSONException {
+        maintenanceCamundaTaskCleanUpJobService = new MaintenanceCamundaTaskCleanUpJobService(
+            camundaClient,
+            cleanUpJobConfig
+        );
+
+        HistoricCamundaTask camundaTask = new HistoricCamundaTask(
+            "ac365ec0-4220-412e-bd0c-4cc56e71f64e",
+            null,
+            null,
+            null
+        );
+
+        List<HistoricCamundaTask> tasks = singletonList(camundaTask);
+
+        when(camundaClient.getActiveProcesses(
+            eq("0"),
+            eq("50"),
+            actualQueryParametersCaptor.capture()
+        )).thenReturn(tasks);
+
+        List<HistoricCamundaTask> actualTaskList = maintenanceCamundaTaskCleanUpJobService.retrieveActiveProcesses();
+
+        verify(camundaClient, times(1))
+            .getActiveProcesses(anyString(), any(), any());
+
+        assertEquals(tasks, actualTaskList);
+        assertThat(output.getOut().contains("cleanUpJobConfig:"));
+        assertThat(output.getOut().contains("active processes retrieved successfully"));
+        assertQueryForActive();
+
+    }
+
+    @Test
+    void should_return_empty_list_when_environment_is_prod(CapturedOutput output) {
         maintenanceCamundaTaskCleanUpJobService = new MaintenanceCamundaTaskCleanUpJobService(
             camundaClient,
             cleanUpJobConfig
@@ -150,7 +184,27 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
         lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("prod");
         lenient().when(cleanUpJobConfig.getAllowedEnvironment()).thenReturn(List.of("local", "aat", "prod"));
 
-        List<HistoricCamundaTask> actualTaskList = maintenanceCamundaTaskCleanUpJobService.retrieveProcesses();
+        List<HistoricCamundaTask> actualTaskList = maintenanceCamundaTaskCleanUpJobService.retrieveHistoricProcesses();
+
+        verify(camundaClient, never())
+            .getHistoryProcesses(anyString(), any(), any());
+
+        assertEquals(emptyList(), actualTaskList);
+        assertThat(output.getOut().contains("is not enabled for this environment: prod"));
+
+    }
+
+    @Test
+    void should_return_empty_list_when_environment_is_prod_for_active_processes(CapturedOutput output) {
+        maintenanceCamundaTaskCleanUpJobService = new MaintenanceCamundaTaskCleanUpJobService(
+            camundaClient,
+            cleanUpJobConfig
+        );
+
+        lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("prod");
+        lenient().when(cleanUpJobConfig.getAllowedEnvironment()).thenReturn(List.of("local", "aat", "prod"));
+
+        List<HistoricCamundaTask> actualTaskList = maintenanceCamundaTaskCleanUpJobService.retrieveActiveProcesses();
 
         verify(camundaClient, never())
             .getHistoryProcesses(anyString(), any(), any());
@@ -462,7 +516,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
 
     }
 
-    private void assertQuery() throws JSONException {
+    private void assertQueryForHistoric() throws JSONException {
         JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
 
         String startedBefore = query.getString("startedBefore");
@@ -470,7 +524,22 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
         assertDoesNotThrow(() -> ZonedDateTime.parse(startedBefore, maintenanceCamundaTaskCleanUpJobService.formatter));
 
         JSONAssert.assertEquals(
-            getExpectedQueryParameters(startedBefore),
+            getExpectedQueryParametersForHistoric(startedBefore),
+            actualQueryParametersCaptor.getValue(),
+            JSONCompareMode.LENIENT
+        );
+
+    }
+
+    private void assertQueryForActive() throws JSONException {
+        JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
+
+        String startedBefore = query.getString("startedBefore");
+
+        assertDoesNotThrow(() -> ZonedDateTime.parse(startedBefore, maintenanceCamundaTaskCleanUpJobService.formatter));
+
+        JSONAssert.assertEquals(
+            getExpectedQueryParametersForActive(startedBefore),
             actualQueryParametersCaptor.getValue(),
             JSONCompareMode.LENIENT
         );
@@ -478,53 +547,20 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
     }
 
     @NotNull
-    private String getExpectedQueryParameters(String startedBefore) {
+    private String getExpectedQueryParametersForHistoric(String startedBefore) {
 
         return "{\n"
                + " \"startedBefore\": \"" + startedBefore + "\",\n"
-               + "  \"orQueries\": [\n"
-               + "    {\n"
-               + "      \"processVariables\": [\n"
-               + "        {\n"
-               + "          \"active\": true\n"
-               + "        }\n"
-               + "      ]\n"
-               + "    },\n"
-               + "    {\n"
-               + "      \"processVariables\": [\n"
-               + "        {\n"
-               + "          \"completed\": true\n"
-               + "        }\n"
-               + "      ]\n"
-               + "    },\n"
-               + "    {\n"
-               + "      \"processVariables\": [\n"
-               + "        {\n"
-               + "          \"suspended\": true\n"
-               + "        }\n"
-               + "      ]\n"
-               + "    },\n"
-               + "    {\n"
-               + "      \"processVariables\": [\n"
-               + "        {\n"
-               + "          \"externallyTerminated\": true\n"
-               + "        }\n"
-               + "      ]\n"
-               + "    },\n"
-               + "    {\n"
-               + "      \"processVariables\": [\n"
-               + "        {\n"
-               + "          \"internallyTerminated\": true\n"
-               + "        }\n"
-               + "      ]\n"
-               + "    }\n"
-               + "  ],\n"
-               + "  \"sorting\": [\n"
-               + "    {\n"
-               + "      \"sortBy\": \"startTime\",\n"
-               + "      \"sortOrder\": \"asc\"\n"
-               + "    }\n"
-               + "  ]\n"
+               + " \"finished\": true\n"
+               + "}";
+
+    }
+
+    @NotNull
+    private String getExpectedQueryParametersForActive(String startedBefore) {
+
+        return "{\n"
+               + " \"startedBefore\": \"" + startedBefore + "\"\n"
                + "}";
 
     }
