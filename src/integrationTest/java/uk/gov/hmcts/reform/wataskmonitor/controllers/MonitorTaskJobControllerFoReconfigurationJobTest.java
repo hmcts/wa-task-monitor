@@ -6,11 +6,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.TestUtility;
-import uk.gov.hmcts.reform.wataskmonitor.clients.TaskReconfigurationClient;
+import uk.gov.hmcts.reform.wataskmonitor.clients.TaskOperationsClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskOperationRequest;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.response.TaskOperationResponse;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
+
+import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,7 +32,7 @@ class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootIntegra
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
     @MockBean
-    private TaskReconfigurationClient taskReconfigurationClient;
+    private TaskOperationsClient taskOperationsClient;
     @MockBean
     private TaskOperationRequest taskOperationRequest;
 
@@ -50,14 +53,16 @@ class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootIntegra
             .andExpect(content().string(equalTo(expectedResponse.apply(JobName.RECONFIGURATION.name()))));
 
         verify(authTokenGenerator).generate();
-        verify(taskReconfigurationClient).executeReconfigure(eq(SERVICE_TOKEN), any(TaskOperationRequest.class));
+        verify(taskOperationsClient).executeOperation(eq(SERVICE_TOKEN), any(TaskOperationRequest.class));
     }
 
     private void mockExternalDependencies() {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
 
-        when(taskReconfigurationClient.executeReconfigure(eq(SERVICE_TOKEN), eq(taskOperationRequest)))
-            .thenReturn("OK");
+        TaskOperationResponse taskOperationResponse = new TaskOperationResponse(Map.of());
+
+        when(taskOperationsClient.executeOperation(eq(SERVICE_TOKEN), eq(taskOperationRequest)))
+            .thenReturn(taskOperationResponse);
     }
 
 }

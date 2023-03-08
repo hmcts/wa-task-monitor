@@ -1,0 +1,47 @@
+package uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.entities;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TaskFilterOperator;
+
+import java.time.OffsetDateTime;
+
+@Schema(
+    name = "TaskFilter",
+    description = "Name of filter and value"
+)
+@EqualsAndHashCode
+@ToString
+public class CleanupSensitiveLogsTaskFilter implements TaskFilter<OffsetDateTime> {
+
+    @Schema(required = true)
+    private final String key;
+
+    @Schema(required = true)
+    private final OffsetDateTime values;
+
+    @Schema(required = true)
+    private final TaskFilterOperator operator;
+
+
+    @JsonCreator
+    public CleanupSensitiveLogsTaskFilter(String key, OffsetDateTime values, TaskFilterOperator operator) {
+        this.key = key;
+        this.values = values;
+        this.operator = operator;
+    }
+    
+    public String getKey() {
+        return key;
+    }
+
+    public OffsetDateTime getValues() {
+        return values;
+    }
+
+    public TaskFilterOperator getOperator() {
+        return operator;
+    }
+}
