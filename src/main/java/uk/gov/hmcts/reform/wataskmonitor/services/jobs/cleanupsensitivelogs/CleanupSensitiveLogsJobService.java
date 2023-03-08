@@ -29,8 +29,7 @@ public class CleanupSensitiveLogsJobService {
     public CleanupSensitiveLogsJobService(TaskOperationsClient taskOperationsClient) {
         this.taskOperationsClient = taskOperationsClient;
     }
-
-    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    
     public String cleanSensitiveLogs(String serviceToken) {
         OffsetDateTime cleanUpStartDate = OffsetDateTime.now();
 
