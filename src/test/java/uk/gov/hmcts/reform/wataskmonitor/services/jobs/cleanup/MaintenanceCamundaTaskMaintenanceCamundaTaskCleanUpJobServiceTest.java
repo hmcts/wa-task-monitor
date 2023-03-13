@@ -156,7 +156,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
 
         List<HistoricCamundaTask> tasks = singletonList(camundaTask);
 
-        when(camundaClient.getActiveProcesses(
+        when(camundaClient.getHistoryProcesses(
             eq("0"),
             eq("50"),
             actualQueryParametersCaptor.capture()
@@ -165,7 +165,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
         List<HistoricCamundaTask> actualTaskList = maintenanceCamundaTaskCleanUpJobService.retrieveActiveProcesses();
 
         verify(camundaClient, times(1))
-            .getActiveProcesses(anyString(), any(), any());
+            .getHistoryProcesses(anyString(), any(), any());
 
         assertEquals(tasks, actualTaskList);
         assertThat(output.getOut().contains("cleanUpJobConfig:"));
@@ -549,19 +549,25 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
     @NotNull
     private String getExpectedQueryParametersForHistoric(String startedBefore) {
 
-        return "{\n"
-               + " \"startedBefore\": \"" + startedBefore + "\",\n"
-               + " \"finished\": true\n"
-               + "}";
+        return String.format("""
+             {
+                 "processDefinitionKey": "wa-task-initiation-ia-asylum",                
+                 "startedBefore": "%s",
+                 "finished": true
+             }
+            """, startedBefore);
 
     }
 
     @NotNull
     private String getExpectedQueryParametersForActive(String startedBefore) {
-
-        return "{\n"
-               + " \"startedBefore\": \"" + startedBefore + "\"\n"
-               + "}";
+        return String.format("""
+            {
+                "processDefinitionKey": "wa-task-initiation-ia-asylum",                
+                "startedBefore": "%s",
+                "unfinished": true
+            }
+            """, startedBefore);
 
     }
 
