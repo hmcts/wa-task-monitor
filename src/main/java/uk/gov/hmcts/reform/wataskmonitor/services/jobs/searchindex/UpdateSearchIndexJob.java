@@ -25,8 +25,10 @@ public class UpdateSearchIndexJob implements JobService {
 
     @Override
     public void run(String serviceToken) {
-        log.info("Starting {} job.", UPDATE_SEARCH_INDEX);
-        String operationId = updateSearchIndexJobService.updateSearchIndex(serviceToken);
-        log.info("{} job finished successfully: {}", UPDATE_SEARCH_INDEX, " for operationId:" + operationId);
+        if (canRun(UPDATE_SEARCH_INDEX)) {
+            log.info("Starting {} job.", UPDATE_SEARCH_INDEX);
+            String operationId = updateSearchIndexJobService.updateSearchIndex(serviceToken);
+            log.info("{} job finished successfully: {}", UPDATE_SEARCH_INDEX, " for operationId:" + operationId);
+        }
     }
 }
