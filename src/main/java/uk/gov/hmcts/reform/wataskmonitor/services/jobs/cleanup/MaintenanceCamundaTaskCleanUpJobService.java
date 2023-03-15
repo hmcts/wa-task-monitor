@@ -80,7 +80,7 @@ public class MaintenanceCamundaTaskCleanUpJobService {
             return emptyList();
         }
 
-        List<HistoricCamundaTask> activeProcesses = camundaClient.getActiveProcesses(
+        List<HistoricCamundaTask> activeProcesses = camundaClient.getHistoryProcesses(
             "0",
             cleanUpJobConfig.getCleanUpCamundaMaxResults(),
             buildSearchQuery(ResourceEnum.CAMUNDA_ACTIVE_CLEAN_UP_TASK_QUERY)
