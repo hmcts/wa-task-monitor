@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums;
 
 public enum TaskOperationName {
     MARK_TO_RECONFIGURE("mark_to_reconfigure"),
-    EXECUTE_RECONFIGURE("execute_reconfigure");
+    EXECUTE_RECONFIGURE("execute_reconfigure"),
+    UPDATE_SEARCH_INDEX("update_search_index");
 
     private final String value;
 

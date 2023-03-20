@@ -11,17 +11,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
 
 @FeignClient(
-    name = "taskReconfiguration",
+    name = "taskOperation",
     url = "${wa-task-management-api.url}"
 )
-public interface TaskReconfigurationClient {
+public interface TaskOperationClient {
 
     @PostMapping(value = "/task/operation",
         consumes = APPLICATION_JSON_VALUE,
         produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    String executeReconfigure(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
-                              @RequestBody TaskOperationRequest taskOperationRequest);
+    String executeOperation(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+                            @RequestBody TaskOperationRequest taskOperationRequest);
 
 }

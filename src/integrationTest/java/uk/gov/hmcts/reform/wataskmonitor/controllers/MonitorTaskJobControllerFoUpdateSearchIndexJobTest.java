@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
-class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootIntegrationBaseTest {
+class MonitorTaskJobControllerFoUpdateSearchIndexJobTest extends SpringBootIntegrationBaseTest {
 
     public static final String SERVICE_TOKEN = "some service token";
 
@@ -41,13 +41,14 @@ class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootIntegra
     @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
     @Test
     public void givenMonitorTaskJobRequestShouldReturnStatus200() throws Exception {
-        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(JobName.RECONFIGURATION));
+        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(
+                new JobDetails(JobName.UPDATE_SEARCH_INDEX));
 
         mockMvc.perform(post("/monitor/tasks/jobs")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(TestUtility.asJsonString(monitorTaskJobReq)))
             .andExpect(status().isOk())
-            .andExpect(content().string(equalTo(expectedResponse.apply(JobName.RECONFIGURATION.name()))));
+            .andExpect(content().string(equalTo(expectedResponse.apply(JobName.UPDATE_SEARCH_INDEX.name()))));
 
         verify(authTokenGenerator).generate();
         verify(taskOperationClient).executeOperation(eq(SERVICE_TOKEN), any(TaskOperationRequest.class));
