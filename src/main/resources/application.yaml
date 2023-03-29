@@ -11,6 +11,9 @@ management:
       exposure:
         include: health, info, prometheus
 
+springdoc:
+  writer-with-order-by-keys: true
+
 spring:
   config:
     import: "optional:configtree:/mnt/secrets/wa/"
