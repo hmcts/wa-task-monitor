@@ -17,7 +17,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUNDA_DATA_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.InitiationHelpers.createMockCamundaVariables;
 import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.InitiationHelpers.createMockedCamundaTask;
