@@ -43,24 +43,42 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
 
         Map<String, Object> actual = initiationTaskAttributesMapper.mapTaskAttributes(camundaTask, camundaVariables);
 
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.AUTO_ASSIGNED.value()).getValue().toString(), actual.get(CamundaVariableDefinition.AUTO_ASSIGNED.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.HAS_WARNINGS.value()).getValue().toString(), actual.get(CamundaVariableDefinition.HAS_WARNINGS.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.CASE_ID.value()).getValue().toString(), actual.get(CamundaVariableDefinition.CASE_ID.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.CASE_NAME.value()).getValue().toString(), actual.get(CamundaVariableDefinition.CASE_NAME.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.CASE_TYPE_ID.value()).getValue().toString(), actual.get(CamundaVariableDefinition.CASE_TYPE_ID.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.TASK_STATE.value()).getValue().toString(), actual.get(CamundaVariableDefinition.TASK_STATE.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.CFT_TASK_STATE.value()).getValue().toString(), actual.get(CamundaVariableDefinition.CFT_TASK_STATE.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.LOCATION.value()).getValue().toString(), actual.get(CamundaVariableDefinition.LOCATION.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.LOCATION_NAME.value()).getValue().toString(), actual.get(CamundaVariableDefinition.LOCATION_NAME.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.SECURITY_CLASSIFICATION.value()).getValue().toString(), actual.get(CamundaVariableDefinition.SECURITY_CLASSIFICATION.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.TITLE.value()).getValue().toString(), actual.get(CamundaVariableDefinition.TITLE.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.EXECUTION_TYPE.value()).getValue().toString(), actual.get(CamundaVariableDefinition.EXECUTION_TYPE.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.TASK_SYSTEM.value()).getValue().toString(), actual.get(CamundaVariableDefinition.TASK_SYSTEM.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.JURISDICTION.value()).getValue().toString(), actual.get(CamundaVariableDefinition.JURISDICTION.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.REGION.value()).getValue().toString(), actual.get(CamundaVariableDefinition.REGION.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.APPEAL_TYPE.value()).getValue().toString(), actual.get(CamundaVariableDefinition.APPEAL_TYPE.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.CASE_MANAGEMENT_CATEGORY.value()).getValue().toString(), actual.get(CamundaVariableDefinition.CASE_MANAGEMENT_CATEGORY.value()).toString());
-        assertEquals(camundaVariables.get(CamundaVariableDefinition.ROLE_ASSIGNMENT_ID.value()).getValue().toString(), actual.get(CamundaVariableDefinition.ROLE_ASSIGNMENT_ID.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.AUTO_ASSIGNED.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.AUTO_ASSIGNED.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.HAS_WARNINGS.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.HAS_WARNINGS.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.CASE_ID.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.CASE_ID.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.CASE_NAME.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.CASE_NAME.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.CASE_TYPE_ID.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.CASE_TYPE_ID.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.TASK_STATE.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.TASK_STATE.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.CFT_TASK_STATE.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.CFT_TASK_STATE.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.LOCATION.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.LOCATION.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.LOCATION_NAME.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.LOCATION_NAME.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.SECURITY_CLASSIFICATION.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.SECURITY_CLASSIFICATION.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.TITLE.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.TITLE.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.EXECUTION_TYPE.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.EXECUTION_TYPE.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.TASK_SYSTEM.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.TASK_SYSTEM.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.JURISDICTION.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.JURISDICTION.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.REGION.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.REGION.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.APPEAL_TYPE.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.APPEAL_TYPE.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.CASE_MANAGEMENT_CATEGORY.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.CASE_MANAGEMENT_CATEGORY.value()).toString());
+        assertEquals(camundaVariables.get(CamundaVariableDefinition.ROLE_ASSIGNMENT_ID.value()).getValue().toString(),
+                     actual.get(CamundaVariableDefinition.ROLE_ASSIGNMENT_ID.value()).toString());
 
     }
 
@@ -98,11 +116,16 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
         assertEquals(CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getDue()), actual.get(CamundaVariableDefinition.DUE_DATE.value()).toString());
         assertEquals(camundaTask.getDescription(), actual.get(CamundaVariableDefinition.DESCRIPTION.value()).toString());
 
-        assertNotEquals(CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getCreated()), actual.get(CamundaVariableDefinition.CREATED.value()).toString());
-        assertNotEquals(camundaVariables.get(CamundaVariableDefinition.TASK_NAME.value()).toString(), actual.get(CamundaVariableDefinition.TASK_NAME.value()).toString());
-        assertNotEquals(camundaVariables.get(CamundaVariableDefinition.ASSIGNEE.value()).toString(), actual.get(CamundaVariableDefinition.ASSIGNEE.value()).toString());
-        assertNotEquals(camundaVariables.get(CamundaVariableDefinition.DUE_DATE.value()).toString(), actual.get(CamundaVariableDefinition.DUE_DATE.value()).toString());
-        assertNotEquals(camundaVariables.get(CamundaVariableDefinition.DESCRIPTION.value()).toString(), actual.get(CamundaVariableDefinition.DESCRIPTION.value()).toString());
+        assertNotEquals(CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getCreated()),
+                        actual.get(CamundaVariableDefinition.CREATED.value()).toString());
+        assertNotEquals(camundaVariables.get(CamundaVariableDefinition.TASK_NAME.value()).toString(),
+                        actual.get(CamundaVariableDefinition.TASK_NAME.value()).toString());
+        assertNotEquals(camundaVariables.get(CamundaVariableDefinition.ASSIGNEE.value()).toString(),
+                        actual.get(CamundaVariableDefinition.ASSIGNEE.value()).toString());
+        assertNotEquals(camundaVariables.get(CamundaVariableDefinition.DUE_DATE.value()).toString(),
+                        actual.get(CamundaVariableDefinition.DUE_DATE.value()).toString());
+        assertNotEquals(camundaVariables.get(CamundaVariableDefinition.DESCRIPTION.value()).toString(),
+                        actual.get(CamundaVariableDefinition.DESCRIPTION.value()).toString());
 
         assertNull(actual.get(CamundaVariableDefinition.PRIORITY_DATE.value()));
     }
