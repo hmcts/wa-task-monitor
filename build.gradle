@@ -288,7 +288,7 @@ def versions = [
   junit               : '5.9.2',
   junitPlatform       : '1.9.2',
   reformLogging       : '5.1.9',
-  springDoc           : '1.6.15',
+  springDoc           : '1.7.0',
   serenity            : '3.2.0',
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.12.0',
