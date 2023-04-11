@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUNDA_DATA_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.ASSIGNEE;
@@ -35,22 +35,22 @@ public class InitiationTaskAttributesMapper {
         // Local Variables
         String type = getType(camundaTask, variables);
 
-        Map<String, Object> attributes = new ConcurrentHashMap<>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put(TASK_TYPE.value(), type);
 
         setAttributesFromCamundaTask(camundaTask, attributes);
 
         variables.entrySet().stream()
-            .filter(variable -> !variable.getKey().equals(DUE_DATE.value())) // done
-            .filter(variable -> !variable.getKey().equals(ASSIGNEE.value())) //done
+            .filter(variable -> !variable.getKey().equals(DUE_DATE.value()))
+            .filter(variable -> !variable.getKey().equals(ASSIGNEE.value()))
             .filter(variable -> !variable.getKey().equals(PRIORITY_DATE.value()))
-            .filter(variable -> !variable.getKey().equals(DESCRIPTION.value())) //done
-            .filter(variable -> !variable.getKey().equals(TASK_NAME.value())) //done
+            .filter(variable -> !variable.getKey().equals(DESCRIPTION.value()))
+            .filter(variable -> !variable.getKey().equals(TASK_NAME.value()))
             .forEach(entry -> attributes.put(entry.getKey(), getCamundaVariableValue(entry.getValue())));
         return attributes;
     }
 
-    private static void setAttributesFromCamundaTask(CamundaTask camundaTask, Map<String, Object> attributes) {
+    private void setAttributesFromCamundaTask(CamundaTask camundaTask, Map<String, Object> attributes) {
         attributes.put(DUE_DATE.value(), CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getDue()));
         attributes.put(CREATED.value(), CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getCreated()));
         if (camundaTask.getAssignee() != null) {
