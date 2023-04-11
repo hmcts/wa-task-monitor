@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUNDA_DATA_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.ASSIGNEE;
@@ -35,7 +35,7 @@ public class InitiationTaskAttributesMapper {
         // Local Variables
         String type = getType(camundaTask, variables);
 
-        Map<String, Object> attributes = new HashMap<>();
+        Map<String, Object> attributes = new ConcurrentHashMap<>();
         attributes.put(TASK_TYPE.value(), type);
 
         setAttributesFromCamundaTask(camundaTask, attributes);
