@@ -16,7 +16,6 @@ import java.util.UUID;
 @Slf4j
 public class ReconfigurationFailuresJobService {
 
-    private static final String RECONFIGURE_REQUEST_TIME = "reconfigure_request_time";
     private final TaskOperationClient taskOperationClient;
     private final long reconfigureMaxTimeLimitSeconds;
     private final long reconfigureRetryWindowTimeLimitHours;
