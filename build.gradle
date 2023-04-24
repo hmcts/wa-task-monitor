@@ -291,7 +291,7 @@ def versions = [
   springDoc           : '1.7.0',
   serenity            : '3.2.0',
   springFrameworkCloud: '2.2.10.RELEASE',
-  pitest              : '1.12.0',
+  pitest              : '1.13.0',
   pactVersion         : '4.1.7'
 ]
 
