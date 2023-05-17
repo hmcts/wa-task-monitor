@@ -16,7 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
-import uk.gov.hmcts.reform.wataskmonitor.config.DocumentManagementFiles;
 import uk.gov.hmcts.reform.wataskmonitor.config.GivensBuilder;
 import uk.gov.hmcts.reform.wataskmonitor.config.RestApiActions;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.InitiateTaskRequest;
@@ -63,8 +62,6 @@ public class SpringBootFunctionalBaseTest {
     @Autowired
     protected CoreCaseDataApi coreCaseDataApi;
     @Autowired
-    protected DocumentManagementFiles documentManagementFiles;
-    @Autowired
     protected IdamService idamService;
     @Autowired
     protected RoleAssignmentServiceApi roleAssignmentServiceApi;
@@ -94,13 +91,10 @@ public class SpringBootFunctionalBaseTest {
         camundaApiActions = new RestApiActions(camundaUrl, LOWER_CAMEL_CASE).setUp();
         taskManagementApiActions = new RestApiActions(taskManagementUrl, SNAKE_CASE).setUp();
 
-        documentManagementFiles.prepare();
-
         given = new GivensBuilder(
                 camundaApiActions,
                 authorizationProvider,
-                coreCaseDataApi,
-                documentManagementFiles
+                coreCaseDataApi
         );
 
         common = new Common(
