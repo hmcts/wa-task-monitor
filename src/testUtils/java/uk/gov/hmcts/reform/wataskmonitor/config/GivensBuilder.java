@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.wataskmonitor.entities.TestAuthenticationCredentials;
 import uk.gov.hmcts.reform.wataskmonitor.entities.camunda.CamundaProcessVariables;
 import uk.gov.hmcts.reform.wataskmonitor.entities.camunda.CamundaSendMessageRequest;
 import uk.gov.hmcts.reform.wataskmonitor.entities.camunda.CamundaValue;
-import uk.gov.hmcts.reform.wataskmonitor.entities.documents.Document;
 import uk.gov.hmcts.reform.wataskmonitor.services.AuthorizationProvider;
 
 import java.io.IOException;
@@ -36,7 +35,6 @@ import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.AUT
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
 import static uk.gov.hmcts.reform.wataskmonitor.entities.camunda.CamundaMessage.CREATE_TASK_MESSAGE;
 import static uk.gov.hmcts.reform.wataskmonitor.entities.camunda.CamundaProcessVariables.ProcessVariablesBuilder.processVariables;
-import static uk.gov.hmcts.reform.wataskmonitor.entities.documents.DocumentNames.NOTICE_OF_APPEAL_PDF;
 import static uk.gov.hmcts.reform.wataskmonitor.utils.Common.CAMUNDA_DATA_TIME_FORMATTER;
 
 @Slf4j
@@ -44,19 +42,16 @@ public class GivensBuilder {
 
     private final RestApiActions camundaApiActions;
     private final AuthorizationProvider authorizationProvider;
-    private final DocumentManagementFiles documentManagementFiles;
 
     private final CoreCaseDataApi coreCaseDataApi;
 
     public GivensBuilder(RestApiActions camundaApiActions,
                          AuthorizationProvider authorizationProvider,
-                         CoreCaseDataApi coreCaseDataApi,
-                         DocumentManagementFiles documentManagementFiles
+                         CoreCaseDataApi coreCaseDataApi
     ) {
         this.camundaApiActions = camundaApiActions;
         this.authorizationProvider = authorizationProvider;
         this.coreCaseDataApi = coreCaseDataApi;
-        this.documentManagementFiles = documentManagementFiles;
 
     }
 
@@ -65,8 +60,6 @@ public class GivensBuilder {
         String userToken = lawFirmCredentials.getHeaders().getValue(AUTHORIZATION);
         String serviceToken = lawFirmCredentials.getHeaders().getValue(SERVICE_AUTHORIZATION);
         UserInfo userInfo = authorizationProvider.getUserInfo(userToken);
-
-        Document document = documentManagementFiles.getDocumentAs(NOTICE_OF_APPEAL_PDF, lawFirmCredentials);
 
         StartEventResponse startCase = coreCaseDataApi.startForCaseworker(
             userToken,
@@ -86,18 +79,6 @@ public class GivensBuilder {
             caseDataString = caseDataString.replace(
                 "{NEXT_HEARING_DATE}",
                 OffsetDateTime.now().toString()
-            );
-            caseDataString = caseDataString.replace(
-                "{NOTICE_OF_DECISION_DOCUMENT_STORE_URL}",
-                document.getDocumentUrl()
-            );
-            caseDataString = caseDataString.replace(
-                "{NOTICE_OF_DECISION_DOCUMENT_NAME}",
-                document.getDocumentFilename()
-            );
-            caseDataString = caseDataString.replace(
-                "{NOTICE_OF_DECISION_DOCUMENT_STORE_URL_BINARY}",
-                document.getDocumentBinaryUrl()
             );
 
             data = new ObjectMapper().readValue(caseDataString, Map.class);
