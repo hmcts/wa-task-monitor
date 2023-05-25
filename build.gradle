@@ -201,6 +201,7 @@ sonarqube {
     property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/wataskmonitor/config/**," +
       "src/testUtils/java/uk/gov/hmcts/reform/wataskmonitor/**," +
+      "src/main/java/uk/gov/hmcts/reform/wataskmonitor/domain/taskmanagement/request/entities/**," +
       "src/main/java/uk/gov/hmcts/reform/wataskmonitor/Application.java"
   }
 }

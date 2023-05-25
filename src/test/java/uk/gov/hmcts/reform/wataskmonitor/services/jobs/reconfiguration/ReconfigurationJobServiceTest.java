@@ -19,10 +19,11 @@ class ReconfigurationJobServiceTest extends UnitBaseTest {
     void setUp() {
 
         reconfigurationJobService = new ReconfigurationJobService(
-                taskOperationClient,
-                                            2,
-                                            120,
-            120);
+            taskOperationClient,
+            2,
+            120,
+            120
+        );
     }
 
     @Test
