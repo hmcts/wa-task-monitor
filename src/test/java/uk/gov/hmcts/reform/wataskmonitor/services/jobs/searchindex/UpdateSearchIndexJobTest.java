@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.jobs.reconfiguration;
+package uk.gov.hmcts.reform.wataskmonitor.services.jobs.searchindex;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,32 +12,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class ReconfigurationJobTest extends UnitBaseTest {
+public class UpdateSearchIndexJobTest extends UnitBaseTest {
 
     @Mock
-    private ReconfigurationJobService reconfigurationService;
+    private UpdateSearchIndexJobService updateSearchIndexJobService;
+
     @InjectMocks
-    private ReconfigurationJob reconfigurationJob;
+    private UpdateSearchIndexJob updateSearchIndexJob;
 
     @ParameterizedTest(name = "jobName: {0} expected: {1}")
     @CsvSource({
         "TERMINATION, false",
         "INITIATION, false",
-        "RECONFIGURATION, true",
+        "UPDATE_SEARCH_INDEX, true",
         "AD_HOC_DELETE_PROCESS_INSTANCES, false"
     })
     void canRun(JobName jobName, boolean expectedResult) {
-        assertThat(reconfigurationJob.canRun(jobName)).isEqualTo(expectedResult);
+        assertThat(updateSearchIndexJob.canRun(jobName)).isEqualTo(expectedResult);
     }
 
     @Test
     void run() {
         String operationId = "101";
-        when(reconfigurationService.reconfigureTask(SOME_SERVICE_TOKEN))
+        when(updateSearchIndexJobService.updateSearchIndex(SOME_SERVICE_TOKEN))
             .thenReturn(operationId);
 
-        reconfigurationJob.run(SOME_SERVICE_TOKEN);
+        updateSearchIndexJob.run(SOME_SERVICE_TOKEN);
 
-        verify(reconfigurationService).reconfigureTask(SOME_SERVICE_TOKEN);
+        verify(updateSearchIndexJobService).updateSearchIndex(SOME_SERVICE_TOKEN);
     }
 }

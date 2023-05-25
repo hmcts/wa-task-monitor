@@ -4,14 +4,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
-import uk.gov.hmcts.reform.wataskmonitor.clients.TaskOperationsClient;
+import uk.gov.hmcts.reform.wataskmonitor.clients.TaskOperationClient;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ReconfigurationJobServiceTest extends UnitBaseTest {
 
     @Mock
-    private TaskOperationsClient taskOperationsClient;
+    private TaskOperationClient taskOperationClient;
 
     private ReconfigurationJobService reconfigurationJobService;
 
@@ -19,10 +19,11 @@ class ReconfigurationJobServiceTest extends UnitBaseTest {
     void setUp() {
 
         reconfigurationJobService = new ReconfigurationJobService(
-            taskOperationsClient,
+            taskOperationClient,
             2,
             120,
-            120);
+            120
+        );
     }
 
     @Test

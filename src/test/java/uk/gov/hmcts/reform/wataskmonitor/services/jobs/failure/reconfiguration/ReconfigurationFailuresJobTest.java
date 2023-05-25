@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.wataskmonitor.services.jobs.reconfiguration;
+package uk.gov.hmcts.reform.wataskmonitor.services.jobs.failure.reconfiguration;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,32 +12,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class ReconfigurationJobTest extends UnitBaseTest {
+class ReconfigurationFailuresJobTest extends UnitBaseTest {
 
     @Mock
-    private ReconfigurationJobService reconfigurationService;
+    private ReconfigurationFailuresJobService reconfigurationFailuresJobService;
     @InjectMocks
-    private ReconfigurationJob reconfigurationJob;
+    private ReconfigurationFailuresJob reconfigurationFailuresJob;
 
     @ParameterizedTest(name = "jobName: {0} expected: {1}")
     @CsvSource({
         "TERMINATION, false",
         "INITIATION, false",
-        "RECONFIGURATION, true",
+        "RECONFIGURATION, false",
+        "RECONFIGURATION_FAILURES, true",
         "AD_HOC_DELETE_PROCESS_INSTANCES, false"
     })
     void canRun(JobName jobName, boolean expectedResult) {
-        assertThat(reconfigurationJob.canRun(jobName)).isEqualTo(expectedResult);
+        assertThat(reconfigurationFailuresJob.canRun(jobName)).isEqualTo(expectedResult);
     }
 
     @Test
     void run() {
         String operationId = "101";
-        when(reconfigurationService.reconfigureTask(SOME_SERVICE_TOKEN))
+        when(reconfigurationFailuresJobService.reconfigureFailuresTask(SOME_SERVICE_TOKEN))
             .thenReturn(operationId);
 
-        reconfigurationJob.run(SOME_SERVICE_TOKEN);
+        reconfigurationFailuresJob.run(SOME_SERVICE_TOKEN);
 
-        verify(reconfigurationService).reconfigureTask(SOME_SERVICE_TOKEN);
+        verify(reconfigurationFailuresJobService).reconfigureFailuresTask(SOME_SERVICE_TOKEN);
     }
 }

@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.cleanupsensitivelogs;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.wataskmonitor.clients.TaskOperationsClient;
+import uk.gov.hmcts.reform.wataskmonitor.clients.TaskOperationClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskOperationRequest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.entities.CleanupSensitiveLogsTaskFilter;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.entities.TaskFilter;
@@ -21,22 +21,23 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.CLEAN
 @Slf4j
 @Component
 public class CleanupSensitiveLogsJobService {
-    private final TaskOperationsClient taskOperationsClient;
+    private final TaskOperationClient taskOperationClient;
 
     private static final String CLEAN_UP_START_DATE = "clean_up_start_date";
 
     @Autowired
-    public CleanupSensitiveLogsJobService(TaskOperationsClient taskOperationsClient) {
-        this.taskOperationsClient = taskOperationsClient;
+    public CleanupSensitiveLogsJobService(TaskOperationClient taskOperationClient) {
+        this.taskOperationClient = taskOperationClient;
     }
-    
+
     public String cleanSensitiveLogs(String serviceToken) {
         OffsetDateTime cleanUpStartDate = OffsetDateTime.now();
 
         TaskFilter<?> filter = new CleanupSensitiveLogsTaskFilter(
             CLEAN_UP_START_DATE,
             cleanUpStartDate,
-            TaskFilterOperator.BEFORE);
+            TaskFilterOperator.BEFORE
+        );
 
         String operationId = UUID.randomUUID().toString();
 
@@ -48,11 +49,12 @@ public class CleanupSensitiveLogsJobService {
         log.info("{} operation: {}", CLEANUP_SENSITIVE_LOG_ENTRIES, operation);
         TaskOperationRequest taskOperationRequest = new TaskOperationRequest(operation, List.of(filter));
 
-        TaskOperationResponse taskOperationResponse = taskOperationsClient
+        TaskOperationResponse taskOperationResponse = taskOperationClient
             .executeOperation(serviceToken, taskOperationRequest);
-        
+
         log.info("{} operation response: {} row(s) deleted", CLEANUP_SENSITIVE_LOG_ENTRIES,
-            taskOperationResponse.getResponseMap().get("deletedRows"));
+                 taskOperationResponse.getResponseMap().get("deletedRows")
+        );
         return operationId;
     }
 }

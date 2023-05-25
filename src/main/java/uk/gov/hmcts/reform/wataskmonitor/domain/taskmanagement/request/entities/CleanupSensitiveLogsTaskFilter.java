@@ -32,15 +32,19 @@ public class CleanupSensitiveLogsTaskFilter implements TaskFilter<OffsetDateTime
         this.values = values;
         this.operator = operator;
     }
-    
+
+
+    @Override
     public String getKey() {
         return key;
     }
 
+    @Override
     public OffsetDateTime getValues() {
         return values;
     }
 
+    @Override
     public TaskFilterOperator getOperator() {
         return operator;
     }

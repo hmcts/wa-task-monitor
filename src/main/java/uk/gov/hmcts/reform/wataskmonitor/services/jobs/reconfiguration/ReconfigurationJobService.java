@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.wataskmonitor.clients.TaskOperationsClient;
+import uk.gov.hmcts.reform.wataskmonitor.clients.TaskOperationClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskOperationRequest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.entities.ExecuteReconfigureTaskFilter;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.entities.TaskFilter;
@@ -22,21 +22,21 @@ import java.util.UUID;
 public class ReconfigurationJobService {
 
     private static final String RECONFIGURE_REQUEST_TIME = "reconfigure_request_time";
-    private final TaskOperationsClient taskOperationsClient;
+    private final TaskOperationClient taskOperationClient;
     private final long reconfigureMaxTimeLimitSeconds;
     private final long reconfigureRetryWindowTimeLimitHours;
     private final long reconfigureRequestTimeHours;
 
     @Autowired
-    public ReconfigurationJobService(TaskOperationsClient taskOperationsClient,
+    public ReconfigurationJobService(TaskOperationClient taskOperationClient,
                                      @Value("${job.reconfiguration.reconfigure_request_time_hours}")
-                                     long reconfigureRequestTimeHours,
+                                            long reconfigureRequestTimeHours,
                                      @Value("${job.reconfiguration.reconfiguration_max_time_limit_seconds}")
-                                     long reconfigureMaxTimeLimitSeconds,
+                                            long reconfigureMaxTimeLimitSeconds,
                                      @Value("${job.reconfiguration.reconfiguration_retry_window_time_hours}")
-                                     long reconfigureRetryWindowTimeLimitHours) {
+                                            long reconfigureRetryWindowTimeLimitHours) {
         this.reconfigureRequestTimeHours = reconfigureRequestTimeHours;
-        this.taskOperationsClient = taskOperationsClient;
+        this.taskOperationClient = taskOperationClient;
         this.reconfigureMaxTimeLimitSeconds = reconfigureMaxTimeLimitSeconds;
         this.reconfigureRetryWindowTimeLimitHours = reconfigureRetryWindowTimeLimitHours;
     }
@@ -63,7 +63,7 @@ public class ReconfigurationJobService {
         log.debug("reconfigureTask for operation: {}", operation);
         TaskOperationRequest taskOperationRequest = new TaskOperationRequest(operation, List.of(filter));
 
-        taskOperationsClient.executeOperation(serviceToken, taskOperationRequest);
+        taskOperationClient.executeOperation(serviceToken, taskOperationRequest);
         return operationId;
     }
 

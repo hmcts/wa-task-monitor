@@ -33,6 +33,36 @@ public class InitiationTaskAttributesMapper {
 
     public Map<String, Object> mapTaskAttributes(CamundaTask camundaTask, Map<String, CamundaVariable> variables) {
         // Local Variables
+        String type = getType(camundaTask, variables);
+
+        Map<String, Object> attributes = new ConcurrentHashMap<>();
+        attributes.put(TASK_TYPE.value(), type);
+
+        setAttributesFromCamundaTask(camundaTask, attributes);
+
+        variables.entrySet().stream()
+            .filter(variable -> !variable.getKey().equals(DUE_DATE.value()))
+            .filter(variable -> !variable.getKey().equals(ASSIGNEE.value()))
+            .filter(variable -> !variable.getKey().equals(PRIORITY_DATE.value()))
+            .filter(variable -> !variable.getKey().equals(DESCRIPTION.value()))
+            .filter(variable -> !variable.getKey().equals(TASK_NAME.value()))
+            .forEach(entry -> attributes.put(entry.getKey(), getCamundaVariableValue(entry.getValue())));
+        return attributes;
+    }
+
+    private void setAttributesFromCamundaTask(CamundaTask camundaTask, Map<String, Object> attributes) {
+        attributes.put(DUE_DATE.value(), CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getDue()));
+        attributes.put(CREATED.value(), CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getCreated()));
+        if (camundaTask.getAssignee() != null) {
+            attributes.put(ASSIGNEE.value(), camundaTask.getAssignee());
+        }
+        if (camundaTask.getDescription() != null) {
+            attributes.put(DESCRIPTION.value(), camundaTask.getDescription());
+        }
+        attributes.put(TASK_NAME.value(), camundaTask.getName());
+    }
+
+    private String getType(CamundaTask camundaTask, Map<String, CamundaVariable> variables) {
         String type = getVariableValue(variables.get(TASK_TYPE.value()), String.class, null);
 
         if (type == null) {
@@ -48,40 +78,16 @@ public class InitiationTaskAttributesMapper {
             );
             type = taskId;
         }
-
-        Map<String, Object> attributes = new ConcurrentHashMap<>();
-        attributes.put(TASK_TYPE.value(), type);
-        attributes.put(DUE_DATE.value(), CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getDue()));
-        attributes.put(CREATED.value(), CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getCreated()));
-        if (camundaTask.getAssignee() != null) {
-            attributes.put(ASSIGNEE.value(), camundaTask.getAssignee());
-        }
-        if (camundaTask.getDescription() != null) {
-            attributes.put(DESCRIPTION.value(), camundaTask.getDescription());
-        }
-        attributes.put(TASK_NAME.value(), camundaTask.getName());
-        variables.entrySet().stream()
-            .filter(variable -> !variable.getKey().equals(DUE_DATE.value()))
-            .filter(variable -> !variable.getKey().equals(ASSIGNEE.value()))
-            .filter(variable -> !variable.getKey().equals(PRIORITY_DATE.value()))
-            .filter(variable -> !variable.getKey().equals(DESCRIPTION.value()))
-            .filter(variable -> !variable.getKey().equals(TASK_NAME.value()))
-            .forEach(entry -> attributes.put(entry.getKey(), getCamundaVariableValue(entry.getValue())));
-        return attributes;
+        return type;
     }
 
     private Object getCamundaVariableValue(CamundaVariable variable) {
-        switch (variable.getType()) {
-
-            case "String":
-                return getVariableValue(variable, String.class, null);
-            case "Boolean":
-                return getVariableValue(variable, Boolean.class, null);
-            case "Integer":
-                return getVariableValue(variable, Integer.class, null);
-            default:
-                return variable.getValue();
-        }
+        return switch (variable.getType()) {
+            case "String" -> getVariableValue(variable, String.class, null);
+            case "Boolean" -> getVariableValue(variable, Boolean.class, null);
+            case "Integer" -> getVariableValue(variable, Integer.class, null);
+            default -> variable.getValue();
+        };
     }
 
     private <T> T getVariableValue(CamundaVariable variable, Class<T> type, T defaultValue) {
