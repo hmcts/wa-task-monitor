@@ -288,7 +288,7 @@ def versions = [
   junit               : '5.9.3',
   junitPlatform       : '1.9.3',
   reformLogging       : '6.0.1',
-  springDoc           : '2.1.0',
+  springDoc           : '1.7.0',
   serenity            : '3.2.0',
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.13.1',
@@ -322,7 +322,7 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: versions.springFrameworkCloud
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.7'
 
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: versions.springDoc
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: versions.springDoc
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
 
