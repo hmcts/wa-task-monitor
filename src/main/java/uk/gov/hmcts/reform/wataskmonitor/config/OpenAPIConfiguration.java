@@ -18,7 +18,7 @@ public class OpenAPIConfiguration {
 
     @Bean
     public OpenAPI openAPI() {
-        return new OpenAPI
+        return new OpenAPI()
             .info(new Info().title("wa-task-monitor Service")
             .version("v1.0.0")
             .license(new License().name("MIT").url("https://opensource.org/licenses/MIT")))
