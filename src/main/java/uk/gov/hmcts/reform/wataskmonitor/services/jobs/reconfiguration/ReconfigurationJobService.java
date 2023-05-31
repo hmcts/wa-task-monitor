@@ -43,17 +43,24 @@ public class ReconfigurationJobService {
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public String reconfigureTask(String serviceToken) {
+
         OffsetDateTime reconfigureRequestTime = OffsetDateTime.now()
             .minus(Duration.ofHours(reconfigureRequestTimeHours));
+
         TaskFilter<?> filter = new ExecuteReconfigureTaskFilter(RECONFIGURE_REQUEST_TIME,
-                                                                reconfigureRequestTime,
-                                                                TaskFilterOperator.AFTER);
+            reconfigureRequestTime,
+            TaskFilterOperator.AFTER);
+
         String operationId = UUID.randomUUID().toString();
-        TaskOperation operation = new TaskOperation(TaskOperationName.EXECUTE_RECONFIGURE,
-                                                    operationId,
-                                                    reconfigureMaxTimeLimitSeconds,
-            reconfigureRetryWindowTimeLimitHours);
-        log.debug("reconfigureTask for operation: {}",operation);
+
+        TaskOperation operation = TaskOperation.builder()
+            .name(TaskOperationName.EXECUTE_RECONFIGURE)
+            .runId(operationId)
+            .maxTimeLimit(reconfigureMaxTimeLimitSeconds)
+            .retryWindowHours(reconfigureRetryWindowTimeLimitHours)
+            .build();
+
+        log.debug("reconfigureTask for operation: {}", operation);
         TaskOperationRequest taskOperationRequest = new TaskOperationRequest(operation, List.of(filter));
 
         taskOperationClient.executeOperation(serviceToken, taskOperationRequest);

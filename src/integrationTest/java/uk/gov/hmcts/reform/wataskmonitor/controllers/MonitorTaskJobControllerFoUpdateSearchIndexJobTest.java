@@ -8,9 +8,12 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskOperationClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskOperationRequest;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.response.TaskOperationResponse;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
+
+import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,9 +59,10 @@ class MonitorTaskJobControllerFoUpdateSearchIndexJobTest extends SpringBootInteg
 
     private void mockExternalDependencies() {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
+        TaskOperationResponse taskOperationResponse = new TaskOperationResponse(Map.of());
 
         when(taskOperationClient.executeOperation(eq(SERVICE_TOKEN), eq(taskOperationRequest)))
-            .thenReturn("OK");
+            .thenReturn(taskOperationResponse);
     }
 
 }

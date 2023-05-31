@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.entities
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.TaskOperationName;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.Tas
 )
 @EqualsAndHashCode
 @ToString
+@Builder
 public class TaskOperation {
 
     @Schema(required = true)

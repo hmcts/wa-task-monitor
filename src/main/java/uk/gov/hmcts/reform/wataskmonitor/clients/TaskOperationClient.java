@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskOperationRequest;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.response.TaskOperationResponse;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
@@ -21,7 +22,7 @@ public interface TaskOperationClient {
         produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    String executeOperation(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
-                            @RequestBody TaskOperationRequest taskOperationRequest);
+    TaskOperationResponse executeOperation(@RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorisation,
+                                           @RequestBody TaskOperationRequest taskOperationRequest);
 
 }
