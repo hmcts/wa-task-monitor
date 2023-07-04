@@ -333,8 +333,8 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.20.0'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.20.0'
 
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.74'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.74'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.76'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.76'
 
   implementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
 
