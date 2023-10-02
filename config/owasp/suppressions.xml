@@ -93,4 +93,10 @@
       Wait for spring boot upgrades</notes>
     <cve>CVE-2023-35116</cve>
   </suppress>
+    <suppress until = "2023-10-31">
+      <cve>CVE-2023-41080</cve>
+      <cve>CVE-2023-20883</cve>
+      <cve>CVE-2023-28709</cve>
+      <cve>CVE-2023-35116</cve>
+    </suppress>
 </suppressions>
