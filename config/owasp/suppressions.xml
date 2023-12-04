@@ -93,4 +93,10 @@
       Wait for spring boot upgrades</notes>
     <cve>CVE-2023-35116</cve>
   </suppress>
+    <suppress>
+    <notes>
+      This CVE is fixed in bouncycastle ver.1.74 but this is under bcprov-jdk18on for JDK 1.8. Currently on Java 17 so upgrade is needed.
+    </notes>
+    <cve>CVE-2023-33202</cve>
+  </suppress>
 </suppressions>
