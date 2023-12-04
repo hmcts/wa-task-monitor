@@ -42,7 +42,7 @@
     <notes>False positive (https://nvd.nist.gov/vuln/detail/CVE-2022-42003)</notes>
     <cve>CVE-2022-42003</cve>
   </suppress>
-  <suppress until ="2023-12-31">
+  <suppress until ="2024-01-31">
     <notes>False positive (https://nvd.nist.gov/vuln/detail/CVE-2021-37533)</notes>
     <cve>CVE-2021-37533</cve>
   </suppress>
@@ -88,7 +88,7 @@
     </notes>
     <cve>CVE-2023-20863</cve>
   </suppress>
-  <suppress until ="2023-11-30">
+  <suppress until ="2024-01-31">
     <notes>False positive: Jackson community does not consider this a security issue (https://github.com/FasterXML/jackson-databind/issues/3972)
       Wait for spring boot upgrades</notes>
     <cve>CVE-2023-35116</cve>
