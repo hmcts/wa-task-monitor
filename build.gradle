@@ -148,7 +148,7 @@ project.ext {
 
 checkstyle {
   maxWarnings = 0
-  toolVersion = '10.10.0'
+  toolVersion = '10.12.7'
   getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
 }
 
