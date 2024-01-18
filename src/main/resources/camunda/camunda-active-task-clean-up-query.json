@@ -1,4 +1,5 @@
 {
   "processDefinitionKey": "wa-task-initiation-ia-asylum",
-  "startedBefore": "STARTED_BEFORE_PLACE_HOLDER"
+  "startedBefore": "STARTED_BEFORE_PLACE_HOLDER",
+  "unfinished": true
 }

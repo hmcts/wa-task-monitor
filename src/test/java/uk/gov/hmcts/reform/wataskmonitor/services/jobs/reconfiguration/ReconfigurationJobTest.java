@@ -36,9 +36,6 @@ class ReconfigurationJobTest extends UnitBaseTest {
         when(reconfigurationService.reconfigureTask(SOME_SERVICE_TOKEN))
             .thenReturn(operationId);
 
-        when(reconfigurationService.reconfigureTask(SOME_SERVICE_TOKEN))
-            .thenReturn(operationId);
-
         reconfigurationJob.run(SOME_SERVICE_TOKEN);
 
         verify(reconfigurationService).reconfigureTask(SOME_SERVICE_TOKEN);
