@@ -313,7 +313,7 @@ ext.libraries = [
 ]
 
 //https://nvd.nist.gov/vuln/detail/CVE-2022-25857
-ext['snakeyaml.version'] = '1.33'
+ext['snakeyaml.version'] = '2.0'
 
 dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
