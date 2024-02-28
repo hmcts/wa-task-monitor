@@ -6,4 +6,9 @@
    ]]></notes>
     <cve>CVE-GOES-HERE</cve>
   </suppress>-->
+  <suppress until ="2024-04-205>
+    <notes>False positive: Jackson community does not consider this a security issue (https://github.com/FasterXML/jackson-databind/issues/3972)
+      Wait for spring boot upgrades</notes>
+    <cve>CVE-2023-35116</cve>
+  </suppress>
 </suppressions>
