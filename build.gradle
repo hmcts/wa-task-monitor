@@ -244,7 +244,7 @@ dependencyManagement {
     }
 
     // CVE-2021-29425
-    dependency group: 'commons-io', name: 'commons-io', version: '2.15.1'
+    dependency group: 'commons-io', name: 'commons-io', version: '2.16.1'
 
     // CVE-2020-13956 - misinterpret malformed authority component in request URIs - check for update available to com.warrenstrange:googleauth in service-auth-provider-client
     dependency group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
