@@ -276,7 +276,7 @@ dependencyManagement {
       entry 'spring-security-web'
     }
 
-    dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
+    dependencySet(group: 'ch.qos.logback', version: '1.5.6') {
       entry 'logback-classic'
       entry 'logback-core'
     }
