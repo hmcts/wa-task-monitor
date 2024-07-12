@@ -298,7 +298,8 @@ def versions = [
   serenity            : '3.2.0',
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.16.1',
-  pactVersion         : '4.6.10',
+  pactVersion         : '4.3.15',
+  pactJava8Version    : '4.1.42',
   tomcat              : '9.0.91'
 ]
 
@@ -379,7 +380,13 @@ dependencies {
 
   //Pact contract testing
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
-  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.42'
+  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pactJava8Version
+  contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
+  contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pactJava8Version
+
+  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pactVersion
+  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pactVersion
+  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pactVersion
 
   contractTestImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit)
   contractTestRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit)
