@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.wataskmonitor.consumer.idam;
 
-import au.com.dius.pact.consumer.dsl.PactDslJsonArray;
-import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
-import au.com.dius.pact.consumer.dsl.PactDslJsonRootValue;
-import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
+import au.com.dius.pact.consumer.dsl.*;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +26,10 @@ public class IdamConsumerTestForPostUserInfo extends SpringBootContractBaseTest 
     private IdamWebApi idamApi;
 
     @Pact(provider = "idamApi_oidc", consumer = "wa_task_monitor")
-    public RequestResponsePact generatePactFragmentUserInfo(PactDslWithProvider builder) {
+    public V4Pact generatePactFragmentUserInfo(PactBuilder builder) {
 
         return builder
+            .usingLegacyDsl()
             .given("userinfo is requested")
             .uponReceiving("A request for a UserInfo")
             .path("/o/userinfo")
@@ -40,7 +39,7 @@ public class IdamConsumerTestForPostUserInfo extends SpringBootContractBaseTest 
             .willRespondWith()
             .status(200)
             .body(createUserDetailsResponse())
-            .toPact();
+            .toPact(V4Pact.class);
     }
 
     @Test

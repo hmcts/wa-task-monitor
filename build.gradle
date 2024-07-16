@@ -298,7 +298,7 @@ def versions = [
   serenity            : '3.2.0',
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.16.1',
-  pactVersion         : '4.3.15',
+  pactVersion         : '4.6.10',
   pactJava8Version    : '4.1.42',
   tomcat              : '9.0.91'
 ]

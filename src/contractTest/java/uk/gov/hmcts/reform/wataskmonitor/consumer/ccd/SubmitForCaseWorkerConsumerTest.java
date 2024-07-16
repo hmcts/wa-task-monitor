@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.wataskmonitor.consumer.ccd;
 
+import au.com.dius.pact.consumer.dsl.PactBuilder;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.apache.http.HttpStatus;
 import org.json.JSONException;
@@ -36,8 +38,9 @@ public class SubmitForCaseWorkerConsumerTest extends CcdConsumerTestBase {
     }
 
     @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "wa_task_monitor")
-    public RequestResponsePact submitCaseWorkerDetails(PactDslWithProvider builder) throws Exception {
+    public V4Pact submitCaseWorkerDetails(PactBuilder builder) throws Exception {
         return builder
+            .usingLegacyDsl()
             .given("A Submit for a Caseworker is requested",
                 setUpStateMapForProviderWithoutCaseData())
             .uponReceiving("A Submit For a Caseworker")
@@ -52,7 +55,7 @@ public class SubmitForCaseWorkerConsumerTest extends CcdConsumerTestBase {
             .status(HttpStatus.SC_CREATED)
             .body(buildSubmitForCaseWorkedPactDsl(CASE_ID))
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .toPact();
+            .toPact(V4Pact.class);
     }
 
     @Test
