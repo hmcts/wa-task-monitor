@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.wataskmonitor;
 
-
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.core.model.annotations.PactFolder;
 import lombok.extern.slf4j.Slf4j;
