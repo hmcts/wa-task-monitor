@@ -13,7 +13,7 @@ plugins {
   id 'io.freefair.lombok' version '5.3.3.3'
   id 'info.solidsoft.pitest' version '1.15.0'
   id 'net.serenity-bdd.serenity-gradle-plugin' version '3.5.0'
-  id 'au.com.dius.pact' version '4.6.10'
+  id 'au.com.dius.pact' version '4.6.11'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -298,7 +298,7 @@ def versions = [
   serenity            : '3.2.0',
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.16.1',
-  pactVersion         : '4.6.10',
+  pactVersion         : '4.6.11',
   pactJava8Version    : '4.1.42',
   tomcat              : '9.0.91'
 ]
@@ -381,12 +381,6 @@ dependencies {
   //Pact contract testing
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pactJava8Version
-  contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
-  contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pactJava8Version
-
-  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pactVersion
-  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pactVersion
-  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pactVersion
 
   contractTestImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit)
   contractTestRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit)
@@ -409,17 +403,20 @@ dependencies {
 }
 
 task runAndPublishConsumerPactTests(type: Test) {
+  dependsOn(contract)
+  useJUnitPlatform()
   logger.lifecycle("Runs pact Tests")
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
+  finalizedBy(pactPublish)
 }
 
-runAndPublishConsumerPactTests.finalizedBy pactPublish
-
 pact {
+  broker {
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+  }
   publish {
     pactDirectory = 'pacts'
-    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
     tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
     version = project.pacticipantVersion
   }
