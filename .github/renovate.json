@@ -15,6 +15,5 @@
     }
   ],
   "platformAutomerge": true,
-  "automerge": true,
   "automergeType": "pr"
 }
