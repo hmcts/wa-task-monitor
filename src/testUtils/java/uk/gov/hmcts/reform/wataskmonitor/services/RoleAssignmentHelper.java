@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
@@ -28,6 +29,7 @@ public class RoleAssignmentHelper {
     protected String roleAssignmentUrl;
 
     @Autowired
+    @Qualifier("authTokenGenerator")
     private AuthTokenGenerator serviceAuthTokenGenerator;
 
     @Autowired
