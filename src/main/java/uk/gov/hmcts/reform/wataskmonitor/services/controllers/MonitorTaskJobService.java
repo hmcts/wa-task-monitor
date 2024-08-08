@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.wataskmonitor.services.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -13,7 +12,6 @@ import java.util.List;
 
 @Component
 @Slf4j
-@Import({AuthTokenGenerator.class})
 public class MonitorTaskJobService {
     private final List<JobService> jobServices;
     private final AuthTokenGenerator authTokenGenerator;
