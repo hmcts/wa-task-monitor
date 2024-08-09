@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.wataskmonitor.matchers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jknack.handlebars.internal.lang3.StringUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.mockito.ArgumentMatcher;
 
 import java.time.LocalDateTime;

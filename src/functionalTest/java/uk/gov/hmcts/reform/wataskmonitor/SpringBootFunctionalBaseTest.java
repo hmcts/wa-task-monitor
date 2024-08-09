@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -49,6 +50,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.en
 @SpringBootTest
 @ActiveProfiles({"functional"})
 @RunWith(SpringIntegrationSerenityRunner.class)
+@Import({CoreCaseDataApi.class})
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
 public class SpringBootFunctionalBaseTest {
 

@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 
 import java.io.IOException;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -58,11 +57,11 @@ class CamundaClientTest {
                 null,
                 ZonedDateTime.parse(
                     "2021-06-02T16:17:32.808+0000",
-                    CAMUNDA_DATA_TIME_FORMATTER.withZone(ZoneId.of("UTC"))
+                    CAMUNDA_DATA_TIME_FORMATTER
                 ),
                 ZonedDateTime.parse(
                     "2021-06-04T16:17:32.325+0000",
-                    CAMUNDA_DATA_TIME_FORMATTER.withZone(ZoneId.of("UTC"))
+                    CAMUNDA_DATA_TIME_FORMATTER
                 ),
                 null,
                 null,
@@ -75,11 +74,11 @@ class CamundaClientTest {
                 null,
                 ZonedDateTime.parse(
                     "2021-06-02T16:54:01.317+0000",
-                    CAMUNDA_DATA_TIME_FORMATTER.withZone(ZoneId.of("UTC"))
+                    CAMUNDA_DATA_TIME_FORMATTER
                 ),
                 ZonedDateTime.parse(
                     "2021-06-04T16:54:00.973+0000",
-                    CAMUNDA_DATA_TIME_FORMATTER.withZone(ZoneId.of("UTC"))
+                    CAMUNDA_DATA_TIME_FORMATTER
                 ),
                 null,
                 null,
