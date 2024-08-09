@@ -50,7 +50,6 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.en
 @SpringBootTest
 @ActiveProfiles({"functional"})
 @RunWith(SpringIntegrationSerenityRunner.class)
-//@Import({CoreCaseDataApi.class,BearerTokenGenerator.class})
 @Import({CoreCaseDataApi.class})
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
 public class SpringBootFunctionalBaseTest {
