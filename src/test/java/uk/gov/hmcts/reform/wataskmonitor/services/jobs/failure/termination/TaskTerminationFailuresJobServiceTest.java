@@ -152,7 +152,7 @@ class TaskTerminationFailuresJobServiceTest extends UnitBaseTest {
 
         taskTerminationFailuresJobService.checkUnTerminatedTasks(SOME_SERVICE_TOKEN);
 
-        assertThat(output.getOut().contains("TASK_TERMINATION_FAILURES There was no task"));
+        assertThat(output.getOut()).contains("TASK_TERMINATION_FAILURES There was no task");
     }
 
     @Test
@@ -177,10 +177,10 @@ class TaskTerminationFailuresJobServiceTest extends UnitBaseTest {
 
         taskTerminationFailuresJobService.checkUnTerminatedTasks(SOME_SERVICE_TOKEN);
 
-        assertThat(output.getOut().contains("TASK_TERMINATION_FAILURES -> taskId:1"));
-        assertThat(output.getOut().contains("TASK_TERMINATION_FAILURES -> taskId:2"));
-        assertThat(output.getOut().contains("TASK_TERMINATION_FAILURES -> taskId:3"));
-        assertThat(output.getOut().contains("TASK_TERMINATION_FAILURES There are some unterminated tasks"));
+        assertThat(output.getOut()).contains("TASK_TERMINATION_FAILURES -> taskId:1");
+        assertThat(output.getOut()).contains("TASK_TERMINATION_FAILURES -> taskId:2");
+        assertThat(output.getOut()).contains("TASK_TERMINATION_FAILURES -> taskId:3");
+        assertThat(output.getOut()).contains("TASK_TERMINATION_FAILURES There are some unterminated tasks");
     }
 
     private void assertQuery() throws JSONException {
