@@ -258,7 +258,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
             .deleteHistoricProcesses(tasks, SOME_SERVICE_TOKEN);
 
         assertEquals(expectedReport, actualReport);
-        assertThat(output.getOut()).contains("There was no task(s) to delete.");
+        assertThat(output.getOut().contains("There was no task(s) to delete."));
     }
 
     @Test
@@ -293,7 +293,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
             .deleteHistoricProcesses(tasks, SOME_SERVICE_TOKEN);
 
         assertEquals(expectedReport, actualReport);
-        assertThat(output.getOut()).contains("An error occurred when deleting history tasks :");
+        assertThat(output.getOut().contains("An error occurred when deleting history tasks :"));
     }
 
     @Test
@@ -500,7 +500,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
 
         assertFalse(isAllowedEnvironment);
 
-        assertTrue(output.getOut().contains(enabledMessage));
+        assertThat(output.getOut().contains(enabledMessage));
 
     }
 
