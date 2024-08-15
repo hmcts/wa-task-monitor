@@ -210,7 +210,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
             .getHistoryProcesses(anyString(), any(), any());
 
         assertEquals(emptyList(), actualTaskList);
-        assertThat(output.getOut()).contains("job can not be working on PROD environment");
+        assertThat(output.getOut().contains("is not enabled for this environment: prod"));
 
     }
 
