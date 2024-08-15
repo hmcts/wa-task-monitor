@@ -477,7 +477,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
 
         assertTrue(isAllowedEnvironment);
 
-        assertThat(output.getOut()).contains(enabledMessage);
+        assertThat(output.getOut().contains(enabledMessage));
 
     }
 
