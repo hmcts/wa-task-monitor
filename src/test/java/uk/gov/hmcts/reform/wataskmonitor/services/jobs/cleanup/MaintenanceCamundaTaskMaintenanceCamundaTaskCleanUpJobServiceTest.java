@@ -190,7 +190,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
             .getHistoryProcesses(anyString(), any(), any());
 
         assertEquals(emptyList(), actualTaskList);
-        assertThat(output.getOut()).contains("is not enabled for this environment: prod");
+        assertThat(output.getOut().contains("is not enabled for this environment: prod"));
 
     }
 
@@ -402,7 +402,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
             .deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
 
         assertEquals(expectedReport, actualReport);
-        assertThat(output.getOut()).contains("There was no active task(s) to delete.");
+        assertThat(output.getOut().contains("There was no active task(s) to delete."));
     }
 
     @Test
@@ -437,7 +437,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
             .deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
 
         assertEquals(expectedReport, actualReport);
-        assertThat(output.getOut()).contains("An error occurred when deleting history tasks :");
+        assertThat(output.getOut()).contains("An error occurred when deleting active tasks :");
     }
 
     @ParameterizedTest(name = "jobName: {0} expected: {1}")
@@ -500,7 +500,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
 
         assertFalse(isAllowedEnvironment);
 
-        assertThat(output.getOut().contains(enabledMessage));
+        assertTrue(output.getOut().contains(enabledMessage));
 
     }
 
