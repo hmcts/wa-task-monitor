@@ -56,7 +56,7 @@ class CleanupSensitiveLogsJobTest extends UnitBaseTest {
         String finishingLog = String.format("%s job finished successfully: %s",
             CLEANUP_SENSITIVE_LOG_ENTRIES, " for operationId:" + operationId);
 
-        assertThat(output.getOut().contains(startingLog));
-        assertThat(output.getOut().contains(finishingLog));
+        assertThat(output.getOut()).contains(startingLog);
+        assertThat(output.getOut()).contains(finishingLog);
     }
 }

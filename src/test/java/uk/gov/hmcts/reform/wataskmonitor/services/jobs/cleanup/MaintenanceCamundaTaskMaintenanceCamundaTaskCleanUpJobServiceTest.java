@@ -134,8 +134,8 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
             .getHistoryProcesses(anyString(), any(), any());
 
         assertEquals(tasks, actualTaskList);
-        assertThat(output.getOut().contains("cleanUpJobConfig:"));
-        assertThat(output.getOut().contains("task(s) retrieved successfully from history"));
+        assertThat(output.getOut()).contains("cleanUpJobConfig:");
+        assertThat(output.getOut()).contains("task(s) retrieved successfully from history");
         assertQueryForHistoric();
 
     }
@@ -168,8 +168,8 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
             .getHistoryProcesses(anyString(), any(), any());
 
         assertEquals(tasks, actualTaskList);
-        assertThat(output.getOut().contains("cleanUpJobConfig:"));
-        assertThat(output.getOut().contains("active processes retrieved successfully"));
+        assertThat(output.getOut()).contains("cleanUpJobConfig:");
+        assertThat(output.getOut()).contains("active processes retrieved successfully");
         assertQueryForActive();
 
     }
@@ -437,7 +437,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
             .deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
 
         assertEquals(expectedReport, actualReport);
-        assertThat(output.getOut().contains("An error occurred when deleting history tasks :"));
+        assertThat(output.getOut()).contains("An error occurred when deleting active tasks :");
     }
 
     @ParameterizedTest(name = "jobName: {0} expected: {1}")
@@ -551,7 +551,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
 
         return String.format("""
              {
-                 "processDefinitionKey": "wa-task-initiation-ia-asylum",                
+                 "processDefinitionKey": "wa-task-initiation-ia-asylum",
                  "startedBefore": "%s",
                  "finished": true
              }
@@ -563,7 +563,7 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
     private String getExpectedQueryParametersForActive(String startedBefore) {
         return String.format("""
             {
-                "processDefinitionKey": "wa-task-initiation-ia-asylum",                
+                "processDefinitionKey": "wa-task-initiation-ia-asylum",
                 "startedBefore": "%s",
                 "unfinished": true
             }
