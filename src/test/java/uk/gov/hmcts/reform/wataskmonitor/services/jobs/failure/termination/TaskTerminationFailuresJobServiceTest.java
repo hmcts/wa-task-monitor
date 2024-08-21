@@ -20,10 +20,12 @@ import uk.gov.hmcts.reform.wataskmonitor.config.job.TerminationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.HistoricCamundaTask;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -138,11 +140,6 @@ class TaskTerminationFailuresJobServiceTest extends UnitBaseTest {
 
     @Test
     void should_log_message_when_no_unterminated_task_found(CapturedOutput output) {
-        taskTerminationFailuresJobService = new TaskTerminationFailuresJobService(
-            camundaClient,
-            terminationJobConfig
-        );
-
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
@@ -152,21 +149,20 @@ class TaskTerminationFailuresJobServiceTest extends UnitBaseTest {
 
         taskTerminationFailuresJobService.checkUnTerminatedTasks(SOME_SERVICE_TOKEN);
 
-        assertThat(output.getOut().contains("TASK_TERMINATION_FAILURES There was no task"));
+        await().atMost(10, TimeUnit.SECONDS)
+            .untilAsserted(() -> assertThat(output.getOut()).isNotEmpty());
+
+        assertThat(output.getOut()).contains("TASK_TERMINATION_FAILURES There was no task");
     }
 
     @Test
     void should_log_message_when_unterminated_task_found(CapturedOutput output) {
-        taskTerminationFailuresJobService = new TaskTerminationFailuresJobService(
-            camundaClient,
-            terminationJobConfig
-        );
-
         List<HistoricCamundaTask> expectedCamundaTasks = List.of(
             new HistoricCamundaTask("1", "cancelled", null, null),
             new HistoricCamundaTask("2", "completed", null, null),
             new HistoricCamundaTask("3", "deleted", null, null)
         );
+
 
         when(camundaClient.getTasksFromHistory(
             eq(SOME_SERVICE_TOKEN),
@@ -175,12 +171,16 @@ class TaskTerminationFailuresJobServiceTest extends UnitBaseTest {
             actualQueryParametersCaptor.capture()
         )).thenReturn(expectedCamundaTasks);
 
-        taskTerminationFailuresJobService.checkUnTerminatedTasks(SOME_SERVICE_TOKEN);
+        await().atMost(10, TimeUnit.SECONDS)
+            .untilAsserted(() -> taskTerminationFailuresJobService.checkUnTerminatedTasks(SOME_SERVICE_TOKEN));
 
-        assertThat(output.getOut().contains("TASK_TERMINATION_FAILURES -> taskId:1"));
-        assertThat(output.getOut().contains("TASK_TERMINATION_FAILURES -> taskId:2"));
-        assertThat(output.getOut().contains("TASK_TERMINATION_FAILURES -> taskId:3"));
-        assertThat(output.getOut().contains("TASK_TERMINATION_FAILURES There are some unterminated tasks"));
+        await().atMost(10, TimeUnit.SECONDS)
+            .untilAsserted(() -> assertThat(output.getOut()).isNotEmpty());
+
+        assertThat(output.getOut()).contains("TASK_TERMINATION_FAILURES -> taskId:1");
+        assertThat(output.getOut()).contains("TASK_TERMINATION_FAILURES -> taskId:2");
+        assertThat(output.getOut()).contains("TASK_TERMINATION_FAILURES -> taskId:3");
+        assertThat(output.getOut()).contains("TASK_TERMINATION_FAILURES There are some unterminated tasks");
     }
 
     private void assertQuery() throws JSONException {

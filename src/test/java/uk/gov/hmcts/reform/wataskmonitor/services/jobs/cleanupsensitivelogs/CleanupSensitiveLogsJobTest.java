@@ -12,8 +12,10 @@ import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.CLEANUP_SENSITIVE_LOG_ENTRIES;
@@ -48,13 +50,17 @@ class CleanupSensitiveLogsJobTest extends UnitBaseTest {
         when(cleanupSensitiveLogsJobService.cleanSensitiveLogs(SOME_SERVICE_TOKEN))
             .thenReturn(operationId);
 
-        cleanupSensitiveLogsJob.run(SOME_SERVICE_TOKEN);
+        await().untilAsserted(() -> cleanupSensitiveLogsJob.run(SOME_SERVICE_TOKEN));
+
 
         verify(cleanupSensitiveLogsJobService).cleanSensitiveLogs(SOME_SERVICE_TOKEN);
 
         String startingLog = String.format("Starting %s job.", CLEANUP_SENSITIVE_LOG_ENTRIES);
         String finishingLog = String.format("%s job finished successfully: %s",
             CLEANUP_SENSITIVE_LOG_ENTRIES, " for operationId:" + operationId);
+
+        await().atMost(10, TimeUnit.SECONDS)
+            .untilAsserted(() -> assertThat(output.getOut()).isNotEmpty());
 
         assertThat(output.getOut()).contains(startingLog);
         assertThat(output.getOut()).contains(finishingLog);

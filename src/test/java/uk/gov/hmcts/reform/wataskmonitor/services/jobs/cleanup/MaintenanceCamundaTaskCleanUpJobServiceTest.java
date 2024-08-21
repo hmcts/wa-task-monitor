@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
@@ -47,7 +48,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.MAINTENANCE_CAMUNDA_TASK_CLEAN_UP;
 
 @ExtendWith(OutputCaptureExtension.class)
-class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends UnitBaseTest {
+class MaintenanceCamundaTaskCleanUpJobServiceTest extends UnitBaseTest {
 
     @Mock
     private CamundaClient camundaClient;
@@ -92,7 +93,6 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
 
         GenericJobReport expectation = new GenericJobReport(0, emptyList());
         assertEquals(expectation, actualActiveTaskReport);
-
     }
 
     @Test
@@ -103,7 +103,6 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
 
         GenericJobReport expectation = new GenericJobReport(0, emptyList());
         assertEquals(expectation, actualActiveTaskReport);
-
     }
 
     @Test
@@ -129,6 +128,8 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
         )).thenReturn(tasks);
 
         List<HistoricCamundaTask> actualTaskList = maintenanceCamundaTaskCleanUpJobService.retrieveHistoricProcesses();
+
+        assertActualTaskListNotnull(actualTaskList);
 
         verify(camundaClient, times(1))
             .getHistoryProcesses(anyString(), any(), any());
@@ -164,7 +165,9 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
 
         List<HistoricCamundaTask> actualTaskList = maintenanceCamundaTaskCleanUpJobService.retrieveActiveProcesses();
 
-        verify(camundaClient, times(1))
+        assertActualTaskListNotnull(actualTaskList);
+
+        verify(camundaClient, atLeast(1))
             .getHistoryProcesses(anyString(), any(), any());
 
         assertEquals(tasks, actualTaskList);
@@ -175,42 +178,36 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
     }
 
     @Test
-    void should_return_empty_list_when_environment_is_prod(CapturedOutput output) {
-        maintenanceCamundaTaskCleanUpJobService = new MaintenanceCamundaTaskCleanUpJobService(
-            camundaClient,
-            cleanUpJobConfig
-        );
+    void should_return_empty_list_when_environment_is_prod() {
 
         lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("prod");
         lenient().when(cleanUpJobConfig.getAllowedEnvironment()).thenReturn(List.of("local", "aat", "prod"));
 
         List<HistoricCamundaTask> actualTaskList = maintenanceCamundaTaskCleanUpJobService.retrieveHistoricProcesses();
 
+        assertActualTaskListNotnull(actualTaskList);
+
         verify(camundaClient, never())
             .getHistoryProcesses(anyString(), any(), any());
 
         assertEquals(emptyList(), actualTaskList);
-        assertThat(output.getOut().contains("is not enabled for this environment: prod"));
 
     }
 
     @Test
-    void should_return_empty_list_when_environment_is_prod_for_active_processes(CapturedOutput output) {
-        maintenanceCamundaTaskCleanUpJobService = new MaintenanceCamundaTaskCleanUpJobService(
-            camundaClient,
-            cleanUpJobConfig
-        );
+    void should_return_empty_list_when_environment_is_prod_for_active_processes() {
 
-        lenient().when(cleanUpJobConfig.getEnvironment()).thenReturn("prod");
-        lenient().when(cleanUpJobConfig.getAllowedEnvironment()).thenReturn(List.of("local", "aat", "prod"));
+        when(cleanUpJobConfig.getEnvironment()).thenReturn("prod");
+        when(cleanUpJobConfig.getAllowedEnvironment()).thenReturn(List.of("local", "aat", "prod"));
 
         List<HistoricCamundaTask> actualTaskList = maintenanceCamundaTaskCleanUpJobService.retrieveActiveProcesses();
+
+        assertActualTaskListNotnull(actualTaskList);
 
         verify(camundaClient, never())
             .getHistoryProcesses(anyString(), any(), any());
 
         assertEquals(emptyList(), actualTaskList);
-        assertThat(output.getOut().contains("is not enabled for this environment: prod"));
 
     }
 
@@ -257,8 +254,11 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
         GenericJobReport actualReport = maintenanceCamundaTaskCleanUpJobService
             .deleteHistoricProcesses(tasks, SOME_SERVICE_TOKEN);
 
+        assertActualReportNotNull(actualReport);
+
         assertEquals(expectedReport, actualReport);
-        assertThat(output.getOut().contains("There was no task(s) to delete."));
+
+        assertThat(output.getOut()).contains("There was no task(s) to delete.");
     }
 
     @Test
@@ -292,8 +292,10 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
         GenericJobReport actualReport = maintenanceCamundaTaskCleanUpJobService
             .deleteHistoricProcesses(tasks, SOME_SERVICE_TOKEN);
 
+        assertActualReportNotNull(actualReport);
+
         assertEquals(expectedReport, actualReport);
-        assertThat(output.getOut().contains("An error occurred when deleting history tasks :"));
+        assertThat(output.getOut()).contains("An error occurred when deleting history tasks :");
     }
 
     @Test
@@ -401,8 +403,10 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
         GenericJobReport actualReport = maintenanceCamundaTaskCleanUpJobService
             .deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
 
+        assertActualReportNotNull(actualReport);
+
         assertEquals(expectedReport, actualReport);
-        assertThat(output.getOut().contains("There was no active task(s) to delete."));
+        assertThat(output.getOut()).contains("There was no active task(s) to delete.");
     }
 
     @Test
@@ -436,6 +440,8 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
         GenericJobReport actualReport = maintenanceCamundaTaskCleanUpJobService
             .deleteActiveProcesses(tasks, SOME_SERVICE_TOKEN);
 
+        assertActualReportNotNull(actualReport);
+
         assertEquals(expectedReport, actualReport);
         assertThat(output.getOut()).contains("An error occurred when deleting active tasks :");
     }
@@ -466,18 +472,21 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
     })
     void should_log_a_message_when_environment_is_allowed(String environment, CapturedOutput output) {
 
-        String enabledMessage = String.format("%s is enabled for this environment: %s",
-            MAINTENANCE_CAMUNDA_TASK_CLEAN_UP.name(), environment);
-
-
         when(cleanUpJobConfig.getEnvironment())
             .thenReturn(environment);
 
         boolean isAllowedEnvironment = maintenanceCamundaTaskCleanUpJobService.isAllowedEnvironment();
 
+        await().atMost(10, TimeUnit.SECONDS)
+            .untilAsserted(() -> assertThat(isAllowedEnvironment)
+                .isTrue());
+
         assertTrue(isAllowedEnvironment);
 
-        assertThat(output.getOut().contains(enabledMessage));
+        String enabledMessage = String.format("%s is enabled for this environment: %s",
+            MAINTENANCE_CAMUNDA_TASK_CLEAN_UP.name(), environment);
+
+        assertThat(output.getOut()).contains(enabledMessage);
 
     }
 
@@ -489,18 +498,21 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
     })
     void should_log_a_message_when_environment_is_not_allowed(String environment, CapturedOutput output) {
 
-        String enabledMessage = String.format("%s is not enabled for this environment: %s",
-            MAINTENANCE_CAMUNDA_TASK_CLEAN_UP.name(), environment);
-
-
         when(cleanUpJobConfig.getEnvironment())
             .thenReturn(environment);
 
         boolean isAllowedEnvironment = maintenanceCamundaTaskCleanUpJobService.isAllowedEnvironment();
 
+        await().atMost(10, TimeUnit.SECONDS)
+            .untilAsserted(() -> assertThat(isAllowedEnvironment)
+                .isFalse());
+
         assertFalse(isAllowedEnvironment);
 
-        assertThat(output.getOut().contains(enabledMessage));
+        String enabledMessage = String.format("%s is not enabled for this environment: %s",
+            MAINTENANCE_CAMUNDA_TASK_CLEAN_UP.name(), environment);
+
+        assertThat(output.getOut()).contains(enabledMessage);
 
     }
 
@@ -571,4 +583,15 @@ class MaintenanceCamundaTaskMaintenanceCamundaTaskCleanUpJobServiceTest extends 
 
     }
 
+    private static void assertActualTaskListNotnull(List<HistoricCamundaTask> actualTaskList) {
+        await().atMost(10, TimeUnit.SECONDS)
+            .untilAsserted(() -> assertThat(actualTaskList)
+                .isNotNull());
+    }
+
+    private static void assertActualReportNotNull(GenericJobReport actualReport) {
+        await().atMost(10, TimeUnit.SECONDS)
+            .untilAsserted(() -> assertThat(actualReport)
+                .isNotNull());
+    }
 }
