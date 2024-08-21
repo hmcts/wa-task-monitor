@@ -12,9 +12,10 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.TaskOpera
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.response.TaskOperationResponse;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -24,7 +25,6 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.CLEAN
 @ExtendWith(OutputCaptureExtension.class)
 class CleanupSensitiveLogsJobServiceTest extends UnitBaseTest {
 
-    private static final String CLEAN_UP_START_DATE = "clean_up_start_date";
     @Mock
     private TaskOperationClient taskOperationClient;
     private CleanupSensitiveLogsJobService cleanupSensitiveLogsJobService;
@@ -44,18 +44,21 @@ class CleanupSensitiveLogsJobServiceTest extends UnitBaseTest {
             .thenReturn(taskOperationResponse);
 
         String operationId = cleanupSensitiveLogsJobService.cleanSensitiveLogs(SOME_SERVICE_TOKEN);
-        assertNotNull(operationId);
+
+        await().atMost(10, TimeUnit.SECONDS)
+            .untilAsserted(() -> assertThat(operationId)
+                .isNotNull());
 
         verify(taskOperationClient).executeOperation(anyString(), any(TaskOperationRequest.class));
 
         String requestLog = String.format("%s operation: ", CLEANUP_SENSITIVE_LOG_ENTRIES);
-        assertThat(output.getOut().contains(requestLog));
+        assertThat(output.getOut()).contains(requestLog);
 
         String responseLog = String.format("%s operation response: %s row(s) deleted",
                                            CLEANUP_SENSITIVE_LOG_ENTRIES,
                                            taskOperationResponse.getResponseMap().get("deletedRows")
         );
-        assertThat(output.getOut().contains(responseLog));
+        assertThat(output.getOut()).contains(responseLog);
 
     }
 

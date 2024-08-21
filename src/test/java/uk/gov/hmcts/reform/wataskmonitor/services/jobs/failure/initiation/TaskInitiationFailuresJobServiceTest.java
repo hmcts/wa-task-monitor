@@ -25,10 +25,12 @@ import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.Initia
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -88,6 +90,8 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
 
         GenericJobReport genericJobReport = taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
 
+        assertActualReportNotNull(genericJobReport);
+
         assertQueryTargetsUserTasksAndNotDelayedTasks();
         assertQuery();
         assertThat(genericJobReport.getTotalTasks()).isEqualTo(camundaTasks.size());
@@ -108,6 +112,8 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
         )).thenReturn(emptyList());
 
         GenericJobReport genericJobReport = taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
+
+        assertActualReportNotNull(genericJobReport);
 
         assertQueryTargetsUserTasksAndNotDelayedTasks();
         assertQuery();
@@ -267,6 +273,12 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
                + "    }\n"
                + "  ]"
                + "}\n";
+    }
+
+    private static void assertActualReportNotNull(GenericJobReport actualReport) {
+        await().atMost(10, TimeUnit.SECONDS)
+            .untilAsserted(() -> assertThat(actualReport)
+                .isNotNull());
     }
 
 }
