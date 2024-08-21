@@ -369,9 +369,6 @@ dependencies {
   testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.15.0'
   testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: '0.5'
 
-  /*testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8', version: '3.0.1', {
-    exclude group: 'com.github.jknack.handlebars.java'
-  }*/
   testImplementation "org.wiremock:wiremock-jetty12:3.9.1"
   testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.3'
   testImplementation group: 'com.obsidiandynamics.pojotester', name: 'core', version: '0.9.0'
