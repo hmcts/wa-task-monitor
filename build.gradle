@@ -299,7 +299,7 @@ def versions = [
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.16.1',
   pactVersion         : '4.1.7',
-  tomcat              : '9.0.93'
+  tomcat              : '10.1.29'
 ]
 
 ext.libraries = [
