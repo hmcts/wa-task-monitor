@@ -278,7 +278,7 @@ dependencyManagement {
       entry 'spring-security-test'
     }
 
-    dependencySet(group: 'ch.qos.logback', version: '1.5.6') {
+    dependencySet(group: 'ch.qos.logback', version: '1.5.8') {
       entry 'logback-classic'
       entry 'logback-core'
     }
