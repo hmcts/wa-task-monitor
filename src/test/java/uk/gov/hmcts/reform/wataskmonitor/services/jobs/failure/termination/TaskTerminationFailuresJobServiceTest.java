@@ -217,23 +217,25 @@ class TaskTerminationFailuresJobServiceTest extends UnitBaseTest {
 
     @NotNull
     private String getExpectedQueryParameters() {
-        return "{\n"
-               + "  \"taskVariables\": [\n"
-               + "    {\n"
-               + "      \"name\": \"cftTaskState\",\n"
-               + "      \"operator\": \"eq\",\n"
-               + "      \"value\": \"pendingTermination\"\n"
-               + "    }\n"
-               + "  ],\n"
-               + "  \"taskDefinitionKey\": \"processTask\",\n"
-               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
-               + "  \"sorting\": [\n"
-               + "    {\n"
-               + "      \"sortBy\": \"endTime\",\n"
-               + "      \"sortOrder\": \"desc\"\n"
-               + "    }\n"
-               + "  ]"
-               + "}";
+        return """
+            {
+              "taskVariables": [
+                {
+                  "name": "cftTaskState",
+                  "operator": "eq",
+                  "value": "pendingTermination"
+                }
+              ],
+              "taskDefinitionKey": "processTask",
+              "processDefinitionKey": "wa-task-initiation-ia-asylum",
+              "sorting": [
+                {
+                  "sortBy": "endTime",
+                  "sortOrder": "desc"
+                }
+              ]
+            }
+            """;
     }
 }
 

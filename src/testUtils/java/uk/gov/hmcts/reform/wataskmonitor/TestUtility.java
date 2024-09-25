@@ -39,15 +39,17 @@ public final class TestUtility {
     }
 
     public static String getExpectedRequestForHistoricTasksPendingTermination() {
-        return "{\n"
-               + "  \"taskVariables\": [\n"
-               + "    {\n"
-               + "      \"name\": \"cftTaskState\",\n"
-               + "      \"operator\": \"eq\",\n"
-               + "      \"value\": \"pendingTermination\"\n"
-               + "    }\n"
-               + "  ],\n"
-               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\"\n"
-               + "}\n";
+        return """
+              {
+              "taskVariables": [
+                {
+                  "name": "cftTaskState",
+                  "operator": "eq",
+                  "value": "pendingTermination"
+                }
+              ],
+              "processDefinitionKey": "wa-task-initiation-ia-asylum"
+            }
+            """;
     }
 }

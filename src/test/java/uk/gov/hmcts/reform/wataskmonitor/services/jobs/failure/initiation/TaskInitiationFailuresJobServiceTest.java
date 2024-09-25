@@ -252,27 +252,29 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
 
     @NotNull
     private String getExpectedQueryParameters() {
-        return "{\n"
-               + "  \"orQueries\": [\n"
-               + "    {\n"
-               + "      \"taskVariables\": [\n"
-               + "        {\n"
-               + "          \"name\": \"cftTaskState\",\n"
-               + "          \"operator\": \"eq\",\n"
-               + "          \"value\": \"unconfigured\"\n"
-               + "        }\n"
-               + "      ]\n"
-               + "    }\n"
-               + "  ],\n"
-               + "  \"taskDefinitionKey\": \"processTask\",\n"
-               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
-               + "  \"sorting\": [\n"
-               + "    {\n"
-               + "      \"sortBy\": \"created\",\n"
-               + "      \"sortOrder\": \"desc\"\n"
-               + "    }\n"
-               + "  ]"
-               + "}\n";
+        return """
+            {
+              "orQueries": [
+                {
+                  "taskVariables": [
+                    {
+                      "name": "cftTaskState",
+                      "operator": "eq",
+                      "value": "unconfigured"
+                    }
+                  ]
+                }
+              ],
+              "taskDefinitionKey": "processTask",
+              "processDefinitionKey": "wa-task-initiation-ia-asylum",
+              "sorting": [
+                {
+                  "sortBy": "created",
+                  "sortOrder": "desc"
+                }
+              ]
+            }
+            """;
     }
 
     private static void assertActualReportNotNull(GenericJobReport actualReport) {

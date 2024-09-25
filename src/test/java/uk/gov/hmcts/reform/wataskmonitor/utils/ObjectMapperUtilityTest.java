@@ -14,12 +14,14 @@ class ObjectMapperUtilityTest {
 
     @Test
     void stringToObjectTest() {
-        String source = "{\n"
-                        + "  \"caseIds\": [\n"
-                        + "    \"1626272789070361\",\n"
-                        + "    \"1626272789070362\"\n"
-                        + "  ]\n"
-                        + "}\n";
+        String source = """
+            {
+              "caseIds": [
+                "1626272789070361",
+                "1626272789070362"
+              ]
+            }
+            """;
 
         JsonResourceCaseList actual = stringToObject(source, JsonResourceCaseList.class);
         assertThat(actual).isEqualTo(new JsonResourceCaseList(List.of("1626272789070361", "1626272789070362")));
@@ -28,7 +30,7 @@ class ObjectMapperUtilityTest {
     @Test
     void stringToObjectThrowException() {
         assertThatThrownBy(() ->
-                               stringToObject("invalid source", JsonResourceCaseList.class))
+            stringToObject("invalid source", JsonResourceCaseList.class))
             .hasMessage("Error deserializing object[class "
                         + "uk.gov.hmcts.reform.wataskmonitor.domain.jobs.adhoc.createtasks.JsonResourceCaseList] "
                         + "from string[invalid source]")
