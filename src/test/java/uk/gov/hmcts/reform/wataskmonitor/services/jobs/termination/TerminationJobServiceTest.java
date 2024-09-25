@@ -341,8 +341,7 @@ class TerminationJobServiceTest extends UnitBaseTest {
                   "sortOrder": "desc"
                 }
               ]
-            }
-            """;
+            }""";
     }
 }
 

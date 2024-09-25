@@ -49,7 +49,6 @@ public final class TestUtility {
                 }
               ],
               "processDefinitionKey": "wa-task-initiation-ia-asylum"
-            }
-            """;
+            }""";
     }
 }

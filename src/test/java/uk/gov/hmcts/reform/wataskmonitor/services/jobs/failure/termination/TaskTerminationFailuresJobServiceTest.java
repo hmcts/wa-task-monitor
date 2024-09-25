@@ -234,8 +234,7 @@ class TaskTerminationFailuresJobServiceTest extends UnitBaseTest {
                   "sortOrder": "desc"
                 }
               ]
-            }
-            """;
+            }""";
     }
 }
 

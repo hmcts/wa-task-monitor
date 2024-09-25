@@ -285,7 +285,6 @@ class InitiationJobServiceTest extends UnitBaseTest {
                   "sortOrder": "desc"
                 }
               ]
-            }
-            """;
+            }""";
     }
 }

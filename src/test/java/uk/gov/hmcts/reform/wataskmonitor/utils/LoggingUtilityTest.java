@@ -23,8 +23,7 @@ class LoggingUtilityTest {
               "job_details" : {
                 "name" : "CONFIGURATION"
               }
-            }
-            """;
+            }""";
 
         assertEquals(expectedOutput, output, "output does not match expected output");
         assertNotEquals(output, input, "output can't be equal to input");
@@ -53,8 +52,7 @@ class LoggingUtilityTest {
               "taskId" : "some task id",
               "processInstanceId" : "some process instance id",
               "created" : true
-            }
-            """;
+            }""";
 
         assertEquals(expectedOutput, output, "output does not match expected output");
     }

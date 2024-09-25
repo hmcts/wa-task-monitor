@@ -273,8 +273,7 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
                   "sortOrder": "desc"
                 }
               ]
-            }
-            """;
+            }""";
     }
 
     private static void assertActualReportNotNull(GenericJobReport actualReport) {

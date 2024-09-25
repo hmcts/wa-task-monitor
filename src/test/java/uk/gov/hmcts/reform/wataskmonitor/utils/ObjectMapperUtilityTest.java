@@ -20,8 +20,7 @@ class ObjectMapperUtilityTest {
                 "1626272789070361",
                 "1626272789070362"
               ]
-            }
-            """;
+            }""";
 
         JsonResourceCaseList actual = stringToObject(source, JsonResourceCaseList.class);
         assertThat(actual).isEqualTo(new JsonResourceCaseList(List.of("1626272789070361", "1626272789070362")));
