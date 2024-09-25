@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.wataskmonitor.clients.TaskOperationClient;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class ReplicationCheckJobServiceTest extends UnitBaseTest {
+class ReplicationCheckJobServiceTest extends UnitBaseTest {
 
     @Mock
     private TaskOperationClient taskOperationClient;

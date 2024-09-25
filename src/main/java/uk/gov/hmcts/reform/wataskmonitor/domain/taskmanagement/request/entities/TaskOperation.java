@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.Tas
 @Builder
 public class TaskOperation {
 
-    @Schema(required = true)
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty("name")
     private final TaskOperationName name;
 

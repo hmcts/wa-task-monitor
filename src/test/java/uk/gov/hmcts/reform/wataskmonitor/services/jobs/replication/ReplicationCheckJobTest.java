@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ReplicationCheckJobTest extends UnitBaseTest {
+class ReplicationCheckJobTest extends UnitBaseTest {
 
     @Mock
     private ReplicationCheckJobService replicationCheckJobService;
