@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.wataskmonitor.services.IdamService;
 import uk.gov.hmcts.reform.wataskmonitor.services.RoleAssignmentServiceApi;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -36,7 +37,6 @@ import java.util.Set;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Collections.singleton;
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.fail;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.AUTHORIZATION;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
@@ -257,11 +257,11 @@ public class Common {
             //Delete All role assignments
             List<RoleAssignment> organisationalRoleAssignments = response.getRoleAssignmentResponse().stream()
                 .filter(assignment -> ORGANISATION.equals(assignment.getRoleType()))
-                .collect(toList());
+                .toList();
 
             List<RoleAssignment> caseRoleAssignments = response.getRoleAssignmentResponse().stream()
                 .filter(assignment -> CASE.equals(assignment.getRoleType()))
-                .collect(toList());
+                .toList();
 
             //Check if there are 'orphaned' restricted roles
             if (organisationalRoleAssignments.isEmpty() && !caseRoleAssignments.isEmpty()) {
@@ -435,7 +435,7 @@ public class Common {
 
         try {
             assignmentRequestBody = FileUtils.readFileToString(ResourceUtils.getFile(
-                "classpath:" + resourceFilename), "UTF-8"
+                "classpath:" + resourceFilename), StandardCharsets.UTF_8
             );
             assignmentRequestBody = assignmentRequestBody.replace("{ACTOR_ID_PLACEHOLDER}", actorId);
             assignmentRequestBody = assignmentRequestBody.replace("{ROLE_NAME_PLACEHOLDER}", roleName);

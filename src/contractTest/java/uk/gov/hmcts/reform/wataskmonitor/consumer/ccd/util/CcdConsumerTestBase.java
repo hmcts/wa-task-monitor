@@ -51,8 +51,7 @@ public abstract class CcdConsumerTestBase extends SpringBootContractBaseTest {
     public Map<String, Object> getCaseDetailsAsMap(String fileName) throws JSONException, IOException {
         File file = getFile(fileName);
         CaseDetails caseDetails = objectMapper.readValue(file, CaseDetails.class);
-        Map<String, Object> map = objectMapper.convertValue(caseDetails, Map.class);
-        return map;
+        return objectMapper.convertValue(caseDetails, Map.class);
     }
 
     public Map<String, Object> setUpStateMapForProviderWithCaseData(CaseDataContent caseDataContent)
