@@ -81,7 +81,6 @@ public class SpringBootFunctionalBaseTest {
     private AuthTokenGenerator authTokenGenerator;
 
     private static final String TASK_INITIATION_ENDPOINT = "task/{task-id}/initiation";
-    private static final String TASK_GET_ENDPOINT = "task/{task-id}";
 
     @Before
     public void setUpGivens() throws IOException {

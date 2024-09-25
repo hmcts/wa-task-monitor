@@ -51,8 +51,6 @@ public class IdamConsumerTestForPostUserInfo extends SpringBootContractBaseTest 
     }
 
     private PactDslJsonBody createUserDetailsResponse() {
-        PactDslJsonArray array = new PactDslJsonArray().stringValue("caseofficer-ia");
-
         return new PactDslJsonBody()
             .stringType("uid", "1111-2222-3333-4568")
             .stringValue("sub", "ia-caseofficer@fake.hmcts.net")

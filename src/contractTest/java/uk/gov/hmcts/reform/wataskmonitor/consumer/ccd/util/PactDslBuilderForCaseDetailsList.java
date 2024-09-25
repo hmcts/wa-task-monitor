@@ -55,9 +55,9 @@ public final class PactDslBuilderForCaseDetailsList {
     }
 
     public static DslPart buildSearchResultDsl(Long caseId) {
-        return newJsonBody((o) -> {
+        return newJsonBody(o -> {
             o.numberType("total", 1)
-                .minArrayLike("cases", 1, (cd) -> {
+                .minArrayLike("cases", 1, cd -> {
                     cd.numberType("id", caseId);
                 });
         }).build();
