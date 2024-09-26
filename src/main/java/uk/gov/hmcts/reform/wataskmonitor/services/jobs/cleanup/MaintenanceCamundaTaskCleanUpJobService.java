@@ -16,7 +16,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.MAINTENANCE_CAMUNDA_TASK_CLEAN_UP;
@@ -128,7 +127,7 @@ public class MaintenanceCamundaTaskCleanUpJobService {
         boolean isSuccess = false;
 
         List<String> historicProcessInstanceIds = historicCamundaTasks.stream()
-            .map(HistoricCamundaTask::getId).collect(Collectors.toList());
+            .map(HistoricCamundaTask::getId).toList();
 
 
         String body = prepareRequestBody(HISTORIC_PROCESS_DELETE_REQUEST, historicProcessInstanceIds);
@@ -154,7 +153,7 @@ public class MaintenanceCamundaTaskCleanUpJobService {
         boolean isSuccess = false;
 
         List<String> processInstanceIds = activeCamundaTasks.stream()
-            .map(HistoricCamundaTask::getId).collect(Collectors.toList());
+            .map(HistoricCamundaTask::getId).toList();
 
         String body = prepareRequestBody(ACTIVE_PROCESS_DELETE_REQUEST, processInstanceIds);
 

@@ -18,11 +18,12 @@ class LoggingUtilityTest {
         @SuppressWarnings("PMD.LawOfDemeter")
         String output = LoggingUtility.logPrettyPrint(input);
 
-        String expectedOutput = "{\n"
-                                + "  \"job_details\" : {\n"
-                                + "    \"name\" : \"CONFIGURATION\"\n"
-                                + "  }\n"
-                                + "}";
+        String expectedOutput = """
+            {
+              "job_details" : {
+                "name" : "CONFIGURATION"
+              }
+            }""";
 
         assertEquals(expectedOutput, output, "output does not match expected output");
         assertNotEquals(output, input, "output can't be equal to input");
@@ -45,12 +46,13 @@ class LoggingUtilityTest {
         @SuppressWarnings("PMD.LawOfDemeter")
         String output = LoggingUtility.logPrettyPrint(input);
 
-        String expectedOutput = "{\n"
-                                + "  \"caseId\" : \"someCaseId\",\n"
-                                + "  \"taskId\" : \"some task id\",\n"
-                                + "  \"processInstanceId\" : \"some process instance id\",\n"
-                                + "  \"created\" : true\n"
-                                + "}";
+        String expectedOutput = """
+            {
+              "caseId" : "someCaseId",
+              "taskId" : "some task id",
+              "processInstanceId" : "some process instance id",
+              "created" : true
+            }""";
 
         assertEquals(expectedOutput, output, "output does not match expected output");
     }

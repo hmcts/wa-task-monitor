@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class UpdateSearchIndexJobTest extends UnitBaseTest {
+class UpdateSearchIndexJobTest extends UnitBaseTest {
 
     @Mock
     private UpdateSearchIndexJobService updateSearchIndexJobService;

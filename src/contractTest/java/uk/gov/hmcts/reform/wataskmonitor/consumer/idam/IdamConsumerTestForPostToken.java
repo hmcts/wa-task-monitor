@@ -64,7 +64,7 @@ public class IdamConsumerTestForPostToken extends SpringBootContractBaseTest {
     }
 
     private Map<String, String> buildTokenRequestMap() {
-        Map<String, String> tokenRequestMap = ImmutableMap.<String, String>builder()
+        return ImmutableMap.<String, String>builder()
             .put("redirect_uri", "http://www.dummy-pact-service.com/callback")
             .put("client_id", PACT_TEST_CLIENT_ID_VALUE)
             .put("client_secret", PACT_TEST_CLIENT_SECRET_VALUE)
@@ -73,7 +73,6 @@ public class IdamConsumerTestForPostToken extends SpringBootContractBaseTest {
             .put("password", PACT_TEST_PASSWORD_VALUE)
             .put("scope", PACT_TEST_SCOPES_VALUE)
             .build();
-        return tokenRequestMap;
     }
 
     private PactDslJsonBody createAuthResponse() {

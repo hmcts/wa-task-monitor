@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.wataskmonitor.entities.camunda.CamundaValue;
 import uk.gov.hmcts.reform.wataskmonitor.services.AuthorizationProvider;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +76,8 @@ public class GivensBuilder {
         Map data = null;
         try {
             String caseDataString =
-                FileUtils.readFileToString(ResourceUtils.getFile("classpath:" + resourceFilename), "UTF-8");
+                FileUtils.readFileToString(ResourceUtils.getFile("classpath:" + resourceFilename),
+                    StandardCharsets.UTF_8);
             caseDataString = caseDataString.replace(
                 "{NEXT_HEARING_DATE}",
                 OffsetDateTime.now().toString()

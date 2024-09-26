@@ -17,7 +17,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_INITIATION_FAILURES;
@@ -59,7 +58,7 @@ public class TaskInitiationFailuresJobService {
                 log.info("{} There was no task", TASK_INITIATION_FAILURES.name());
                 return new GenericJobReport(0, emptyList());
             } else {
-                List<String> taskIds = camundaTasks.stream().map(CamundaTask::getId).collect(Collectors.toList());
+                List<String> taskIds = camundaTasks.stream().map(CamundaTask::getId).toList();
                 log.warn("{} There are some uninitiated tasks. Task Ids: {}",
                          TASK_INITIATION_FAILURES.name(),
                          String.join(", ", taskIds)

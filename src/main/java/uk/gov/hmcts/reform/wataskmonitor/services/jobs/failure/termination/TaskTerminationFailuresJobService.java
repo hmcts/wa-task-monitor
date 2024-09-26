@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_TERMINATION_FAILURES;
 import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_TASKS_TERMINATION_FAILURES;
@@ -48,8 +47,7 @@ public class TaskTerminationFailuresJobService {
             if (camundaTasks.isEmpty()) {
                 log.info("{} There was no task", TASK_TERMINATION_FAILURES.name());
             } else {
-                List<String> processIds = camundaTasks.stream().map(HistoricCamundaTask::getId)
-                    .collect(Collectors.toList());
+                List<String> processIds = camundaTasks.stream().map(HistoricCamundaTask::getId).toList();
                 log.warn("{} There are some unterminated tasks. Process Ids: {}",
                          TASK_TERMINATION_FAILURES.name(),
                          String.join(", ", processIds)

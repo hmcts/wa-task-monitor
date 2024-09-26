@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.wataskmonitor.consumer.idam;
 
-import au.com.dius.pact.consumer.dsl.PactDslJsonArray;
 import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.consumer.dsl.PactDslJsonRootValue;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
@@ -51,8 +50,6 @@ public class IdamConsumerTestForPostUserInfo extends SpringBootContractBaseTest 
     }
 
     private PactDslJsonBody createUserDetailsResponse() {
-        PactDslJsonArray array = new PactDslJsonArray().stringValue("caseofficer-ia");
-
         return new PactDslJsonBody()
             .stringType("uid", "1111-2222-3333-4568")
             .stringValue("sub", "ia-caseofficer@fake.hmcts.net")

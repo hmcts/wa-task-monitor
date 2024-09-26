@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.consumer.ccd.util.PactDslBuilder
 
 public class StartEventForCaseWorkerConsumerTest extends CcdConsumerTestBase {
 
+    @Override
     public Map<String, Object> setUpStateMapForProviderWithCaseData(CaseDataContent caseDataContent)
         throws JSONException {
         Map<String, Object> caseDataContentMap = super.setUpStateMapForProviderWithCaseData(caseDataContent);

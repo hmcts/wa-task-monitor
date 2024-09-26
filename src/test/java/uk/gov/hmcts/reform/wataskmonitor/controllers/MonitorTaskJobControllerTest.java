@@ -28,7 +28,7 @@ class MonitorTaskJobControllerTest {
     }
 
     @Test
-    public void should_succeed_and_return_job_name() {
+    void should_succeed_and_return_job_name() {
         MonitorTaskJobRequest monitorTaskJobRequest = new MonitorTaskJobRequest(new JobDetails(JobName.INITIATION));
 
         MonitorTaskJobRequest response = monitorTaskJobController.monitorTaskJob(monitorTaskJobRequest);

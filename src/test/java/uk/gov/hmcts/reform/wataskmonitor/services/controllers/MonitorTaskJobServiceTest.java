@@ -42,7 +42,7 @@ class MonitorTaskJobServiceTest {
     }
 
     @Test
-    public void should_run_initiation_job() {
+    void should_run_initiation_job() {
         when(authTokenGenerator.generate())
             .thenReturn(SERVICE_TOKEN);
 
