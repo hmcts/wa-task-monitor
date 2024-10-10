@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
 import uk.gov.hmcts.reform.wataskmonitor.services.controllers.MonitorTaskJobService;
 
+import java.util.concurrent.CompletableFuture;
+
 @RestController
 @Slf4j
 public class MonitorTaskJobController {
@@ -22,9 +24,15 @@ public class MonitorTaskJobController {
     @PostMapping("/monitor/tasks/jobs")
     public MonitorTaskJobRequest monitorTaskJob(@RequestBody MonitorTaskJobRequest monitorTaskJobReq) {
         log.info("Received request to create a new job of type '{}'", monitorTaskJobReq.getJobDetails().getName());
-        monitorTaskJobService.execute(monitorTaskJobReq.getJobDetails().getName());
-        log.info("Job '{}' processed in the background", monitorTaskJobReq.getJobDetails().getName());
-        return monitorTaskJobReq;
+        try {
+            CompletableFuture<String> future = monitorTaskJobService.execute(monitorTaskJobReq.getJobDetails().getName());
+            String result = future.join();
+            log.info("Job '{}' processed in the background with result {}", monitorTaskJobReq.getJobDetails().getName(), result);
+            return monitorTaskJobReq;
+        } catch (Exception e) {
+            log.error("Error processing job monitorTaskJob '{}' with exception '{}'", monitorTaskJobReq.getJobDetails().getName(), e.getMessage());
+            return null;
+        }
     }
 
 }
