@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerErrorException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.JobService;
@@ -26,7 +25,7 @@ public class MonitorTaskJobService {
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     @Async
-    public CompletableFuture<String> execute(JobName jobName) throws ServerErrorException{
+    public CompletableFuture<String> execute(JobName jobName) {
         String serviceToken = authTokenGenerator.generate();
         try {
             jobServices.forEach(job -> {

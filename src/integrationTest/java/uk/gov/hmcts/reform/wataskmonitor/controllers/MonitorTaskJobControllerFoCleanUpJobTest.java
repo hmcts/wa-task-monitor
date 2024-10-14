@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.wataskmonitor.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -62,7 +63,7 @@ class MonitorTaskJobControllerFoCleanUpJobTest extends SpringBootIntegrationBase
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
 
         TaskOperationResponse taskOperationResponse = new TaskOperationResponse(Map.of());
-        when(taskOperationClient.executeOperation(eq(SERVICE_TOKEN), eq(taskOperationRequest)))
+        when(taskOperationClient.executeOperation(eq(SERVICE_TOKEN), Mockito.any(TaskOperationRequest.class)))
             .thenReturn(taskOperationResponse);
     }
 

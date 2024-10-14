@@ -41,6 +41,7 @@ public class TaskOperation {
         this.retryWindowHours = retryWindowHours;
     }
 
+    @JsonCreator
     public TaskOperation(@JsonProperty("name") TaskOperationName name,
                          @JsonProperty("run_id")  String runId) {
         this.name = name;
