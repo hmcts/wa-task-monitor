@@ -12,8 +12,10 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.response.TaskOper
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
+import uk.gov.hmcts.reform.wataskmonitor.services.controllers.MonitorTaskJobService;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,6 +38,9 @@ class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootIntegra
     @MockBean
     private TaskOperationRequest taskOperationRequest;
 
+    @MockBean
+    private MonitorTaskJobService monitorTaskJobService;
+
     @BeforeEach
     void setUp() {
         mockExternalDependencies();
@@ -43,7 +48,7 @@ class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootIntegra
 
     @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
     @Test
-    public void givenMonitorTaskJobRequestShouldReturnStatus200() throws Exception {
+    public void given_monitor_task_job_request_should_return_status_200() throws Exception {
         MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(JobName.RECONFIGURATION));
 
         mockMvc.perform(post("/monitor/tasks/jobs")
@@ -54,6 +59,20 @@ class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootIntegra
 
         verify(authTokenGenerator).generate();
         verify(taskOperationClient).executeOperation(eq(SERVICE_TOKEN), any(TaskOperationRequest.class));
+    }
+
+    @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
+    @Test
+    public void given_monitor_task_job_request_should_throw_exception() throws Exception {
+        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(JobName.RECONFIGURATION));
+
+        CompletableFuture<String> future = CompletableFuture.failedFuture(new RuntimeException("Job execution failed"));
+        when(monitorTaskJobService.execute(monitorTaskJobReq.getJobDetails().getName())).thenReturn(future);
+
+        mockMvc.perform(post("/monitor/tasks/jobs")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtility.asJsonString(monitorTaskJobReq)))
+            .andExpect(status().isInternalServerError());
     }
 
     private void mockExternalDependencies() {
