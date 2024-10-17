@@ -12,10 +12,8 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.response.TaskOper
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
-import uk.gov.hmcts.reform.wataskmonitor.services.controllers.MonitorTaskJobService;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
