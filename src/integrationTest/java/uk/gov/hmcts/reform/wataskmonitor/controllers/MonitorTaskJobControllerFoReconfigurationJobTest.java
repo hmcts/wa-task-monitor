@@ -38,9 +38,6 @@ class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootIntegra
     @MockBean
     private TaskOperationRequest taskOperationRequest;
 
-    @MockBean
-    private MonitorTaskJobService monitorTaskJobService;
-
     @BeforeEach
     void setUp() {
         mockExternalDependencies();
@@ -50,7 +47,6 @@ class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootIntegra
     @Test
     public void given_monitor_task_job_request_should_return_status_200() throws Exception {
         MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(JobName.RECONFIGURATION));
-
         mockMvc.perform(post("/monitor/tasks/jobs")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(TestUtility.asJsonString(monitorTaskJobReq)))
@@ -66,9 +62,8 @@ class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootIntegra
     public void given_monitor_task_job_request_should_throw_exception() throws Exception {
         MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(JobName.RECONFIGURATION));
 
-        CompletableFuture<String> future = CompletableFuture.failedFuture(new RuntimeException("Job execution failed"));
-        when(monitorTaskJobService.execute(monitorTaskJobReq.getJobDetails().getName())).thenReturn(future);
-
+        when(taskOperationClient.executeOperation(eq(SERVICE_TOKEN), any(TaskOperationRequest.class)))
+            .thenThrow(new RuntimeException("Job execution failed"));
         mockMvc.perform(post("/monitor/tasks/jobs")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtility.asJsonString(monitorTaskJobReq)))

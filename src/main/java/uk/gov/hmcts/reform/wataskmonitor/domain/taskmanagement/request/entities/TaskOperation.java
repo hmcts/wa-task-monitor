@@ -30,6 +30,7 @@ public class TaskOperation {
     @JsonProperty("retry_window_hours")
     private long retryWindowHours;
 
+    @JsonCreator
     public TaskOperation(@JsonProperty("name") TaskOperationName name,
                          @JsonProperty("run_id")  String runId,
                          @JsonProperty("max_time_limit") long maxTimeLimit,
