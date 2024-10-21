@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.services.JobService;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 @Slf4j
@@ -24,13 +25,19 @@ public class MonitorTaskJobService {
 
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     @Async
-    public void execute(JobName jobName) {
+    public CompletableFuture<String> execute(JobName jobName) {
         String serviceToken = authTokenGenerator.generate();
-        jobServices.forEach(job -> {
-            if (job.canRun(jobName)) {
-                log.info("Running job '{}'", jobName.name());
-                job.run(serviceToken);
-            }
-        });
+        try {
+            jobServices.forEach(job -> {
+                if (job.canRun(jobName)) {
+                    log.info("Running job '{}'", jobName.name());
+                    job.run(serviceToken);
+                }
+            });
+            return CompletableFuture.completedFuture(jobName.name() + " Job completed successfully");
+        } catch (Exception e) {
+            log.error("Error running job '{}'", jobName.name(), e);
+            return CompletableFuture.failedFuture(e); // Return failed future with exception
+        }
     }
 }
