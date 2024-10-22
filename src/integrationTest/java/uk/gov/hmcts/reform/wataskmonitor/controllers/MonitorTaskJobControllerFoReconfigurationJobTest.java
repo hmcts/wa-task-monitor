@@ -43,9 +43,8 @@ class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootIntegra
 
     @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
     @Test
-    public void givenMonitorTaskJobRequestShouldReturnStatus200() throws Exception {
+    public void given_monitor_task_job_request_should_return_status_200() throws Exception {
         MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(JobName.RECONFIGURATION));
-
         mockMvc.perform(post("/monitor/tasks/jobs")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(TestUtility.asJsonString(monitorTaskJobReq)))
@@ -54,6 +53,19 @@ class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootIntegra
 
         verify(authTokenGenerator).generate();
         verify(taskOperationClient).executeOperation(eq(SERVICE_TOKEN), any(TaskOperationRequest.class));
+    }
+
+    @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
+    @Test
+    public void given_monitor_task_job_request_should_throw_exception() throws Exception {
+        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(new JobDetails(JobName.RECONFIGURATION));
+
+        when(taskOperationClient.executeOperation(eq(SERVICE_TOKEN), any(TaskOperationRequest.class)))
+            .thenThrow(new RuntimeException("Job execution failed"));
+        mockMvc.perform(post("/monitor/tasks/jobs")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtility.asJsonString(monitorTaskJobReq)))
+            .andExpect(status().isInternalServerError());
     }
 
     private void mockExternalDependencies() {
