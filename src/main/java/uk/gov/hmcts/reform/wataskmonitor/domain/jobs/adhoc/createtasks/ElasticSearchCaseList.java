@@ -12,7 +12,7 @@ import java.util.List;
 @ToString
 @EqualsAndHashCode(callSuper = false)
 @Getter
-public class ElasticSearchCaseList extends CaseIdList {
+public class ElasticSearchCaseList implements CaseIdList {
 
     private final int total;
     private final List<ElasticSearchCase> cases;

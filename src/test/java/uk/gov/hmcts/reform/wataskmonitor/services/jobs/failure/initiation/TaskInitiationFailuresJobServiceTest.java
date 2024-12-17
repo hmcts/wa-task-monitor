@@ -95,7 +95,7 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
         assertQueryTargetsUserTasksAndNotDelayedTasks();
         assertQuery();
         assertThat(genericJobReport.getTotalTasks()).isEqualTo(camundaTasks.size());
-        assertThat(genericJobReport.getOutcomeList().size()).isEqualTo(camundaTasks.size());
+        assertThat(genericJobReport.getOutcomeList()).hasSameSizeAs(camundaTasks.size());
         assertTrue(genericJobReport.getOutcomeList().get(0).isSuccessful());
         assertThat(output.getOut()).contains("TASK_INITIATION_FAILURES There are some uninitiated tasks");
 
@@ -118,7 +118,7 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
         assertQueryTargetsUserTasksAndNotDelayedTasks();
         assertQuery();
         assertThat(genericJobReport.getTotalTasks()).isZero();
-        assertThat(genericJobReport.getOutcomeList().size()).isZero();
+        assertTrue(genericJobReport.getOutcomeList().isEmpty());
         assertThat(output.getOut()).contains("TASK_INITIATION_FAILURES There was no task");
     }
 
@@ -149,7 +149,7 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
         assertQueryTargetsUserTasksAndNotDelayedTasks();
         assertQuery();
         assertThat(genericJobReport.getTotalTasks()).isEqualTo(camundaTasks.size());
-        assertThat(genericJobReport.getOutcomeList().size()).isEqualTo(camundaTasks.size());
+        assertThat(genericJobReport.getOutcomeList()).hasSameSizeAs(camundaTasks.size());
         assertFalse(genericJobReport.getOutcomeList().get(0).isSuccessful());
     }
 
