@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum;
 @ToString
 @EqualsAndHashCode(callSuper = false)
 @Getter
-public class ElasticSearchRetrieverParameter extends RetrieveCaseListParam {
+public class ElasticSearchRetrieverParameter implements RetrieveCaseListParam {
 
     private final String serviceAuthentication;
     private final ResourceEnum resourceEnum;
