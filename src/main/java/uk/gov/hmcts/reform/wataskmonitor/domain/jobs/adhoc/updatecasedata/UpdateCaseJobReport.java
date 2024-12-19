@@ -10,7 +10,7 @@ import java.util.List;
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(callSuper = false)
 @Getter
-public class UpdateCaseJobReport extends JobReport {
+public class UpdateCaseJobReport implements JobReport {
 
     @ToString.Include
     private final int totalNumberOfCasesInSearchResult;

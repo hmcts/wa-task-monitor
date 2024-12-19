@@ -53,15 +53,13 @@ public class TaskTerminationFailuresJobService {
                          String.join(", ", processIds)
                 );
 
-                camundaTasks.forEach(task -> {
-                    log.warn("{} -> taskId:{} deleteReason:{} startTime:{} endTime:{}",
-                             TASK_TERMINATION_FAILURES.name(),
-                             task.getId(),
-                             task.getDeleteReason(),
-                             task.getStartTime(),
-                             task.getEndTime()
-                    );
-                });
+                camundaTasks.forEach(task -> log.warn("{} -> taskId:{} deleteReason:{} startTime:{} endTime:{}",
+                                                  TASK_TERMINATION_FAILURES.name(),
+                                                  task.getId(),
+                                                  task.getDeleteReason(),
+                                                  task.getStartTime(),
+                                                  task.getEndTime()
+                ));
 
             }
         } else {

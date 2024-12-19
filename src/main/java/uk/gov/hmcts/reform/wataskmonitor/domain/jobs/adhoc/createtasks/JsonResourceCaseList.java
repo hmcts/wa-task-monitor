@@ -12,7 +12,7 @@ import java.util.List;
 @ToString
 @EqualsAndHashCode(callSuper = false)
 @Getter
-public class JsonResourceCaseList extends CaseIdList {
+public class JsonResourceCaseList implements CaseIdList {
 
     List<String> caseIds;
 

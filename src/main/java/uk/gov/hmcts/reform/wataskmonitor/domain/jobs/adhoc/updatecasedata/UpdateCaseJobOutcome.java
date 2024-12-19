@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.JobOutcome;
 @EqualsAndHashCode(callSuper = false)
 @Builder
 @Getter
-public class UpdateCaseJobOutcome extends JobOutcome {
+public class UpdateCaseJobOutcome implements JobOutcome {
     String caseId;
     boolean updated;
 }

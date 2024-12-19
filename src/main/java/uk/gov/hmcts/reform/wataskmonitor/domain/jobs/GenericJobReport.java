@@ -9,7 +9,7 @@ import java.util.List;
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(callSuper = false)
 @Getter
-public class GenericJobReport extends JobReport {
+public class GenericJobReport implements JobReport {
 
     @ToString.Include
     private final int totalTasks;
