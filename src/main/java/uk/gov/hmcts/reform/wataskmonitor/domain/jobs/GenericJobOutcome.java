@@ -9,7 +9,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = false)
 @Builder
 @Getter
-public class GenericJobOutcome extends JobOutcome {
+public class GenericJobOutcome implements JobOutcome {
     String taskId;
     String processInstanceId;
     boolean successful;
