@@ -12,17 +12,13 @@ java:
   environment:
     S2S_URL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CAMUNDA_URL: "http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest"
-    TASK_MANAGEMENT_SERVICE_URL: "http://wa-task-management-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    WA_TASK_MANAGEMENT_API_URL: "http://wa-task-management-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CASE_EVENT_HANDLER_SERVICE_URL: "http://wa-case-event-handler-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CCD_SEARCH_URL: "http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CCD_URL: "http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     OPEN_ID_IDAM_URL: "https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net"
     IDAM_URL: "https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net"
     ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
-    CONFIGURATION_CAMUNDA_MAX_RESULTS: 100
-    CONFIGURATION_TIME_LIMIT_FLAG: true
-    CONFIGURATION_TIME_LIMIT: 1440
-
     INITIATION_CAMUNDA_MAX_RESULTS: 100
     INITIATION_TIME_LIMIT_FLAG: true
     INITIATION_TIME_LIMIT: 120
@@ -31,13 +27,23 @@ java:
     TERMINATION_TIME_LIMIT_FLAG: true
     TERMINATION_TIME_LIMIT: 120
 
+    CLEAN_UP_CAMUNDA_MAX_RESULTS: 100
+    CLEAN_UP_STARTED_DAYS_BEFORE: 7
+
     PENDING_TERMINATION_CAMUNDA_MAX_RESULTS: 1
+    REFORM_ENVIRONMENT: "{{ .Values.global.environment }}"
+
+    RECONFIGURATION_MAX_TIME_LIMIT_SECONDS: 120
+    RECONFIGURATION_RETRY_WINDOW_TIME_HOURS: 2
+
+  spotInstances:
+    enabled: false
 
   keyVaults:
     wa:
       secrets:
-        - name: AppInsightsInstrumentationKey
-          alias: azure.application-insights.instrumentation-key
+        - name: app-insights-connection-string
+          alias: app-insights-connection-string
         - name: s2s-secret-task-monitor
           alias: S2S_SECRET_TASK_MONITOR
         - name: wa-system-username

@@ -2,18 +2,17 @@ package uk.gov.hmcts.reform.wataskmonitor.matchers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jknack.handlebars.internal.lang3.StringUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.mockito.ArgumentMatcher;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.configuration.ConfigurationJobService.CAMUNDA_DATE_REQUEST_PATTERN;
-
 @Slf4j
 public class CamundaQueryParametersMatcher implements ArgumentMatcher<String> {
+    public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private final String expectedCamundaQueryParameters;
 
     public CamundaQueryParametersMatcher(String expectedCamundaQueryParameters) {

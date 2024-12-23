@@ -7,8 +7,6 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -27,14 +25,19 @@ import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.Initia
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(OutputCaptureExtension.class)
@@ -87,12 +90,14 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
 
         GenericJobReport genericJobReport = taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
 
+        assertActualReportNotNull(genericJobReport);
+
         assertQueryTargetsUserTasksAndNotDelayedTasks();
-        assertQuery(true);
+        assertQuery();
         assertThat(genericJobReport.getTotalTasks()).isEqualTo(camundaTasks.size());
-        assertThat(genericJobReport.getOutcomeList().size()).isEqualTo(camundaTasks.size());
+        assertThat(genericJobReport.getOutcomeList()).hasSameSizeAs(camundaTasks);
         assertTrue(genericJobReport.getOutcomeList().get(0).isSuccessful());
-        assertThat(output.getOut().contains("TASK_INITIATION_FAILURES There are some uninitiated tasks"));
+        assertThat(output.getOut()).contains("TASK_INITIATION_FAILURES There are some uninitiated tasks");
 
     }
 
@@ -108,11 +113,13 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
 
         GenericJobReport genericJobReport = taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
 
+        assertActualReportNotNull(genericJobReport);
+
         assertQueryTargetsUserTasksAndNotDelayedTasks();
-        assertQuery(true);
-        assertThat(genericJobReport.getTotalTasks()).isEqualTo(0);
-        assertThat(genericJobReport.getOutcomeList().size()).isEqualTo(0);
-        assertThat(output.getOut().contains("TASK_INITIATION_FAILURES There was no task"));
+        assertQuery();
+        assertThat(genericJobReport.getTotalTasks()).isZero();
+        assertTrue(genericJobReport.getOutcomeList().isEmpty());
+        assertThat(output.getOut()).contains("TASK_INITIATION_FAILURES There was no task");
     }
 
     @Test
@@ -140,15 +147,14 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
         GenericJobReport genericJobReport = taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
 
         assertQueryTargetsUserTasksAndNotDelayedTasks();
-        assertQuery(true);
+        assertQuery();
         assertThat(genericJobReport.getTotalTasks()).isEqualTo(camundaTasks.size());
-        assertThat(genericJobReport.getOutcomeList().size()).isEqualTo(camundaTasks.size());
+        assertThat(genericJobReport.getOutcomeList()).hasSameSizeAs(camundaTasks);
         assertFalse(genericJobReport.getOutcomeList().get(0).isSuccessful());
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void should_createdBefore_exists_or_not_in_query_according_to_initiation_flag(boolean timeFlag)
+    @Test
+    void should_createdBefore_exists_in_query_according_to_initiation_flag()
         throws JSONException {
 
         ZonedDateTime createdDate = ZonedDateTime.now();
@@ -179,30 +185,35 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
             camundaClient,
             initiationJobConfig
         );
-        lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeFlag);
+        lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
 
         taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
 
-        assertQuery(timeFlag);
+        assertQuery();
 
     }
 
-    private void assertQuery(boolean timeFlag) throws JSONException {
+    @Test
+    void should_not_create_alert_if_time_limit_flag_is_false() {
+        taskInitiationFailuresJobService = new TaskInitiationFailuresJobService(
+            camundaClient,
+            initiationJobConfig
+        );
+        lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(false);
+
+        taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
+
+        verify(camundaClient, never()).getTasks(any(), any(), any(), any());
+    }
+
+    private void assertQuery() throws JSONException {
         JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
-        if (timeFlag) {
-            String createdBefore = query.getString("createdBefore");
-            JSONAssert.assertEquals(
-                getExpectedQueryParameters(createdBefore),
-                actualQueryParametersCaptor.getValue(),
-                JSONCompareMode.LENIENT
-            );
-        } else {
-            JSONAssert.assertEquals(
-                getExpectedQueryParameters(),
-                actualQueryParametersCaptor.getValue(),
-                JSONCompareMode.LENIENT
-            );
-        }
+        String createdBefore = query.getString("createdBefore");
+        JSONAssert.assertEquals(
+            getExpectedQueryParameters(createdBefore),
+            actualQueryParametersCaptor.getValue(),
+            JSONCompareMode.LENIENT
+        );
     }
 
     private void assertQueryTargetsUserTasksAndNotDelayedTasks() throws JSONException {
@@ -241,27 +252,34 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
 
     @NotNull
     private String getExpectedQueryParameters() {
-        return "{\n"
-               + "  \"orQueries\": [\n"
-               + "    {\n"
-               + "      \"taskVariables\": [\n"
-               + "        {\n"
-               + "          \"name\": \"cftTaskState\",\n"
-               + "          \"operator\": \"eq\",\n"
-               + "          \"value\": \"unconfigured\"\n"
-               + "        }\n"
-               + "      ]\n"
-               + "    }\n"
-               + "  ],\n"
-               + "  \"taskDefinitionKey\": \"processTask\",\n"
-               + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
-               + "  \"sorting\": [\n"
-               + "    {\n"
-               + "      \"sortBy\": \"created\",\n"
-               + "      \"sortOrder\": \"desc\"\n"
-               + "    }\n"
-               + "  ]"
-               + "}\n";
+        return """
+            {
+              "orQueries": [
+                {
+                  "taskVariables": [
+                    {
+                      "name": "cftTaskState",
+                      "operator": "eq",
+                      "value": "unconfigured"
+                    }
+                  ]
+                }
+              ],
+              "taskDefinitionKey": "processTask",
+              "processDefinitionKey": "wa-task-initiation-ia-asylum",
+              "sorting": [
+                {
+                  "sortBy": "created",
+                  "sortOrder": "desc"
+                }
+              ]
+            }""";
+    }
+
+    private static void assertActualReportNotNull(GenericJobReport actualReport) {
+        await().atMost(10, TimeUnit.SECONDS)
+            .untilAsserted(() -> assertThat(actualReport)
+                .isNotNull());
     }
 
 }

@@ -10,7 +10,11 @@ import uk.gov.hmcts.reform.wataskmonitor.services.JobService;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.InitiationJob;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,7 +46,7 @@ class MonitorTaskJobServiceTest {
     }
 
     @Test
-    public void should_run_initiation_job() {
+    void should_run_initiation_job() {
         when(authTokenGenerator.generate())
             .thenReturn(SERVICE_TOKEN);
 
@@ -51,6 +55,18 @@ class MonitorTaskJobServiceTest {
 
         monitorTaskJobService.execute(INITIATION);
 
+        verify(initiationJob, times(1)).run(SERVICE_TOKEN);
+    }
+
+    @Test
+    void should_throw_exception_when_job_fails() {
+        when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
+        when(initiationJob.canRun(INITIATION)).thenReturn(true);
+        doThrow(new RuntimeException("Job failed")).when(initiationJob).run(SERVICE_TOKEN);
+
+        CompletableFuture<String> future = monitorTaskJobService.execute(INITIATION);
+
+        assertThrows(ExecutionException.class, future::get);
         verify(initiationJob, times(1)).run(SERVICE_TOKEN);
     }
 

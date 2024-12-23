@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.wataskmonitor.SpringBootContractBaseTest;
-import uk.gov.hmcts.reform.wataskmonitor.clients.CcdClient;
 import uk.gov.hmcts.reform.wataskmonitor.consumer.ccd.CoreCaseDataConsumerApplication;
 
 import java.io.File;
@@ -47,16 +46,12 @@ public abstract class CcdConsumerTestBase extends SpringBootContractBaseTest {
     protected CoreCaseDataApi coreCaseDataApi;
 
     @Autowired
-    protected CcdClient ccdClient;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
     public Map<String, Object> getCaseDetailsAsMap(String fileName) throws JSONException, IOException {
         File file = getFile(fileName);
         CaseDetails caseDetails = objectMapper.readValue(file, CaseDetails.class);
-        Map<String, Object> map = objectMapper.convertValue(caseDetails, Map.class);
-        return map;
+        return objectMapper.convertValue(caseDetails, Map.class);
     }
 
     public Map<String, Object> setUpStateMapForProviderWithCaseData(CaseDataContent caseDataContent)

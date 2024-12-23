@@ -22,7 +22,6 @@ class PendingTerminationJobTest extends UnitBaseTest {
     @CsvSource({
         "TERMINATION, false",
         "INITIATION, false",
-        "CONFIGURATION, false",
         "AD_HOC_DELETE_PROCESS_INSTANCES, false",
         "AD_HOC_PENDING_TERMINATION_TASKS, true"
     })
