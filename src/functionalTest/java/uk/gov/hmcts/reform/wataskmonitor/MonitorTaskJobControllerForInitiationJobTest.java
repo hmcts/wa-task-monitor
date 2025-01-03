@@ -46,6 +46,7 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
 
     @After
     public void cleanUp() {
+        common.clearAllRoleAssignments(caseworkerCredentials.getHeaders());
         authorizationProvider.deleteAccount(caseworkerCredentials.getAccount().getUsername());
         common.cleanUpTask(caseworkerCredentials.getHeaders(), caseIds);
     }
