@@ -40,7 +40,8 @@ public class SecurityConfiguration {
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http
             .addFilterBefore(serviceAuthFilter, AbstractPreAuthenticatedProcessingFilter.class)
-            .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+            .sessionManagement((sessionManagementConfigurer) ->
+                                   sessionManagementConfigurer.sessionCreationPolicy(STATELESS))
             .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
             .logout(AbstractHttpConfigurer::disable)
