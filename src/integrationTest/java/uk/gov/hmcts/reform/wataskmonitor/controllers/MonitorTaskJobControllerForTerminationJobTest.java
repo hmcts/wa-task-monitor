@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.wataskmonitor.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
@@ -36,11 +36,11 @@ class MonitorTaskJobControllerForTerminationJobTest extends SpringBootIntegratio
     public static final String CAMUNDA_TASK_ID_FOR_COMPLETION = "some camunda task id for completion";
     public static final String CAMUNDA_TASK_ID_FOR_DELETED = "some camunda task id for deletion";
 
-    @MockBean
+    @MockitoBean
     private CamundaClient camundaClient;
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     private TaskManagementClient taskManagementClient;
 
     @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})

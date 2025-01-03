@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.wataskmonitor.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskOperationClient;
@@ -29,11 +29,11 @@ class MonitorTaskJobControllerFoReconfigurationJobTest extends SpringBootIntegra
 
     public static final String SERVICE_TOKEN = "some service token";
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     private TaskOperationClient taskOperationClient;
-    @MockBean
+    @MockitoBean
     private TaskOperationRequest taskOperationRequest;
 
     @BeforeEach
