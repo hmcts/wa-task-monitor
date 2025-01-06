@@ -41,9 +41,11 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTime.CAMUN
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.CASE_ID;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.CREATED;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.DUE_DATE;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.ROLE_CATEGORY;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.TASK_NAME;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.TASK_TYPE;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.TITLE;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.camunda.enums.CamundaVariableDefinition.WORK_TYPE;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.InitiateTaskOperation.INITIATION;
 
 @Slf4j
@@ -139,8 +141,8 @@ public class SpringBootFunctionalBaseTest {
         taskAttributes.put(CASE_ID.value(), testVariables.getCaseId());
         taskAttributes.put(CREATED.value(), formattedCreatedDate);
         taskAttributes.put(DUE_DATE.value(), formattedDueDate);
-        taskAttributes.put("roleCategory", "LEGAL_OPERATIONS");
-        taskAttributes.put("workType", "routine_work");
+        taskAttributes.put(ROLE_CATEGORY.value(), "LEGAL_OPERATIONS");
+        taskAttributes.put(WORK_TYPE.value(), "routine_work");
 
         InitiateTaskRequest initiateTaskRequest = new InitiateTaskRequest(INITIATION, taskAttributes);
 

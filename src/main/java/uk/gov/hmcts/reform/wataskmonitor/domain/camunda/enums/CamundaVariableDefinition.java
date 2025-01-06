@@ -28,7 +28,9 @@ public enum CamundaVariableDefinition {
     CFT_TASK_STATE("cftTaskState"),
     PRIORITY_DATE("priorityDate"),
     CASE_MANAGEMENT_CATEGORY("caseManagementCategory"),
-    ROLE_ASSIGNMENT_ID("roleAssignmentId");
+    ROLE_ASSIGNMENT_ID("roleAssignmentId"),
+    ROLE_CATEGORY("roleCategory"),
+    WORK_TYPE("workType"),;
 
     private final String value;
 
