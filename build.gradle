@@ -301,6 +301,7 @@ def versions = [
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.18.2',
   pactVersion         : '4.6.17',
+  pactJava8Version    : '4.1.43',
   tomcat              : '10.1.31'
 ]
 
@@ -383,7 +384,7 @@ dependencies {
 
   //Pact contract testing
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
-  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.43'
+  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pactJava8Version
 
   contractTestImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit)
   contractTestRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit)
