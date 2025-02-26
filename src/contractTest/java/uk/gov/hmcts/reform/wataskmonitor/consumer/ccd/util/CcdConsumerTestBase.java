@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor.consumer.ccd.util;
 
 import au.com.dius.pact.consumer.junit5.PactTestFor;
+import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.annotations.PactFolder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ import java.util.Map;
 
 @Slf4j
 @ContextConfiguration(classes = {CoreCaseDataConsumerApplication.class})
-@PactTestFor(providerName = "ccdDataStoreAPI_Cases", port = "8891")
+@PactTestFor(providerName = "ccdDataStoreAPI_Cases", port = "8891", pactVersion = PactSpecVersion.V3)
 @PactFolder("pacts")
 @SuppressWarnings("unchecked")
 public abstract class CcdConsumerTestBase extends SpringBootContractBaseTest {
