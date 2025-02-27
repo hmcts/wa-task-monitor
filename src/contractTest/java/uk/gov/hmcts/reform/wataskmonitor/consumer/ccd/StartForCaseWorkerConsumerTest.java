@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.wataskmonitor.consumer.ccd;
 
+import au.com.dius.pact.consumer.dsl.LambdaDsl;
+import au.com.dius.pact.consumer.dsl.LambdaDslJsonBody;
+import au.com.dius.pact.consumer.dsl.LambdaDslObject;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
+import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.json.JSONException;
@@ -13,6 +17,7 @@ import uk.gov.hmcts.reform.wataskmonitor.consumer.ccd.util.CcdConsumerTestBase;
 
 import java.util.Map;
 
+import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonBody;
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -46,11 +51,28 @@ public class StartForCaseWorkerConsumerTest extends CcdConsumerTestBase {
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .status(200)
             .body(buildStartForCaseWorkerPactDsl(START_APPEAL))
+//            .body(LambdaDsl.newJsonBody(((lambdaDslJsonBody) -> {
+//                    string
+//                }))
             .toPact();
     }
 
+//            .body(String.valueOf(newJsonBody(
+//                o -> o.stringType("event_id", START_APPEAL)
+//                    .stringType("token", null)
+//                    .object("case_details", cd -> {
+//                        cd.stringMatcher("jurisdiction", "[/^[A-Za-z_]+$/]+", "IA");
+//                        cd.stringMatcher("case_type_id", "[/^[A-Za-z_]+$/]+", "Asylum");
+//                        cd.object("case_data", data -> {
+//                            data.stringMatcher("isOutOfCountryEnabled", "Yes|No|YES|NO", "No");
+//                            data.stringMatcher("appealOutOfCountry", "Yes|No|YES|NO", "No");
+//                        });
+//                    }).build()
+
+
+
     @Test
-    @PactTestFor(pactMethod = "startForCaseWorker")
+    @PactTestFor(pactMethod = "startForCaseWorker", pactVersion = PactSpecVersion.V3)
     public void verifyStartEventForCaseworker() throws JSONException {
 
         StartEventResponse startEventResponse = coreCaseDataApi.startForCaseworker(

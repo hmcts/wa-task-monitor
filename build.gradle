@@ -13,7 +13,7 @@ plugins {
   id 'io.freefair.lombok' version '8.10.2'
   id 'info.solidsoft.pitest' version '1.15.0'
   id 'net.serenity-bdd.serenity-gradle-plugin' version '3.9.8'
-  id 'au.com.dius.pact' version '4.6.17'
+  id 'au.com.dius.pact' version '4.6.11'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -144,6 +144,8 @@ task fortifyScan(type: JavaExec) {
 project.ext {
   pacticipant = 'wa_task_monitor'
   pacticipantVersion = getCheckedOutGitCommitHash()
+  pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+  pactBranchName = System.getenv("PACT_BRANCH_NAME") ?: 'Dev'
 }
 
 checkstyle {
@@ -300,7 +302,7 @@ def versions = [
   serenity            : '4.2.16',
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.18.2',
-  pactVersion         : '4.6.17',
+  pactVersion         : '4.6.11',
   pactJava8Version    : '4.1.43',
   tomcat              : '10.1.31'
 ]
@@ -416,10 +418,11 @@ runAndPublishConsumerPactTests.finalizedBy pactPublish
 
 pact {
   broker {
-    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    pactBrokerUrl = project.ext.pactBrokerUrl
   }
   publish {
     pactDirectory = 'pacts'
+    pactBrokerUrl = project.ext.pactBrokerUrl
     tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
     version = project.pacticipantVersion
   }
