@@ -12,8 +12,8 @@ plugins {
   id 'org.sonarqube' version '5.1.0.4882'
   id 'io.freefair.lombok' version '8.10.2'
   id 'info.solidsoft.pitest' version '1.15.0'
-  id 'net.serenity-bdd.serenity-gradle-plugin' version '3.2.0'
-  id 'au.com.dius.pact' version '4.1.0'
+  id 'net.serenity-bdd.serenity-gradle-plugin' version '3.9.8'
+  id 'au.com.dius.pact' version '4.6.11'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -144,6 +144,8 @@ task fortifyScan(type: JavaExec) {
 project.ext {
   pacticipant = 'wa_task_monitor'
   pacticipantVersion = getCheckedOutGitCommitHash()
+  pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+  pactBranchName = System.getenv("PACT_BRANCH_NAME") ?: 'Dev'
 }
 
 checkstyle {
@@ -299,8 +301,9 @@ def versions = [
   springDoc           : '2.6.0',
   serenity            : '4.2.16',
   springFrameworkCloud: '2.2.10.RELEASE',
-  pitest              : '1.16.1',
-  pactVersion         : '4.1.7',
+  pitest              : '1.18.2',
+  pactVersion         : '4.6.11',
+  pactJava8Version    : '4.1.43',
   tomcat              : '10.1.31'
 ]
 
@@ -383,7 +386,7 @@ dependencies {
 
   //Pact contract testing
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
-  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pactVersion
+  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pactJava8Version
 
   contractTestImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit)
   contractTestRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit)
@@ -415,13 +418,18 @@ runAndPublishConsumerPactTests.finalizedBy pactPublish
 
 pact {
   broker {
-    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    pactBrokerUrl = project.ext.pactBrokerUrl
   }
   publish {
     pactDirectory = 'pacts'
+    pactBrokerUrl = project.ext.pactBrokerUrl
     tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
     version = project.pacticipantVersion
   }
+}
+
+pactPublish {
+  pactPublish = project.pact.publish
 }
 
 def getCheckedOutGitCommitHash() {
