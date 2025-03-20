@@ -58,11 +58,36 @@ public class TaskInitiationFailuresJobService {
                 log.info("{} There was no task", TASK_INITIATION_FAILURES.name());
                 return new GenericJobReport(0, emptyList());
             } else {
-                List<String> taskIds = camundaTasks.stream().map(CamundaTask::getId).toList();
-                log.warn("{} There are some uninitiated tasks. Task Ids: {}",
-                         TASK_INITIATION_FAILURES.name(),
-                         String.join(", ", taskIds)
-                );
+
+                StringBuilder logMessage = new StringBuilder(TASK_INITIATION_FAILURES.name())
+                    .append(" There are some uninitiated tasks:\n");
+
+                camundaTasks.forEach(task -> {
+                    try {
+                        Map<String, CamundaVariable> variables = camundaClient.getVariables(
+                            serviceToken,
+                            task.getId()
+                        );
+
+                        logMessage.append(" -> caseId: ").append(variables.get("caseId").getValue())
+                            .append(", taskId: ").append(task.getId())
+                            .append(", jurisdiction: ").append(variables.get("jurisdiction").getValue())
+                            .append(", name: ").append(variables.get("name").getValue())
+                            .append(", caseType: ").append(variables.get("caseTypeId").getValue())
+                            .append(", created: ").append(task.getCreated())
+                            .append("\n"); // New line for readability
+
+                    } catch (Exception e) {
+                        log.error("{} Error while getting variable from Camunda taskId({}) and processId({})",
+                                  TASK_INITIATION_FAILURES.name(),
+                                  task.getId(),
+                                  task.getProcessInstanceId(),
+                                  e);
+                    }
+                });
+
+                log.warn(logMessage.toString());
+
                 List<GenericJobOutcome> outcomesList = prepareInitiationFailureReport(camundaTasks, serviceToken);
                 return new GenericJobReport(camundaTasks.size(), outcomesList);
             }
