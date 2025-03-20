@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility;
 import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
-import java.lang.StringBuilder;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
