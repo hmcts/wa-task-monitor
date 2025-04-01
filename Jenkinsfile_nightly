@@ -28,6 +28,7 @@ def secrets = [
     secret('wa-test-law-firm-a-password', 'TEST_WA_LAW_FIRM_PASSWORD'),
     secret('wa-system-username', 'WA_SYSTEM_USERNAME'),
     secret('wa-system-password', 'WA_SYSTEM_PASSWORD'),
+    secret('generic-docker-pact-broker-password', 'GENERIC_DOCKER_PACT_BROKER_YAML_PASS'),
 
   ],
   's2s-${env}': [
