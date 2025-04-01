@@ -67,7 +67,7 @@ withNightlyPipeline(type, product, component) {
   env.RECONFIGURATION_MAX_TIME_LIMIT_SECONDS = 120
   env.RECONFIGURATION_RETRY_WINDOW_TIME_HOURS= 2
   loadVaultSecrets(secrets)
-//  enableFortifyScan()
+  enableFortifyScan()
   enableMutationTest()
   enableFullFunctionalTest()
   enableSlackNotifications('#wa-build')
