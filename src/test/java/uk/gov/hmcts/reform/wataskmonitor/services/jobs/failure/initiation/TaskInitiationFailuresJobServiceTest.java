@@ -98,6 +98,12 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
         assertThat(genericJobReport.getOutcomeList()).hasSameSizeAs(camundaTasks);
         assertTrue(genericJobReport.getOutcomeList().get(0).isSuccessful());
         assertThat(output.getOut()).contains("TASK_INITIATION_FAILURES There are some uninitiated tasks");
+        assertThat(output.getOut()).contains("caseId");
+        assertThat(output.getOut()).contains("taskId");
+        assertThat(output.getOut()).contains("jurisdiction");
+        assertThat(output.getOut()).contains("name");
+        assertThat(output.getOut()).contains("caseType");
+        assertThat(output.getOut()).contains("created");
 
     }
 
