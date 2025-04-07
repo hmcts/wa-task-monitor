@@ -14,7 +14,7 @@ properties([
 @Library("Infrastructure")
 
 def type = "java"
-def product = "rpe"
+def product = "wa"
 def component = "task-monitor"
 
 def secrets = [
