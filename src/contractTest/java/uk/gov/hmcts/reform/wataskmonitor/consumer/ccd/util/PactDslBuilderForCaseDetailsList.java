@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.wataskmonitor.consumer.ccd.util;
 
 import au.com.dius.pact.consumer.dsl.DslPart;
+import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
+import au.com.dius.pact.core.support.json.JsonValue;
 import io.pactfoundation.consumer.dsl.LambdaDslObject;
 
 import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonBody;
@@ -28,6 +30,34 @@ public final class PactDslBuilderForCaseDetailsList {
                 })).build();
     }
 
+    //TODO: Investigate this further, does not work with current Pact version
+    public static JsonValue buildStartEventForCaseWorkerPactDslA(String eventId) {
+        return new PactDslJsonBody()
+            .stringType("event_id", eventId)
+            .stringType("token", null)
+            .object("case_details")
+            .numberType("id", 2000)
+            .stringMatcher("jurisdiction", ALPHABETIC_REGEX, "IA")
+            .stringMatcher("case_type", ALPHABETIC_REGEX, "Asylum")
+            .stringValue("state", "appealStarted")
+            .stringValue("securityClassification", "PUBLIC")
+            .object("case_data", PactDslBuilderForCaseDetailsList::getCaseDataPactDsl)
+            .closeObject()
+            .getBody();
+    }
+
+//    String pactDslJson = new PactDslJsonBody()
+//        .stringType("status", "ON")
+//        .object("document")
+//        .stringType("status", "NOT_FOUND")
+//        .stringType("release", "undefined")
+//        .closeObject()
+//        .object("file")
+//        .stringType("version", "v1.4")
+//        .stringType("release", "1.1")
+//        .closeObject()
+//        .getBody().toString();
+
     public static DslPart buildStartForCaseWorkerPactDsl(String eventId) {
         return newJsonBody(
             o -> o.stringType("event_id", eventId)
@@ -42,6 +72,22 @@ public final class PactDslBuilderForCaseDetailsList {
                 }))
             .build();
     }
+//    public static DslPart buildStartForCaseWorkerPactDslAA(String eventId) {
+//        return PactDslJsonBody(
+//            o -> o.stringType("event_id", eventId)
+//                .stringType("token", null)
+//                .object("case_details", cd -> {
+//                    cd.stringMatcher("jurisdiction", ALPHABETIC_REGEX, "IA");
+//                    cd.stringMatcher("case_type_id", ALPHABETIC_REGEX, "Asylum");
+//                    cd.object("case_data", data -> {
+//                        data.stringMatcher("isOutOfCountryEnabled", "Yes|No|YES|NO", "No");
+//                        data.stringMatcher("appealOutOfCountry", "Yes|No|YES|NO", "No");
+//                    });
+//                }))
+//            .build();
+//    }
+
+
 
     public static DslPart buildSubmitForCaseWorkedPactDsl(Long caseId) {
         return newJsonBody(
