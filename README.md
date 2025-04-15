@@ -1,13 +1,15 @@
 # wa-task-monitor
 
+Last reviewed on: **15/04/2025**
+
 [![Build Status](https://travis-ci.org/hmcts/wa-task-monitor.svg?branch=master)](https://travis-ci.org/hmcts/wa-task-monitor)
 
 ## Purpose
 
-Task Monitor would use the Camunda Rest API to query for all Tasks that meet conditions that include:
+The **wa-task-monitor** application interacts with the Camunda REST API to identify and process tasks that meet specific conditions, such as:
 
-* The Task level variable taskState is 'Unconfigured'
-* Over a minimum age threshold
+- The Task level variable taskState is 'Unconfigured'
+- Over a minimum age threshold
 
 The latter condition would be set at 60 seconds to start with but can be adjusted as appropriate. It should be set long
 enough so that we do not select any Tasks that are currently being Configured. Note we also want to avoid picking up
@@ -23,6 +25,17 @@ appropriate TaskId. Task Management Service would then retrieve the Task from Ca
 following diagram shows the process:
 
 ![wa-monitor-unconfigured-tasks-service](TaskConfigurationOverRest.png)
+
+## Prerequisites
+
+Ensure the following tools and dependencies are installed:
+
+- **Java**: Version 11 or higher
+- **Gradle**: Included via the `./gradlew` wrapper
+- **Docker**: For containerization and running services
+- **Minikube**: For local Kubernetes environment
+- **Camunda REST API**: Accessible for task queries
+- **wa-task-management-service**: Running and accessible
 
 ## Building and deploying the application
 
@@ -43,7 +56,7 @@ To build the project execute the following command:
 
 * Minikube environment needs to up and running
 
-```shell
+```bash
 ./gradlew bootRun
 ```
 
@@ -52,7 +65,7 @@ To build the project execute the following command:
 Make sure, wa-workflow-api,
 wa_task_management_api services should be running
 
-````shell
+```bash
 ./gradlew functional
 ````
 
@@ -60,32 +73,30 @@ wa_task_management_api services should be running
 
 You can run contract or pact tests as follows:
 
-```
+```bash
 ./gradlew contract
 ```
 
-You can then publish your pact tests locally by first running the pact docker-compose:
+To publish Pact tests locally:
 
-```
+- Start the Pact Broker using Docker Compose:
+```bash
 docker-compose -f docker-pactbroker-compose.yml up
-
 ```
-
-and then using it to publish your tests:
-
-```
+- Publish the tests:
+```bash
 ./gradlew pactPublish
 ```
 
 #### Using docker
 
-Create the image of the application by executing the following command:
+- Create the image of the application by executing the following command:
 
 ```bash
   ./gradlew assemble
 ```
 
-Create docker image:
+- Create docker image:
 
 ```bash
   docker-compose build
