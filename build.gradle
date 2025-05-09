@@ -283,6 +283,14 @@ dependencyManagement {
       entry 'logback-core'
     }
 
+    // CVE-2020-8908, CVE-2022-25647 - Multiple deserialization and security issues
+    dependency group: 'com.google.code.gson', name: 'gson', version: '2.11'
+
+    // CVE-2019-9440, CVE-2023-3635 - OkHttp prior to 3.14.9 and 4.x have SSL and redirect flaws
+    dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+
+    // CVE-2023-32697 - DoS due to improper handling of large input
+    dependency group: 'com.squareup.okio', name: 'okio', version: '3.11.0'
   }
 }
 
