@@ -422,6 +422,7 @@ pact {
     pactDirectory = 'pacts'
     tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
     version = project.pacticipantVersion
+    consumerVersion = project.pacticipantVersion
   }
 }
 
