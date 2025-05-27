@@ -183,6 +183,6 @@ public class AuthorizationProvider {
         idamServiceApi.createTestUser(body);
 
         log.info("Test account created successfully");
-        return new TestAccount(email, password);
+        return new TestAccount(email, idamTestAccountPassword);
     }
 }
