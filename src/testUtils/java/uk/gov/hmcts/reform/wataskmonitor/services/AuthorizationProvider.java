@@ -167,8 +167,7 @@ public class AuthorizationProvider {
 
     private TestAccount generateIdamTestAccount(String emailPrefix, List<RoleCode> requiredRoles) {
         String email = emailPrefix + UUID.randomUUID() + "@fake.hmcts.net";
-        String tempPassword = idamTestAccountPassword;
-        log.info("temppassword DELETE: ", tempPassword);
+        String tempPassword = "London01";
 
         log.info("Attempting to create a new test account {}", email);
 
