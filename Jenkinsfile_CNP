@@ -95,3 +95,4 @@ withPipeline(type, product, component) {
   // Sync environment specific branches with master branch
   syncBranchesWithMaster(branchesToSync)
 }
+
