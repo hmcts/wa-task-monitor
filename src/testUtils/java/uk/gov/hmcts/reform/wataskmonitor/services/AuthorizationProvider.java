@@ -167,6 +167,8 @@ public class AuthorizationProvider {
 
     private TestAccount generateIdamTestAccount(String emailPrefix, List<RoleCode> requiredRoles) {
         String email = emailPrefix + UUID.randomUUID() + "@fake.hmcts.net";
+        String tempPassword = idamTestAccountPassword;
+        log.info("temppassword DELETE: ", tempPassword);
 
         log.info("Attempting to create a new test account {}", email);
 
@@ -174,7 +176,7 @@ public class AuthorizationProvider {
 
         Map<String, Object> body = new ConcurrentHashMap<>();
         body.put("email", email);
-        body.put("password", idamTestAccountPassword);
+        body.put("password", tempPassword);
         body.put("forename", "WAFTAccount");
         body.put("surname", "Functional");
         body.put("roles", requiredRoles);
@@ -183,6 +185,6 @@ public class AuthorizationProvider {
         idamServiceApi.createTestUser(body);
 
         log.info("Test account created successfully");
-        return new TestAccount(email, idamTestAccountPassword);
+        return new TestAccount(email, tempPassword);
     }
 }
