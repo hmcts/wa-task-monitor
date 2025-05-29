@@ -449,4 +449,3 @@ bootJar {
 wrapper {
   distributionType = Wrapper.DistributionType.ALL
 }
-

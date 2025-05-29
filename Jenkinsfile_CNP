@@ -19,6 +19,7 @@ def secrets = [
     secret('wa-system-username', 'WA_SYSTEM_USERNAME'),
     secret('wa-system-password', 'WA_SYSTEM_PASSWORD'),
     secret('generic-docker-pact-broker-password', 'GENERIC_DOCKER_PACT_BROKER_YAML_PASS'),
+    secret('idam-test-account-pw', 'IDAM_TEST_ACCOUNT_PW'),
   ],
   's2s-${env}': [
     secret('microservicekey-wa-task-monitor', 'S2S_SECRET_TASK_MONITOR'),
