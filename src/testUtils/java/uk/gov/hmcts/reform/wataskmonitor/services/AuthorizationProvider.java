@@ -35,7 +35,7 @@ public class AuthorizationProvider {
     @Value("${idam.scope}") protected String userScope;
     @Value("${spring.security.oauth2.client.registration.oidc.client-id}") protected String idamClientId;
     @Value("${spring.security.oauth2.client.registration.oidc.client-secret}") protected String idamClientSecret;
-    @Value("${idam.test.test-account-pw}") protected String idamTestAccountPassword;
+    @Value("${idam.test-account-pw}") protected String idamTestAccountPassword;
 
     @Autowired
     private IdamWebApi idamWebApi;
