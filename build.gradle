@@ -333,7 +333,7 @@ dependencies {
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.2.1'
 
-  implementation group: 'io.github.resilience4j', name: 'resilience4j-spring-boot3', version: '2.2.0'
+  implementation group: 'io.github.resilience4j', name: 'resilience4j-spring-boot3', version: '2.3.0'
 
   implementation group: 'org.springframework.security', name: 'spring-security-rsa', version: '1.1.5'
 
