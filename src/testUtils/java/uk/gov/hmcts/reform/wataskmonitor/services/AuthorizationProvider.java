@@ -35,6 +35,8 @@ public class AuthorizationProvider {
     @Value("${idam.scope}") protected String userScope;
     @Value("${spring.security.oauth2.client.registration.oidc.client-id}") protected String idamClientId;
     @Value("${spring.security.oauth2.client.registration.oidc.client-secret}") protected String idamClientSecret;
+    @Value("${idam.test-account-pw:default}") protected String idamTestAccountPassword;
+
     @Autowired
     private IdamWebApi idamWebApi;
 
@@ -165,7 +167,6 @@ public class AuthorizationProvider {
 
     private TestAccount generateIdamTestAccount(String emailPrefix, List<RoleCode> requiredRoles) {
         String email = emailPrefix + UUID.randomUUID() + "@fake.hmcts.net";
-        String password = "London01";
 
         log.info("Attempting to create a new test account {}", email);
 
@@ -173,7 +174,7 @@ public class AuthorizationProvider {
 
         Map<String, Object> body = new ConcurrentHashMap<>();
         body.put("email", email);
-        body.put("password", password);
+        body.put("password", idamTestAccountPassword);
         body.put("forename", "WAFTAccount");
         body.put("surname", "Functional");
         body.put("roles", requiredRoles);
@@ -182,6 +183,6 @@ public class AuthorizationProvider {
         idamServiceApi.createTestUser(body);
 
         log.info("Test account created successfully");
-        return new TestAccount(email, password);
+        return new TestAccount(email, idamTestAccountPassword);
     }
 }
