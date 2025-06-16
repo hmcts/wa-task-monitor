@@ -5,7 +5,7 @@ plugins {
   id 'pmd'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.7'
-  id 'org.springframework.boot' version '3.4.5'
+  id 'org.springframework.boot' version '3.5.0'
   id 'org.owasp.dependencycheck' version '12.1.1'
   id 'uk.gov.hmcts.java' version '0.12.66'
   id 'com.github.ben-manes.versions' version '0.51.0'
@@ -13,7 +13,7 @@ plugins {
   id 'io.freefair.lombok' version '8.10.2'
   id 'info.solidsoft.pitest' version '1.15.0'
   id 'net.serenity-bdd.serenity-gradle-plugin' version '4.1.14'
-  id 'au.com.dius.pact' version '4.6.14'
+  id 'au.com.dius.pact' version '4.6.17'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -144,6 +144,8 @@ task fortifyScan(type: JavaExec) {
 project.ext {
   pacticipant = 'wa_task_monitor'
   pacticipantVersion = getCheckedOutGitCommitHash()
+  pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+  pactBranchName = System.getenv("PACT_BRANCH_NAME") ?: 'Dev'
 }
 
 checkstyle {
@@ -172,6 +174,7 @@ jacocoTestReport {
 
 pitest {
   junit5PluginVersion = '1.2.1'
+  pitestVersion = '1.18.2'
   targetClasses = ['uk.gov.hmcts.reform.wataskmonitor.*']
   excludedClasses = [
     'uk.gov.hmcts.reform.wataskmonitor.config.*',
@@ -253,7 +256,7 @@ dependencyManagement {
     dependency group: 'org.glassfish', name: 'jakarta.el', version: '4.0.2'
 
     //CVE-2022-31692, CVE-2022-31690
-    dependencySet( group: 'org.springframework.security', version: '6.4.2'){
+    dependencySet( group: 'org.springframework.security', version: '6.5.0'){
       entry 'spring-boot-starter-security'
       entry 'spring-security-core'
       entry 'spring-security-acl'
@@ -296,11 +299,11 @@ def versions = [
   junit               : '5.12.2',
   junitPlatform       : '1.12.2',
   reformLogging       : '6.1.9',
-  springDoc           : '2.6.0',
+  springDoc           : '2.8.9',
   serenity            : '4.2.16',
   springFrameworkCloud: '2.2.10.RELEASE',
-  pitest              : '1.16.1',
-  pactVersion         : '4.1.7',
+  pitest              : '1.18.2',
+  pactVersion         : '4.6.11',
   tomcat              : '10.1.41'
 ]
 
@@ -331,7 +334,7 @@ dependencies {
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.19.0'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.19.0'
 
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.2.1'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.0'
 
   implementation group: 'io.github.resilience4j', name: 'resilience4j-spring-boot3', version: '2.3.0'
 
@@ -383,7 +386,6 @@ dependencies {
 
   //Pact contract testing
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
-  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pactVersion
 
   contractTestImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit)
   contractTestRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit)
@@ -415,11 +417,12 @@ runAndPublishConsumerPactTests.finalizedBy pactPublish
 
 pact {
   broker {
-    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    pactBrokerUrl = project.ext.pactBrokerUrl
   }
   publish {
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
     pactDirectory = 'pacts'
+    pactBrokerUrl = project.ext.pactBrokerUrl
     tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
     version = project.pacticipantVersion
     consumerVersion = project.pacticipantVersion
