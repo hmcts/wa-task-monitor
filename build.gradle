@@ -296,7 +296,7 @@ def versions = [
   junit               : '5.12.2',
   junitPlatform       : '1.12.2',
   reformLogging       : '6.1.9',
-  springDoc           : '2.6.0',
+  springDoc           : '2.8.9',
   serenity            : '4.2.16',
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.16.1',
@@ -352,7 +352,7 @@ dependencies {
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: versions.tomcat
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: versions.tomcat
 
-  implementation group: 'org.awaitility', name: 'awaitility', version: '4.2.2'
+  implementation group: 'org.awaitility', name: 'awaitility', version: '4.3.0'
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
