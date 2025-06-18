@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.wataskmonitor.consumer.ccd;
 
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
-import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ public class StartEventForCaseWorkerConsumerTest extends CcdConsumerTestBase {
     }
 
     @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "wa_task_monitor")
-    public RequestResponsePact startEventForCaseWorker(PactDslWithProvider builder) throws JSONException {
+    public V4Pact startEventForCaseWorker(PactDslWithProvider builder) throws JSONException {
         return builder
             .given("A Start Event for a Caseworker is  requested",
                 setUpStateMapForProviderWithCaseData(caseDataContent)
@@ -47,7 +47,7 @@ public class StartEventForCaseWorkerConsumerTest extends CcdConsumerTestBase {
             .matchHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .status(200)
             .body(buildStartEventForCaseWorkerPactDsl(START_APPEAL))
-            .toPact();
+            .toPact(V4Pact.class);
     }
 
     @Test
