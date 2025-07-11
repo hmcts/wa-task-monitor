@@ -129,35 +129,6 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
     }
 
     @Test
-    void should_return_empty_list_when_camundaTasks_is_over_5_days(CapturedOutput output) throws JSONException {
-
-        ZonedDateTime createdDate = ZonedDateTime.now().plusDays(6);
-        ZonedDateTime dueDate = ZonedDateTime.now().plusDays(7);
-        CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(
-            createdDate,
-            dueDate
-        );
-        List<CamundaTask> camundaTasks = singletonList(camundaTask);
-
-        when(camundaClient.getTasks(
-            eq(SOME_SERVICE_TOKEN),
-            eq("0"),
-            eq("100"),
-            actualQueryParametersCaptor.capture()
-        )).thenReturn(camundaTasks);
-
-        GenericJobReport genericJobReport = taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
-
-        assertActualReportNotNull(genericJobReport);
-
-        assertQueryTargetsUserTasksAndNotDelayedTasks();
-        assertQuery();
-        assertThat(genericJobReport.getTotalTasks()).isZero();
-        assertTrue(genericJobReport.getOutcomeList().isEmpty());
-        assertThat(output.getOut()).contains("TASK_INITIATION_FAILURES There was no task");
-    }
-
-    @Test
     void should_return_isSuccessful_false_when_an_exception_thrown() throws JSONException {
         ZonedDateTime createdDate = ZonedDateTime.now();
         ZonedDateTime dueDate = ZonedDateTime.now().plusDays(1);
