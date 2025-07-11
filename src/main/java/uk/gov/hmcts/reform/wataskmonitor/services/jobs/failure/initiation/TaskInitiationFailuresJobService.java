@@ -64,19 +64,20 @@ public class TaskInitiationFailuresJobService {
 
                 camundaTasks.forEach(task -> {
                     try {
-                        Map<String, CamundaVariable> variables = camundaClient.getVariables(
-                            serviceToken,
-                            task.getId()
-                        );
+                        if (task.getCreated().isAfter(ZonedDateTime.now().minusDays(5))){
+                            Map<String, CamundaVariable> variables = camundaClient.getVariables(
+                                serviceToken,
+                                task.getId()
+                            );
 
-                        logMessage.append(" -> caseId: ").append(variables.get("caseId").getValue())
-                            .append(", taskId: ").append(task.getId())
-                            .append(", jurisdiction: ").append(variables.get("jurisdiction").getValue())
-                            .append(", name: ").append(variables.get("name").getValue())
-                            .append(", caseType: ").append(variables.get("caseTypeId").getValue())
-                            .append(", created: ").append(task.getCreated())
-                            .append("\n"); // New line for readability
-
+                            logMessage.append(" -> caseId: ").append(variables.get("caseId").getValue())
+                                .append(", taskId: ").append(task.getId())
+                                .append(", jurisdiction: ").append(variables.get("jurisdiction").getValue())
+                                .append(", name: ").append(variables.get("name").getValue())
+                                .append(", caseType: ").append(variables.get("caseTypeId").getValue())
+                                .append(", created: ").append(task.getCreated())
+                                .append("\n"); // New line for readability
+                        }
                     } catch (Exception e) {
                         log.error("{} Error while getting variable from Camunda taskId({}) and processId({})",
                                   TASK_INITIATION_FAILURES.name(),
