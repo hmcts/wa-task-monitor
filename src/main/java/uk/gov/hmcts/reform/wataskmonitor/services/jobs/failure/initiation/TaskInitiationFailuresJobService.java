@@ -64,7 +64,7 @@ public class TaskInitiationFailuresJobService {
 
                 camundaTasks.forEach(task -> {
                     try {
-                        if (task.getCreated().isAfter(ZonedDateTime.now().minusDays(5))){
+                        if (task.getCreated().isAfter(ZonedDateTime.now().minusDays(5))) {
                             Map<String, CamundaVariable> variables = camundaClient.getVariables(
                                 serviceToken,
                                 task.getId()
