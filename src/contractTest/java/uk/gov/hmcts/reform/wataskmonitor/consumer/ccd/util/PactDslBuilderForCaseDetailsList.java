@@ -18,7 +18,7 @@ public final class PactDslBuilderForCaseDetailsList {
         return newJsonBody(o ->
             o.stringType("event_id", eventId)
                 .stringType("token", "token")
-                .nullValue("token")
+                .stringValue("token", "")
                 .object("case_details", cd -> {
                     cd.numberType("id", 2000);
                     cd.stringMatcher("jurisdiction", ALPHABETIC_REGEX, "IA");
@@ -33,7 +33,7 @@ public final class PactDslBuilderForCaseDetailsList {
         return newJsonBody(
             o -> o.stringType("event_id", eventId)
                 .stringType("token", "token")
-                .nullValue("token")
+                .stringValue("token", "")
                 .object("case_details", cd -> {
                     cd.stringMatcher("jurisdiction", ALPHABETIC_REGEX, "IA");
                     cd.stringMatcher("case_type_id", ALPHABETIC_REGEX, "Asylum");
@@ -85,16 +85,17 @@ public final class PactDslBuilderForCaseDetailsList {
             .stringType("uploadAddendumEvidenceLegalRepActionAvailable", "No")
             .object("legalRepCompanyAddress", addr -> {
                 addr.stringType("AddressLine1", "AddressLine1")
-                    .nullValue("AddressLine1");
+                    .stringValue("AddressLine1", "");
                 addr.stringType("AddressLine2", "AddressLine2")
-                    .nullValue("AddressLine2");
+                    .stringValue("AddressLine2", "");
                 addr.stringType("AddressLine3", "AddressLine3")
-                    .nullValue("AddressLine3");
+                    .stringValue("AddressLine3", "");
                 addr.stringType("Country", "Country")
-                    .nullValue("Country");
-                addr.stringType("PostCode", "");
+                    .stringValue("Country", "");
+                addr.stringType("PostCode", "PostCode")
+                    .stringValue("PostCode", "");
                 addr.stringType("PostTown", "PostTown")
-                    .nullValue("PostTown");
+                    .stringValue("PostTown", "");
             })
             .minArrayLike("uploadTheNoticeOfDecisionDocs", 1, 1,
                 docsUploaded ->
