@@ -352,8 +352,8 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
   implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '5.1.1'
 
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.0'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.25.0'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.25.1'
 
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: versions.tomcat
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: versions.tomcat
