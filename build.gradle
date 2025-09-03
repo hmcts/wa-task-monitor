@@ -136,7 +136,7 @@ task tests {
 }
 
 task fortifyScan(type: JavaExec) {
-  mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+  mainClass.set("uk.gov.hmcts.fortifyclient.FortifyClientMainApp")
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
@@ -440,12 +440,12 @@ def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
-mainClassName = 'uk.gov.hmcts.reform.wataskmonitor.Application'
+application {
+  mainClass = 'uk.gov.hmcts.reform.wataskmonitor.Application'
+}
 
 bootJar {
-  getArchiveFileName().set(provider {
-    'wa-task-monitor.jar'
-  })
+  archiveFileName.set('wa-task-monitor.jar')
 
   manifest {
     attributes('Implementation-Version': project.version.toString())
