@@ -163,11 +163,6 @@ pmd {
   ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
-reporting {
-  // Gradle 9: use baseDirectory instead of removed reporting.baseDir
-  baseDirectory = layout.buildDirectory.dir("reports")
-}
-
 jacocoTestReport {
   executionData(test, integration)
   reports {
