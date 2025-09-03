@@ -11,7 +11,7 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.52.0'
   id 'org.sonarqube' version '6.2.0.5505'
   id 'io.freefair.lombok' version '8.14.2'
-  id 'info.solidsoft.pitest' version '1.15.0'
+  id 'info.solidsoft.pitest' version '1.16.0'
   id 'net.serenity-bdd.serenity-gradle-plugin' version '4.1.14'
   id 'au.com.dius.pact' version '4.6.17'
 }
@@ -161,6 +161,11 @@ pmd {
   // https://github.com/pmd/pmd/issues/876
   ruleSets = []
   ruleSetFiles = files("config/pmd/ruleset.xml")
+}
+
+reporting {
+  // Gradle 9: use baseDirectory instead of removed reporting.baseDir
+  baseDirectory = layout.buildDirectory.dir("reports")
 }
 
 jacocoTestReport {
@@ -328,10 +333,8 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
-  implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.18'
 
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.19.2'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.19.2'
@@ -441,7 +444,7 @@ def getCheckedOutGitCommitHash() {
 }
 
 application {
-  mainClass = 'uk.gov.hmcts.reform.wataskmonitor.Application'
+  mainClass.set('uk.gov.hmcts.reform.wataskmonitor.Application')
 }
 
 bootJar {
