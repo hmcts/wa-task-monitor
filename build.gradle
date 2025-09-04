@@ -302,7 +302,7 @@ def versions = [
   junit               : '5.13.4',
   junitPlatform       : '1.13.4',
   reformLogging       : '6.1.9',
-  springDoc           : '2.8.11',
+  springDoc           : '2.8.12',
   serenity            : '4.2.16',
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.18.2',
@@ -331,9 +331,9 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
-  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.19.2'
-  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.19.2'
-  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.19.2'
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.20.0'
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.20.0'
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.20'
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.0'
 
