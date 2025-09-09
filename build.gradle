@@ -302,7 +302,7 @@ def versions = [
   junit               : '5.13.4',
   junitPlatform       : '1.13.4',
   reformLogging       : '6.1.9',
-  springDoc           : '2.8.12',
+  springDoc           : '2.8.13',
   serenity            : '4.2.16',
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.18.2',
