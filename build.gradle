@@ -11,7 +11,7 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.52.0'
   id 'org.sonarqube' version '6.2.0.5505'
   id 'io.freefair.lombok' version '8.14.2'
-  id 'info.solidsoft.pitest' version '1.15.0'
+  id 'info.solidsoft.pitest' version '1.19.0-rc.1'
   id 'net.serenity-bdd.serenity-gradle-plugin' version '4.1.14'
   id 'au.com.dius.pact' version '4.6.17'
 }
@@ -136,7 +136,7 @@ task tests {
 }
 
 task fortifyScan(type: JavaExec) {
-  mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+  mainClass.set("uk.gov.hmcts.fortifyclient.FortifyClientMainApp")
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
@@ -173,7 +173,7 @@ jacocoTestReport {
 }
 
 pitest {
-  junit5PluginVersion = '1.2.1'
+  junit5PluginVersion = '1.2.3'
   pitestVersion = '1.18.2'
   targetClasses = ['uk.gov.hmcts.reform.wataskmonitor.*']
   excludedClasses = [
@@ -302,7 +302,7 @@ def versions = [
   junit               : '5.13.4',
   junitPlatform       : '1.13.4',
   reformLogging       : '6.1.9',
-  springDoc           : '2.8.11',
+  springDoc           : '2.8.12',
   serenity            : '4.2.16',
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.18.2',
@@ -328,14 +328,12 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
-  implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.18'
 
-  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.19.2'
-  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.19.2'
-  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.19.2'
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.20.0'
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.20.0'
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.20'
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.0'
 
@@ -440,12 +438,12 @@ def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
-mainClassName = 'uk.gov.hmcts.reform.wataskmonitor.Application'
+application {
+  mainClass.set('uk.gov.hmcts.reform.wataskmonitor.Application')
+}
 
 bootJar {
-  getArchiveFileName().set(provider {
-    'wa-task-monitor.jar'
-  })
+  archiveFileName.set('wa-task-monitor.jar')
 
   manifest {
     attributes('Implementation-Version': project.version.toString())
