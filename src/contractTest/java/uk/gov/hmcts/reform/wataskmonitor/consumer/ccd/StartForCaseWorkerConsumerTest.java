@@ -62,7 +62,7 @@ public class StartForCaseWorkerConsumerTest extends CcdConsumerTestBase {
             START_APPEAL);
 
         assertThat(startEventResponse.getEventId(), equalTo(START_APPEAL));
-        assertNotNull(startEventResponse.getCaseDetails());
+        assertNotNull(startEventResponse.getToken());
     }
 
     private String buildPath() {

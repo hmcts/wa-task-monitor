@@ -18,7 +18,6 @@ public final class PactDslBuilderForCaseDetailsList {
         return newJsonBody(o ->
             o.stringType("event_id", eventId)
                 .stringType("token", "token")
-                .nullValue("token")
                 .object("case_details", cd -> {
                     cd.numberType("id", 2000);
                     cd.stringMatcher("jurisdiction", ALPHABETIC_REGEX, "IA");
@@ -33,7 +32,6 @@ public final class PactDslBuilderForCaseDetailsList {
         return newJsonBody(
             o -> o.stringType("event_id", eventId)
                 .stringType("token", "token")
-                .nullValue("token")
                 .object("case_details", cd -> {
                     cd.stringMatcher("jurisdiction", ALPHABETIC_REGEX, "IA");
                     cd.stringMatcher("case_type_id", ALPHABETIC_REGEX, "Asylum");
@@ -56,14 +54,6 @@ public final class PactDslBuilderForCaseDetailsList {
                 .object("case_data", PactDslBuilderForCaseDetailsList::getCaseDataPactDsl)).build();
     }
 
-    public static DslPart buildSearchResultDsl(Long caseId) {
-        return newJsonBody(o -> {
-            o.numberType("total", 1)
-                .minArrayLike("cases", 1, cd -> {
-                    cd.numberType("id", caseId);
-                });
-        }).build();
-    }
 
     private static void getCaseDataPactDsl(final LambdaDslObject dataMap) {
         dataMap
