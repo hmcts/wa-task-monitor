@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.wataskmonitor.services.RoleAssignmentServiceApi;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -132,7 +133,7 @@ public class Common {
         log.info("Creating Organizational Role");
         createCaseAllocator(userInfo, headers);
         createSupervisor(userInfo, headers);
-        
+
         Map<String, String> attributes = Map.of(
             "primaryLocation", "765324",
             "region", "1",
@@ -469,7 +470,7 @@ public class Common {
             } else {
                 assignmentRequestBody = assignmentRequestBody.replace(
                     "{END_TIME_PLACEHOLDER}",
-                    ZonedDateTime.now().plusHours(2).format(ROLE_ASSIGNMENT_DATA_TIME_FORMATTER)
+                    ZonedDateTime.now(ZoneOffset.UTC).plusHours(2).format(ROLE_ASSIGNMENT_DATA_TIME_FORMATTER)
                 );
             }
 
