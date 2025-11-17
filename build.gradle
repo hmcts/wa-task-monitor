@@ -343,7 +343,7 @@ dependencies {
 
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: versions.springDoc
 
-  implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
+  implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '9.0'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
 
