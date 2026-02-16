@@ -256,7 +256,7 @@ dependencyManagement {
     dependency group: 'org.glassfish', name: 'jakarta.el', version: '4.0.2'
 
     //CVE-2022-31692, CVE-2022-31690
-    dependencySet( group: 'org.springframework.security', version: '6.5.7'){
+    dependencySet( group: 'org.springframework.security', version: '7.0.3'){
       entry 'spring-boot-starter-security'
       entry 'spring-security-core'
       entry 'spring-security-acl'
