@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJ
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.maintenance.DatabaseMaintenanceExecutorService;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
