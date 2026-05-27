@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.sql.DataSource;
@@ -24,6 +25,8 @@ class DatabaseMaintenanceExecutorServiceTest {
     private Connection connection;
     @Mock
     private Statement statement;
+    @Mock
+    private PreparedStatement preparedStatement;
 
     private DatabaseMaintenanceExecutorService executorService;
 
@@ -40,11 +43,14 @@ class DatabaseMaintenanceExecutorServiceTest {
     void should_execute_maintenance_statement_on_dedicated_connection() throws SQLException {
         when(dataSource.getConnection()).thenReturn(connection);
         when(connection.createStatement()).thenReturn(statement);
+        when(connection.prepareStatement("SELECT set_config('statement_timeout', ?, false)"))
+            .thenReturn(preparedStatement);
 
         executorService.executeConfiguredMaintenance();
 
         verify(connection).setAutoCommit(true);
-        verify(statement).execute("SET statement_timeout = '300s'");
+        verify(preparedStatement).setString(1, "300s");
+        verify(preparedStatement).execute();
         verify(statement).execute("VACUUM ANALYZE cft_task_db.tasks");
     }
 

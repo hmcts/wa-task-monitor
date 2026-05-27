@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Locale;
@@ -16,6 +17,7 @@ import javax.sql.DataSource;
 @Service
 @Slf4j
 public class DatabaseMaintenanceExecutorService {
+    private static final String SET_STATEMENT_TIMEOUT_SQL = "SELECT set_config('statement_timeout', ?, false)";
 
     private static final Pattern REINDEX_SQL =
         Pattern.compile("^REINDEX\\s+INDEX\\s+CONCURRENTLY\\s+CFT_TASK_DB\\.[A-Z_][A-Z0-9_]*\\s*;?$");
@@ -45,11 +47,18 @@ public class DatabaseMaintenanceExecutorService {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
             connection.setAutoCommit(true);
-            statement.execute("SET statement_timeout = '" + timeoutSeconds + "s'");
+            applyStatementTimeout(connection, timeoutSeconds);
             statement.execute(sqlStatement);
             log.info("Database maintenance statement executed successfully: {}", sqlStatement);
         } catch (SQLException exception) {
             throw new IllegalStateException("Database maintenance execution failed", exception);
+        }
+    }
+
+    void applyStatementTimeout(Connection connection, long timeoutSeconds) throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SET_STATEMENT_TIMEOUT_SQL)) {
+            preparedStatement.setString(1, timeoutSeconds + "s");
+            preparedStatement.execute();
         }
     }
 
