@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
 import uk.gov.hmcts.reform.wataskmonitor.services.controllers.MonitorTaskJobService;
 
@@ -30,6 +31,18 @@ public class MonitorTaskJobController {
         try {
             CompletableFuture<String> future =
                 monitorTaskJobService.execute(monitorTaskJobReq.getJobDetails().getName());
+            if (JobName.DATABASE_MAINTENANCE.equals(monitorTaskJobReq.getJobDetails().getName())) {
+                future.whenComplete((result, exception) -> {
+                    if (exception != null) {
+                        log.error("Database maintenance job '{}' failed",
+                                  monitorTaskJobReq.getJobDetails().getName(), exception);
+                    } else {
+                        log.info("Database maintenance job '{}' processed in the background with result {}",
+                                 monitorTaskJobReq.getJobDetails().getName(), result);
+                    }
+                });
+                return new ResponseEntity<>(monitorTaskJobReq, HttpStatus.OK);
+            }
             String result = future.join();
             log.info("Job '{}' processed in the background with result {}",
                      monitorTaskJobReq.getJobDetails().getName(), result);
