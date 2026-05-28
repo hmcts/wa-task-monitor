@@ -38,8 +38,8 @@ java:
 
 
     POSTGRES_PORT: 5432
-    POSTGRES_HOST: cft-task-postgres-db-flexible-{{ .Values.global.environment }}.postgres.database.azure.com
-    POSTGRES_NAME: cft_task_db
+    POSTGRES_HOST: "cft-task-postgres-db-flexible-{{ .Values.global.environment }}.postgres.database.azure.com"
+    POSTGRES_NAME: "cft_task_db"
 
   spotInstances:
     enabled: false
