@@ -19,6 +19,10 @@ java:
     OPEN_ID_IDAM_URL: "https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net"
     IDAM_URL: "https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net"
     ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    POSTGRES_HOST: "cft-task-postgres-db-flexible-{{ .Values.global.environment }}.postgres.database.azure.com"
+    POSTGRES_NAME: "cft_task_db"
+    POSTGRES_PORT: 5432
+
     INITIATION_CAMUNDA_MAX_RESULTS: 100
     INITIATION_TIME_LIMIT_FLAG: true
     INITIATION_TIME_LIMIT: 120
@@ -35,11 +39,6 @@ java:
 
     RECONFIGURATION_MAX_TIME_LIMIT_SECONDS: 120
     RECONFIGURATION_RETRY_WINDOW_TIME_HOURS: 2
-
-
-    POSTGRES_PORT: 5432
-    POSTGRES_HOST: "cft-task-postgres-db-flexible-{{ .Values.global.environment }}.postgres.database.azure.com"
-    POSTGRES_NAME: "cft_task_db"
 
   spotInstances:
     enabled: false
