@@ -20,6 +20,11 @@ def secrets = [
     secret('wa-system-username', 'WA_SYSTEM_USERNAME'),
     secret('wa-system-password', 'WA_SYSTEM_PASSWORD'),
     secret('generic-docker-pact-broker-password', 'GENERIC_DOCKER_PACT_BROKER_YAML_PASS'),
+    secret('cft-task-POSTGRES-PASS-FLEXIBLE', 'POSTGRES_PASSWORD'),
+    secret('cft-task-POSTGRES-USER-FLEXIBLE', 'POSTGRES_USERNAME'),
+    secret('cft-task-POSTGRES-PORT-FLEXIBLE', 'POSTGRES_PORT'),
+    secret('cft-task-POSTGRES-DATABASE-FLEXIBLE', 'POSTGRES_NAME'),
+    secret('cft-task-POSTGRES-HOST-FLEXIBLE', 'POSTGRES_HOST'),
   ],
   's2s-${env}': [
     secret('microservicekey-wa-task-monitor', 'S2S_SECRET_TASK_MONITOR'),
