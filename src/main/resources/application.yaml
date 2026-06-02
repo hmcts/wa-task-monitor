@@ -118,6 +118,12 @@ job:
     reconfigure_request_time_hours: ${RECONFIGURE_REQUEST_TIME_HOURS:2}
     reconfiguration_max_time_limit_seconds: ${RECONFIGURATION_MAX_TIME_LIMIT_SECONDS:120}
     reconfiguration_retry_window_time_hours: ${RECONFIGURATION_RETRY_WINDOW_TIME_HOURS:2}
+  database-maintenance:
+    max-time-limit-seconds: ${DATABASE_MAINTENANCE_MAX_TIME_LIMIT_SECONDS:3600}
+    sql-statement: ${DATABASE_MAINTENANCE_SQL_STATEMENT:REINDEX INDEX CONCURRENTLY cft_task_db.search_index}
+    jdbc-url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_NAME:cft_task_db}
+    username: ${POSTGRES_USERNAME:wa_user}
+    password: ${POSTGRES_PASSWORD:}
 
 role-assignment-service:
   url: ${ROLE_ASSIGNMENT_URL:http://role-assignment}

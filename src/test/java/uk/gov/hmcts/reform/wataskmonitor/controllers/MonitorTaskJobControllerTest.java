@@ -61,4 +61,18 @@ class MonitorTaskJobControllerTest {
         verify(monitorTaskJobService, times(1)).execute(monitorTaskJobRequest.getJobDetails().getName());
     }
 
+    @Test
+    void should_return_ok_without_waiting_for_database_maintenance_completion() {
+        MonitorTaskJobRequest monitorTaskJobRequest =
+            new MonitorTaskJobRequest(new JobDetails(JobName.DATABASE_MAINTENANCE));
+        CompletableFuture<String> future = new CompletableFuture<>();
+        when(monitorTaskJobService.execute(monitorTaskJobRequest.getJobDetails().getName())).thenReturn(future);
+
+        ResponseEntity<MonitorTaskJobRequest> response = monitorTaskJobController.monitorTaskJob(monitorTaskJobRequest);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(JobName.DATABASE_MAINTENANCE, response.getBody().getJobDetails().getName());
+        verify(monitorTaskJobService, times(1)).execute(monitorTaskJobRequest.getJobDetails().getName());
+    }
+
 }
