@@ -6,12 +6,17 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
+import uk.gov.hmcts.reform.wataskmonitor.config.LaunchDarklyFeatureFlagProvider;
+import uk.gov.hmcts.reform.wataskmonitor.config.features.FeatureFlag;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
 
+import java.util.List;
+
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_INITIATION_FAILURES;
@@ -20,6 +25,8 @@ class TaskInitiationFailuresJobTest extends UnitBaseTest {
 
     @Mock
     private TaskInitiationFailuresJobService taskInitiationFailuresJobService;
+    @Mock
+    private LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider;
 
     @InjectMocks
     private TaskInitiationFailuresJob taskInitiationFailuresJob;
@@ -37,7 +44,7 @@ class TaskInitiationFailuresJobTest extends UnitBaseTest {
     }
 
     @Test
-    void run() {
+    void should_initiate_failed_tasks_when_feature_flag_is_enabled() {
 
         GenericJobReport jobReport = new GenericJobReport(
             1,
@@ -49,11 +56,29 @@ class TaskInitiationFailuresJobTest extends UnitBaseTest {
                 .build())
         );
 
+        when(taskInitiationFailuresJobService.initiateFailedTasks(SOME_SERVICE_TOKEN))
+            .thenReturn(jobReport);
+        when(launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE))
+            .thenReturn(true);
+
+        taskInitiationFailuresJob.run(SOME_SERVICE_TOKEN);
+
+        verify(taskInitiationFailuresJobService).initiateFailedTasks(SOME_SERVICE_TOKEN);
+        verify(taskInitiationFailuresJobService, never()).getInitiationFailures(SOME_SERVICE_TOKEN);
+    }
+
+    @Test
+    void should_report_initiation_failures_when_feature_flag_is_disabled() {
+        GenericJobReport jobReport = new GenericJobReport(0, List.of());
+
         when(taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN))
             .thenReturn(jobReport);
+        when(launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE))
+            .thenReturn(false);
 
         taskInitiationFailuresJob.run(SOME_SERVICE_TOKEN);
 
         verify(taskInitiationFailuresJobService).getInitiationFailures(SOME_SERVICE_TOKEN);
+        verify(taskInitiationFailuresJobService, never()).initiateFailedTasks(SOME_SERVICE_TOKEN);
     }
 }

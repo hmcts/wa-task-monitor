@@ -65,3 +65,5 @@ java:
           alias: POSTGRES_NAME
         - name: cft-task-POSTGRES-HOST-FLEXIBLE
           alias: POSTGRES_HOST
+        - name: ld-secret
+          alias: LAUNCH_DARKLY_SDK_KEY

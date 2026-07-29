@@ -6,6 +6,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
+import uk.gov.hmcts.reform.wataskmonitor.config.LaunchDarklyFeatureFlagProvider;
+import uk.gov.hmcts.reform.wataskmonitor.config.features.FeatureFlag;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
@@ -15,6 +17,8 @@ import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,6 +26,8 @@ class InitiationJobTest extends UnitBaseTest {
 
     @Mock
     private InitiationJobService initiationJobService;
+    @Mock
+    private LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider;
     @InjectMocks
     private InitiationJob initiationJob;
 
@@ -36,13 +42,15 @@ class InitiationJobTest extends UnitBaseTest {
     }
 
     @Test
-    void run() {
+    void run_when_launch_darkly_flag_is_disabled() {
         CamundaTask camundaTask = new CamundaTask(
             "some taskId",
             "some name",
             "someProcessInstanceId"
         );
         List<CamundaTask> taskList = singletonList(camundaTask);
+        when(launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE))
+            .thenReturn(false);
         when(initiationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN))
             .thenReturn(taskList);
         GenericJobReport jobReport = new GenericJobReport(
@@ -61,5 +69,16 @@ class InitiationJobTest extends UnitBaseTest {
 
         verify(initiationJobService).getUnConfiguredTasks(SOME_SERVICE_TOKEN);
         verify(initiationJobService).initiateTasks(taskList, SOME_SERVICE_TOKEN);
+    }
+
+    @Test
+    void should_skip_when_launch_darkly_flag_is_enabled() {
+        when(launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE))
+            .thenReturn(true);
+
+        initiationJob.run(SOME_SERVICE_TOKEN);
+
+        verify(initiationJobService, never()).getUnConfiguredTasks(SOME_SERVICE_TOKEN);
+        verify(initiationJobService, never()).initiateTasks(any(), any());
     }
 }

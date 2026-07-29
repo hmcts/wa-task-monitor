@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.wataskmonitor.config.LaunchDarklyFeatureFlagProvider;
+import uk.gov.hmcts.reform.wataskmonitor.config.features.FeatureFlag;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
@@ -17,10 +19,13 @@ import static uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility.logPrettyPr
 @Component
 public class InitiationJob implements JobService {
     private final InitiationJobService initiationJobService;
+    private final LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider;
 
     @Autowired
-    public InitiationJob(InitiationJobService initiationJobService) {
+    public InitiationJob(InitiationJobService initiationJobService,
+                         LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider) {
         this.initiationJobService = initiationJobService;
+        this.launchDarklyFeatureFlagProvider = launchDarklyFeatureFlagProvider;
     }
 
     @Override
@@ -30,6 +35,13 @@ public class InitiationJob implements JobService {
 
     @Override
     public void run(String serviceToken) {
+        if (launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE)) {
+            log.info("{} job skipped because {} feature flag is enabled.",
+                     INITIATION,
+                     FeatureFlag.WA_INITIATE_TASKS_ON_CREATE.getKey());
+            return;
+        }
+
         log.info("Starting task {} job.", INITIATION);
         List<CamundaTask> tasks = initiationJobService.getUnConfiguredTasks(serviceToken);
         GenericJobReport report = initiationJobService.initiateTasks(tasks, serviceToken);

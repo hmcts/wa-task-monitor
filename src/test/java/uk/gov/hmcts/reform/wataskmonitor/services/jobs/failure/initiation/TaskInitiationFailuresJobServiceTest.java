@@ -1,53 +1,56 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.failure.initiation;
 
-import feign.FeignException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.boot.test.system.OutputCaptureExtension;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
+import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
 import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
+import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.InitiationTaskAttributesMapper;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.InitiationHelpers;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_INITIATION_FAILURES;
 
-@ExtendWith(OutputCaptureExtension.class)
 class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
 
     @Mock
     private CamundaClient camundaClient;
     @Mock
+    private TaskManagementClient taskManagementClient;
+    @Mock
     private InitiationJobConfig initiationJobConfig;
 
+    private InitiationTaskAttributesMapper initiationTaskAttributesMapper;
     private TaskInitiationFailuresJobService taskInitiationFailuresJobService;
 
     @Captor
@@ -55,8 +58,11 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
 
     @BeforeEach
     void setUp() {
+        initiationTaskAttributesMapper = new InitiationTaskAttributesMapper(new ObjectMapper());
         taskInitiationFailuresJobService = new TaskInitiationFailuresJobService(
             camundaClient,
+            taskManagementClient,
+            initiationTaskAttributesMapper,
             initiationJobConfig
         );
         lenient().when(initiationJobConfig.getCamundaMaxResults()).thenReturn("100");
@@ -65,161 +71,197 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
     }
 
     @Test
-    void should_return_active_tasks_and_not_delayed_tasks(CapturedOutput output) throws JSONException {
-        ZonedDateTime createdDate = ZonedDateTime.now();
-        ZonedDateTime dueDate = ZonedDateTime.now().plusDays(1);
-        CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(
-            createdDate,
-            dueDate
-        );
-        List<CamundaTask> camundaTasks = singletonList(camundaTask);
-
+    void should_return_active_tasks_and_not_delayed_tasks() throws JSONException {
+        List<CamundaTask> tasks = createRetryableTasks();
         when(camundaClient.getTasks(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
             eq("100"),
             actualQueryParametersCaptor.capture()
-        )).thenReturn(camundaTasks);
+        )).thenReturn(tasks);
+        stubVariablesFor(tasks);
 
+        List<CamundaTask> actualCamundaTasks = getTasksFromReport(
+            taskInitiationFailuresJobService.initiateFailedTasks(SOME_SERVICE_TOKEN)
+        );
+
+        assertQueryTargetsUserTasksAndNotDelayedTasks();
+        assertQuery(true);
+        assertThat(actualCamundaTasks).hasSameSizeAs(tasks);
+    }
+
+    @Test
+    void when_no_tasks_should_generate_report() {
+        when(camundaClient.getTasks(anyString(), anyString(), anyString(), anyString()))
+            .thenReturn(emptyList());
+
+        GenericJobReport actual = taskInitiationFailuresJobService.initiateFailedTasks(SOME_SERVICE_TOKEN);
+
+        GenericJobReport expectation = new GenericJobReport(0, emptyList());
+        assertEquals(expectation, actual);
+    }
+
+    @Test
+    void should_succeed_and_initiate_failed_tasks() {
+        CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(
+            ZonedDateTime.now(),
+            ZonedDateTime.now().plusDays(1)
+        );
+        List<CamundaTask> tasks = singletonList(camundaTask);
         Map<String, CamundaVariable> mockedVariables = InitiationHelpers.createMockCamundaVariables();
 
-        lenient().when(camundaClient.getVariables(
-            SOME_SERVICE_TOKEN,
-            camundaTask.getId()
-        )).thenReturn(mockedVariables);
+        when(camundaClient.getTasks(anyString(), anyString(), anyString(), anyString()))
+            .thenReturn(tasks);
+        when(camundaClient.getVariables(SOME_SERVICE_TOKEN, camundaTask.getId()))
+            .thenReturn(mockedVariables);
 
-        GenericJobReport genericJobReport = taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
+        GenericJobReport actual = taskInitiationFailuresJobService.initiateFailedTasks(SOME_SERVICE_TOKEN);
 
-        assertActualReportNotNull(genericJobReport);
+        verify(taskManagementClient, times(1))
+            .initiateTask(anyString(), anyString(), any());
 
-        assertQueryTargetsUserTasksAndNotDelayedTasks();
-        assertQuery();
-        assertThat(genericJobReport.getTotalTasks()).isEqualTo(camundaTasks.size());
-        assertThat(genericJobReport.getOutcomeList()).hasSameSizeAs(camundaTasks);
-        assertTrue(genericJobReport.getOutcomeList().get(0).isSuccessful());
-        assertThat(output.getOut()).contains("TASK_INITIATION_FAILURES There are some uninitiated tasks");
-        assertThat(output.getOut()).contains("caseId");
-        assertThat(output.getOut()).contains("taskId");
-        assertThat(output.getOut()).contains("jurisdiction");
-        assertThat(output.getOut()).contains("name");
-        assertThat(output.getOut()).contains("caseType");
-        assertThat(output.getOut()).contains("created");
+        GenericJobOutcome outcome = GenericJobOutcome.builder()
+            .taskId(camundaTask.getId())
+            .processInstanceId(camundaTask.getProcessInstanceId())
+            .successful(true)
+            .jobType(TASK_INITIATION_FAILURES.name())
+            .build();
 
+        GenericJobReport expectation = new GenericJobReport(1, singletonList(outcome));
+        assertEquals(expectation, actual);
     }
 
     @Test
-    void should_return_empty_list_when_camundaTasks_is_empty(CapturedOutput output) throws JSONException {
-
-        when(camundaClient.getTasks(
-            eq(SOME_SERVICE_TOKEN),
-            eq("0"),
-            eq("100"),
-            actualQueryParametersCaptor.capture()
-        )).thenReturn(emptyList());
-
-        GenericJobReport genericJobReport = taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
-
-        assertActualReportNotNull(genericJobReport);
-
-        assertQueryTargetsUserTasksAndNotDelayedTasks();
-        assertQuery();
-        assertThat(genericJobReport.getTotalTasks()).isZero();
-        assertTrue(genericJobReport.getOutcomeList().isEmpty());
-        assertThat(output.getOut()).contains("TASK_INITIATION_FAILURES There was no task");
-    }
-
-    @Test
-    void should_return_isSuccessful_false_when_an_exception_thrown() throws JSONException {
-        ZonedDateTime createdDate = ZonedDateTime.now();
-        ZonedDateTime dueDate = ZonedDateTime.now().plusDays(1);
+    void should_return_job_outcome_unsuccessful_when_initiation_fails() {
         CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(
-            createdDate,
-            dueDate
+            ZonedDateTime.now(),
+            ZonedDateTime.now().plusDays(1)
         );
-        List<CamundaTask> camundaTasks = singletonList(camundaTask);
+        List<CamundaTask> tasks = singletonList(camundaTask);
 
-        when(camundaClient.getTasks(
-            eq(SOME_SERVICE_TOKEN),
-            eq("0"),
-            eq("100"),
-            actualQueryParametersCaptor.capture()
-        )).thenReturn(camundaTasks);
+        when(camundaClient.getTasks(anyString(), anyString(), anyString(), anyString()))
+            .thenReturn(tasks);
+        when(camundaClient.getVariables(SOME_SERVICE_TOKEN, camundaTask.getId()))
+            .thenReturn(InitiationHelpers.createMockCamundaVariables());
+        doThrow(new RuntimeException("Task Management unavailable"))
+            .when(taskManagementClient)
+            .initiateTask(anyString(), anyString(), any());
 
-        when(camundaClient.getVariables(
-            SOME_SERVICE_TOKEN,
-            camundaTask.getId()
-        )).thenThrow(FeignException.class);
+        GenericJobReport actual = taskInitiationFailuresJobService.initiateFailedTasks(SOME_SERVICE_TOKEN);
 
-        GenericJobReport genericJobReport = taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
+        GenericJobOutcome outcome = GenericJobOutcome.builder()
+            .taskId(camundaTask.getId())
+            .processInstanceId(camundaTask.getProcessInstanceId())
+            .successful(false)
+            .jobType(TASK_INITIATION_FAILURES.name())
+            .build();
 
-        assertQueryTargetsUserTasksAndNotDelayedTasks();
-        assertQuery();
-        assertThat(genericJobReport.getTotalTasks()).isEqualTo(camundaTasks.size());
-        assertThat(genericJobReport.getOutcomeList()).hasSameSizeAs(camundaTasks);
-        assertFalse(genericJobReport.getOutcomeList().get(0).isSuccessful());
+        GenericJobReport expectation = new GenericJobReport(1, singletonList(outcome));
+        assertEquals(expectation, actual);
     }
 
     @Test
-    void should_createdBefore_exists_in_query_according_to_initiation_flag()
-        throws JSONException {
-
-        ZonedDateTime createdDate = ZonedDateTime.now();
-        ZonedDateTime dueDate = ZonedDateTime.now().plusDays(1);
+    void should_only_report_initiation_failures_for_legacy_flow() {
         CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(
-            createdDate,
-            dueDate
+            ZonedDateTime.now(),
+            ZonedDateTime.now().plusDays(1)
         );
-        List<CamundaTask> camundaTasks = singletonList(camundaTask);
 
+        when(camundaClient.getTasks(anyString(), anyString(), anyString(), anyString()))
+            .thenReturn(singletonList(camundaTask));
+        when(camundaClient.getVariables(SOME_SERVICE_TOKEN, camundaTask.getId()))
+            .thenReturn(InitiationHelpers.createMockCamundaVariables());
+
+        GenericJobReport actual = taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
+
+        GenericJobOutcome outcome = GenericJobOutcome.builder()
+            .taskId(camundaTask.getId())
+            .processInstanceId(camundaTask.getProcessInstanceId())
+            .successful(true)
+            .jobType(TASK_INITIATION_FAILURES.name())
+            .build();
+        assertEquals(new GenericJobReport(1, singletonList(outcome)), actual);
+        verifyNoInteractions(taskManagementClient);
+    }
+
+    @Test
+    void should_createdAfter_exists_or_not_in_query_according_to_initiation_flag() throws JSONException {
+        CamundaTask camundaTask = InitiationHelpers.createMockedCamundaTask(
+            ZonedDateTime.now(),
+            ZonedDateTime.now().plusDays(1)
+        );
+
+        when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(false);
         when(initiationJobConfig.getCamundaMaxResults()).thenReturn("10");
-
         when(camundaClient.getTasks(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
             eq("10"),
             actualQueryParametersCaptor.capture()
-        )).thenReturn(camundaTasks);
+        )).thenReturn(singletonList(camundaTask));
+        when(camundaClient.getVariables(SOME_SERVICE_TOKEN, camundaTask.getId()))
+            .thenReturn(InitiationHelpers.createMockCamundaVariables());
 
-        Map<String, CamundaVariable> mockedVariables = InitiationHelpers.createMockCamundaVariables();
+        taskInitiationFailuresJobService.initiateFailedTasks(SOME_SERVICE_TOKEN);
 
-        lenient().when(camundaClient.getVariables(
-            SOME_SERVICE_TOKEN,
-            camundaTask.getId()
-        )).thenReturn(mockedVariables);
-
-        taskInitiationFailuresJobService = new TaskInitiationFailuresJobService(
-            camundaClient,
-            initiationJobConfig
-        );
-        lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
-
-        taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
-
-        assertQuery();
-
+        assertQuery(false);
     }
 
-    @Test
-    void should_not_create_alert_if_time_limit_flag_is_false() {
-        taskInitiationFailuresJobService = new TaskInitiationFailuresJobService(
-            camundaClient,
-            initiationJobConfig
-        );
-        lenient().when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(false);
-
-        taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN);
-
-        verify(camundaClient, never()).getTasks(any(), any(), any(), any());
+    private void stubVariablesFor(List<CamundaTask> tasks) {
+        tasks.forEach(task -> when(camundaClient.getVariables(SOME_SERVICE_TOKEN, task.getId()))
+            .thenReturn(InitiationHelpers.createMockCamundaVariables()));
     }
 
-    private void assertQuery() throws JSONException {
+    private List<CamundaTask> createRetryableTasks() {
+        ZonedDateTime now = ZonedDateTime.now();
+        return List.of(
+            new CamundaTask(
+                "some id",
+                "task name 1",
+                "2151a580-c3c3-11eb-8b76-d26a7287fec2",
+                "someAssignee",
+                now,
+                now.plusDays(1),
+                "someCamundaTaskDescription",
+                "someCamundaTaskOwner",
+                "someCamundaTaskFormKey"
+            ),
+            new CamundaTask(
+                "some other id",
+                "task name 2",
+                "2151a580-c3c3-11eb-8b76-d26a7287f000",
+                "someAssignee",
+                now,
+                now.plusDays(1),
+                "someCamundaTaskDescription",
+                "someCamundaTaskOwner",
+                "someCamundaTaskFormKey"
+            )
+        );
+    }
+
+    private List<CamundaTask> getTasksFromReport(GenericJobReport genericJobReport) {
+        return genericJobReport.getOutcomeList().stream()
+            .map(outcome -> new CamundaTask(outcome.getTaskId(), null, outcome.getProcessInstanceId()))
+            .toList();
+    }
+
+    private void assertQuery(boolean timeFlag) throws JSONException {
         JSONObject query = new JSONObject(actualQueryParametersCaptor.getValue());
-        String createdBefore = query.getString("createdBefore");
-        JSONAssert.assertEquals(
-            getExpectedQueryParameters(createdBefore),
-            actualQueryParametersCaptor.getValue(),
-            JSONCompareMode.LENIENT
-        );
+        if (timeFlag) {
+            String createdAfter = query.getString("createdAfter");
+            JSONAssert.assertEquals(
+                getExpectedQueryParameters(createdAfter),
+                actualQueryParametersCaptor.getValue(),
+                JSONCompareMode.LENIENT
+            );
+        } else {
+            JSONAssert.assertEquals(
+                getExpectedQueryParameters(),
+                actualQueryParametersCaptor.getValue(),
+                JSONCompareMode.LENIENT
+            );
+        }
     }
 
     private void assertQueryTargetsUserTasksAndNotDelayedTasks() throws JSONException {
@@ -231,7 +273,7 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
     }
 
     @NotNull
-    private String getExpectedQueryParameters(String createdBefore) {
+    private String getExpectedQueryParameters(String createdAfter) {
         return "{\n"
                + "  \"orQueries\": [\n"
                + "    {\n"
@@ -244,7 +286,7 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
                + "      ]\n"
                + "    }\n"
                + "  ],\n"
-               + " \"createdBefore\": \"" + createdBefore + "\",\n"
+               + " \"createdAfter\": \"" + createdAfter + "\",\n"
                + "  \"taskDefinitionKey\": \"processTask\",\n"
                + "  \"processDefinitionKey\": \"wa-task-initiation-ia-asylum\",\n"
                + "  \"sorting\": [\n"
@@ -281,11 +323,4 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
               ]
             }""";
     }
-
-    private static void assertActualReportNotNull(GenericJobReport actualReport) {
-        await().atMost(10, TimeUnit.SECONDS)
-            .untilAsserted(() -> assertThat(actualReport)
-                .isNotNull());
-    }
-
 }
