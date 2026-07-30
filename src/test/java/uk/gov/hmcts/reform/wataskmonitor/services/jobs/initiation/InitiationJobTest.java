@@ -25,7 +25,9 @@ import static org.mockito.Mockito.when;
 class InitiationJobTest extends UnitBaseTest {
 
     @Mock
-    private InitiationJobService initiationJobService;
+    private CamundaService camundaService;
+    @Mock
+    private InitiationService initiationService;
     @Mock
     private LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider;
     @InjectMocks
@@ -51,7 +53,7 @@ class InitiationJobTest extends UnitBaseTest {
         List<CamundaTask> taskList = singletonList(camundaTask);
         when(launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE))
             .thenReturn(false);
-        when(initiationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN))
+        when(camundaService.getUnconfiguredTasks(SOME_SERVICE_TOKEN))
             .thenReturn(taskList);
         GenericJobReport jobReport = new GenericJobReport(
             1,
@@ -62,13 +64,13 @@ class InitiationJobTest extends UnitBaseTest {
                               .jobType("Task Initiation")
                               .build())
         );
-        when(initiationJobService.initiateTasks(taskList, SOME_SERVICE_TOKEN))
+        when(initiationService.initiateTasks(taskList, SOME_SERVICE_TOKEN, "Task Initiation"))
             .thenReturn(jobReport);
 
         initiationJob.run(SOME_SERVICE_TOKEN);
 
-        verify(initiationJobService).getUnConfiguredTasks(SOME_SERVICE_TOKEN);
-        verify(initiationJobService).initiateTasks(taskList, SOME_SERVICE_TOKEN);
+        verify(camundaService).getUnconfiguredTasks(SOME_SERVICE_TOKEN);
+        verify(initiationService).initiateTasks(taskList, SOME_SERVICE_TOKEN, "Task Initiation");
     }
 
     @Test
@@ -78,7 +80,7 @@ class InitiationJobTest extends UnitBaseTest {
 
         initiationJob.run(SOME_SERVICE_TOKEN);
 
-        verify(initiationJobService, never()).getUnConfiguredTasks(SOME_SERVICE_TOKEN);
-        verify(initiationJobService, never()).initiateTasks(any(), any());
+        verify(camundaService, never()).getUnconfiguredTasks(SOME_SERVICE_TOKEN);
+        verify(initiationService, never()).initiateTasks(any(), any(), any());
     }
 }

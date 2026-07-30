@@ -1,136 +1,44 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.failure.initiation;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
-import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
-import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
-import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.InitiateTaskRequest;
-import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.InitiationTaskAttributesMapper;
-import uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility;
-import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.CamundaService;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.emptyList;
-import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.InitiateTaskOperation.INITIATION;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_INITIATION_FAILURES;
-import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED;
 
-@Component
+@Service
 @Slf4j
 public class TaskInitiationFailuresJobService {
 
-    public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN);
+    private final CamundaService camundaService;
 
-    private final CamundaClient camundaClient;
-    private final TaskManagementClient taskManagementClient;
-    private final InitiationTaskAttributesMapper initiationTaskAttributesMapper;
-    private final InitiationJobConfig initiationJobConfig;
-
-    @Autowired
-    public TaskInitiationFailuresJobService(CamundaClient camundaClient,
-                                            TaskManagementClient taskManagementClient,
-                                            InitiationTaskAttributesMapper initiationTaskAttributesMapper,
-                                            InitiationJobConfig initiationJobConfig) {
-        this.camundaClient = camundaClient;
-        this.taskManagementClient = taskManagementClient;
-        this.initiationTaskAttributesMapper = initiationTaskAttributesMapper;
-        this.initiationJobConfig = initiationJobConfig;
+    public TaskInitiationFailuresJobService(CamundaService camundaService) {
+        this.camundaService = camundaService;
     }
 
-    public GenericJobReport initiateFailedTasks(String serviceToken) {
-        log.info("{} initiationJobConfig: {}", TASK_INITIATION_FAILURES.name(), initiationJobConfig.toString());
-
-        List<CamundaTask> camundaTasks = camundaClient.getTasks(
-            serviceToken,
-            "0",
-            initiationJobConfig.getCamundaMaxResults(),
-            buildSearchQuery()
-        );
-
-        log.info("{} {} task(s) retrieved successfully.",
-                 TASK_INITIATION_FAILURES.name(), camundaTasks.size()
-        );
-
-        if (camundaTasks.isEmpty()) {
-            log.info("{} There was no task to initiate.", TASK_INITIATION_FAILURES.name());
-            return new GenericJobReport(0, emptyList());
-        } else {
-            List<GenericJobOutcome> outcomesList = initiateTasksAndReturnOutcome(camundaTasks, serviceToken);
-            return new GenericJobReport(camundaTasks.size(), outcomesList);
-        }
-    }
-
-    public GenericJobReport getInitiationFailures(String serviceToken) {
-        log.info("{} initiationJobConfig: {}", TASK_INITIATION_FAILURES.name(), initiationJobConfig.toString());
-
-        if (!initiationJobConfig.isCamundaTimeLimitFlag()) {
-            log.info("{} Time limit flag is set to false", TASK_INITIATION_FAILURES.name());
-            return new GenericJobReport(0, emptyList());
-        }
-
-        List<CamundaTask> camundaTasks = camundaClient.getTasks(
-            serviceToken,
-            "0",
-            initiationJobConfig.getCamundaMaxResults(),
-            buildInitiationFailuresSearchQuery()
-        );
-
-        log.info("{} {} task(s) retrieved successfully.", TASK_INITIATION_FAILURES.name(), camundaTasks.size());
-
-        if (camundaTasks.isEmpty()) {
+    public GenericJobReport reportInitiationFailures(List<CamundaTask> tasks,
+                                                     String serviceToken) {
+        if (tasks.isEmpty()) {
             log.info("{} There was no task", TASK_INITIATION_FAILURES.name());
             return new GenericJobReport(0, emptyList());
         }
 
-        logInitiationFailures(camundaTasks, serviceToken);
-        List<GenericJobOutcome> outcomesList = prepareInitiationFailureReport(camundaTasks, serviceToken);
-        return new GenericJobReport(camundaTasks.size(), outcomesList);
-    }
-
-    private void logInitiationFailures(List<CamundaTask> camundaTasks, String serviceToken) {
         StringBuilder logMessage = new StringBuilder(TASK_INITIATION_FAILURES.name())
             .append(" There are some uninitiated tasks:\n");
-
-        camundaTasks.forEach(task -> {
+        List<GenericJobOutcome> outcomes = new ArrayList<>();
+        tasks.forEach(task -> {
             try {
-                Map<String, CamundaVariable> variables = camundaClient.getVariables(serviceToken, task.getId());
-                logMessage.append(" -> caseId: ").append(variables.get("caseId").getValue())
-                    .append(", taskId: ").append(task.getId())
-                    .append(", jurisdiction: ").append(variables.get("jurisdiction").getValue())
-                    .append(", name: ").append(variables.get("name").getValue())
-                    .append(", caseType: ").append(variables.get("caseTypeId").getValue())
-                    .append(", created: ").append(task.getCreated())
-                    .append("\n");
-            } catch (Exception e) {
-                log.error("{} Error while getting variable from Camunda taskId({}) and processId({})",
-                          TASK_INITIATION_FAILURES.name(),
-                          task.getId(),
-                          task.getProcessInstanceId(),
-                          e);
-            }
-        });
-
-        log.warn(logMessage.toString());
-    }
-
-    private List<GenericJobOutcome> prepareInitiationFailureReport(List<CamundaTask> camundaTasks,
-                                                                   String serviceToken) {
-        List<GenericJobOutcome> outcomeList = new ArrayList<>();
-        camundaTasks.forEach(task -> {
-            try {
-                Map<String, CamundaVariable> variables = camundaClient.getVariables(serviceToken, task.getId());
+                Map<String, CamundaVariable> variables = camundaService.getTaskVariables(serviceToken, task.getId());
+                appendFailureDetails(logMessage, task, variables);
 
                 log.warn("{} -> caseId:{} taskId:{} processInstanceId:{} taskState:{} cftTaskState:{} created:{}",
                          TASK_INITIATION_FAILURES.name(),
@@ -141,61 +49,31 @@ public class TaskInitiationFailuresJobService {
                          variables.get("cftTaskState").getValue(),
                          task.getCreated());
 
-                outcomeList.add(buildJobOutcome(task, true));
-            } catch (Exception e) {
+                outcomes.add(buildJobOutcome(task, true));
+            } catch (Exception exception) {
                 log.error("{} Error while getting variable from Camunda taskId({}) and processId({})",
                           TASK_INITIATION_FAILURES.name(),
                           task.getId(),
                           task.getProcessInstanceId(),
-                          e);
-                outcomeList.add(buildJobOutcome(task, false));
+                          exception);
+                outcomes.add(buildJobOutcome(task, false));
             }
         });
-        return outcomeList;
+        log.warn(logMessage.toString());
+        return new GenericJobReport(tasks.size(), outcomes);
     }
 
-    private List<GenericJobOutcome> initiateTasksAndReturnOutcome(List<CamundaTask> camundaTasks,
-                                                                  String serviceToken) {
-        log.info("{} Attempting to initiate {} task(s)", TASK_INITIATION_FAILURES.name(), camundaTasks.size());
-        List<GenericJobOutcome> outcomeList = new ArrayList<>();
-        camundaTasks.forEach(task -> {
-            try {
-                log.info("{} Attempting to initiate task with id: '{}'", TASK_INITIATION_FAILURES.name(), task.getId());
-                log.debug("{} -> Retrieving process variables for task with id: '{}'",
-                          TASK_INITIATION_FAILURES.name(),
-                          task.getId());
-                Map<String, CamundaVariable> variables = camundaClient.getVariables(
-                    serviceToken,
-                    task.getId()
-                );
-
-                Map<String, Object> taskAttributes = initiationTaskAttributesMapper.mapTaskAttributes(task, variables);
-                log.debug("{} -> Initiating task with id: '{}'", TASK_INITIATION_FAILURES.name(), task.getId());
-                taskManagementClient.initiateTask(
-                    serviceToken,
-                    task.getId(),
-                    new InitiateTaskRequest(INITIATION, taskAttributes)
-                );
-                log.info(
-                    "{} Task with id: '{}' initiated successfully.",
-                    TASK_INITIATION_FAILURES.name(),
-                    task.getId()
-                );
-                outcomeList.add(buildJobOutcome(task, true));
-            } catch (Exception e) {
-                log.error(
-                    "{} Error while initiating taskId({}) and processId({})",
-                    TASK_INITIATION_FAILURES.name(),
-                    task.getId(),
-                    task.getProcessInstanceId(),
-                    e
-                );
-                outcomeList.add(buildJobOutcome(task, false));
-            }
-        });
-        return outcomeList;
+    private void appendFailureDetails(StringBuilder logMessage,
+                                      CamundaTask task,
+                                      Map<String, CamundaVariable> variables) {
+        logMessage.append(" -> caseId: ").append(variables.get("caseId").getValue())
+            .append(", taskId: ").append(task.getId())
+            .append(", jurisdiction: ").append(variables.get("jurisdiction").getValue())
+            .append(", name: ").append(variables.get("name").getValue())
+            .append(", caseType: ").append(variables.get("caseTypeId").getValue())
+            .append(", created: ").append(task.getCreated())
+            .append("\n");
     }
-
 
     private GenericJobOutcome buildJobOutcome(CamundaTask task, boolean isSuccessful) {
         return GenericJobOutcome.builder()
@@ -205,41 +83,4 @@ public class TaskInitiationFailuresJobService {
             .jobType(TASK_INITIATION_FAILURES.name())
             .build();
     }
-
-    private String buildSearchQuery() {
-        String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED);
-        query = query
-            .replace("\"createdBefore\": \"*\",", "");
-
-        if (initiationJobConfig.isCamundaTimeLimitFlag()) {
-            ZonedDateTime createdTime = ZonedDateTime.now()
-                .minusMinutes(initiationJobConfig.getCamundaTimeLimit());
-            String createdAfter = createdTime.format(formatter);
-            query = query
-                .replace("\"createdAfter\": \"*\",", "\"createdAfter\": \"" + createdAfter + "\",");
-        } else {
-            query = query
-                .replace("\"createdAfter\": \"*\",", "");
-        }
-
-        log.info("{} build query : {}", TASK_INITIATION_FAILURES.name(), LoggingUtility.logPrettyPrint(query));
-        return query;
-    }
-
-    private String buildInitiationFailuresSearchQuery() {
-        String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED);
-        query = query.replace("\"createdAfter\": \"*\",", "");
-
-        ZonedDateTime createdTime = ZonedDateTime.now()
-            .minusMinutes(initiationJobConfig.getCamundaTimeLimit());
-        String createdBefore = createdTime.format(formatter);
-        query = query.replace(
-            "\"createdBefore\": \"*\",",
-            "\"createdBefore\": \"" + createdBefore + "\","
-        );
-
-        log.info("{} build query : {}", TASK_INITIATION_FAILURES.name(), LoggingUtility.logPrettyPrint(query));
-        return query;
-    }
-
 }

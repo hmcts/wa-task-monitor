@@ -18,13 +18,18 @@ import static uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility.logPrettyPr
 @Slf4j
 @Component
 public class InitiationJob implements JobService {
-    private final InitiationJobService initiationJobService;
+    private static final String JOB_TYPE = "Task Initiation";
+
+    private final CamundaService camundaService;
+    private final InitiationService initiationService;
     private final LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider;
 
     @Autowired
-    public InitiationJob(InitiationJobService initiationJobService,
+    public InitiationJob(CamundaService camundaService,
+                         InitiationService initiationService,
                          LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider) {
-        this.initiationJobService = initiationJobService;
+        this.camundaService = camundaService;
+        this.initiationService = initiationService;
         this.launchDarklyFeatureFlagProvider = launchDarklyFeatureFlagProvider;
     }
 
@@ -43,8 +48,8 @@ public class InitiationJob implements JobService {
         }
 
         log.info("Starting task {} job.", INITIATION);
-        List<CamundaTask> tasks = initiationJobService.getUnConfiguredTasks(serviceToken);
-        GenericJobReport report = initiationJobService.initiateTasks(tasks, serviceToken);
+        List<CamundaTask> tasks = camundaService.getUnconfiguredTasks(serviceToken);
+        GenericJobReport report = initiationService.initiateTasks(tasks, serviceToken, JOB_TYPE);
         log.info("{} job finished successfully: {}", INITIATION, logPrettyPrint(report));
     }
 }
