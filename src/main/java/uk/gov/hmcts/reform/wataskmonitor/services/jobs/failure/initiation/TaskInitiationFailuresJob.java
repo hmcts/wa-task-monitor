@@ -20,17 +20,17 @@ import static uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility.logPrettyPr
 @Slf4j
 @Component
 public class TaskInitiationFailuresJob implements JobService {
-    private final TaskInitiationFailuresJobService taskInitiationFailuresJobService;
+    private final TaskInitiationFailuresLogService taskInitiationFailuresLogService;
     private final CamundaService camundaService;
     private final InitiationService initiationService;
     private final LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider;
 
     @Autowired
-    public TaskInitiationFailuresJob(TaskInitiationFailuresJobService taskInitiationFailuresJobService,
+    public TaskInitiationFailuresJob(TaskInitiationFailuresLogService taskInitiationFailuresLogService,
                                      CamundaService camundaService,
                                      InitiationService initiationService,
                                      LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider) {
-        this.taskInitiationFailuresJobService = taskInitiationFailuresJobService;
+        this.taskInitiationFailuresLogService = taskInitiationFailuresLogService;
         this.camundaService = camundaService;
         this.initiationService = initiationService;
         this.launchDarklyFeatureFlagProvider = launchDarklyFeatureFlagProvider;
@@ -54,7 +54,7 @@ public class TaskInitiationFailuresJob implements JobService {
             );
         } else {
             List<CamundaTask> tasks = camundaService.getStaleUnconfiguredTasks(serviceToken);
-            report = taskInitiationFailuresJobService.reportInitiationFailures(tasks, serviceToken);
+            report = taskInitiationFailuresLogService.reportInitiationFailures(tasks, serviceToken);
         }
         log.info("{} job completed successfully: {}", TASK_INITIATION_FAILURES, logPrettyPrint(report));
     }

@@ -2,8 +2,9 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.failure.initiation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
@@ -21,21 +22,24 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_INITIATION_FAILURES;
 
-class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
+@ExtendWith(MockitoExtension.class)
+class TaskInitiationFailuresLogServiceTest {
+
+    private static final String SOME_SERVICE_TOKEN = "some service token";
 
     @Mock
     private CamundaService camundaService;
 
-    private TaskInitiationFailuresJobService taskInitiationFailuresJobService;
+    private TaskInitiationFailuresLogService taskInitiationFailuresLogService;
 
     @BeforeEach
     void setUp() {
-        taskInitiationFailuresJobService = new TaskInitiationFailuresJobService(camundaService);
+        taskInitiationFailuresLogService = new TaskInitiationFailuresLogService(camundaService);
     }
 
     @Test
     void should_return_empty_report_when_there_are_no_failures() {
-        GenericJobReport result = taskInitiationFailuresJobService.reportInitiationFailures(
+        GenericJobReport result = taskInitiationFailuresLogService.reportInitiationFailures(
             emptyList(),
             SOME_SERVICE_TOKEN
         );
@@ -50,7 +54,7 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
         when(camundaService.getTaskVariables(SOME_SERVICE_TOKEN, task.getId()))
             .thenReturn(InitiationHelpers.createMockCamundaVariables());
 
-        GenericJobReport result = taskInitiationFailuresJobService.reportInitiationFailures(
+        GenericJobReport result = taskInitiationFailuresLogService.reportInitiationFailures(
             singletonList(task),
             SOME_SERVICE_TOKEN
         );
@@ -65,7 +69,7 @@ class TaskInitiationFailuresJobServiceTest extends UnitBaseTest {
         when(camundaService.getTaskVariables(SOME_SERVICE_TOKEN, task.getId()))
             .thenThrow(new RuntimeException("Camunda unavailable"));
 
-        GenericJobReport result = taskInitiationFailuresJobService.reportInitiationFailures(
+        GenericJobReport result = taskInitiationFailuresLogService.reportInitiationFailures(
             singletonList(task),
             SOME_SERVICE_TOKEN
         );

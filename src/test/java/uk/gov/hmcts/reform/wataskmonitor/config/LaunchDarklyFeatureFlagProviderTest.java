@@ -4,8 +4,9 @@ import com.launchdarkly.sdk.LDContext;
 import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.config.features.FeatureFlag;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,7 +15,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-class LaunchDarklyFeatureFlagProviderTest extends UnitBaseTest {
+@ExtendWith(MockitoExtension.class)
+class LaunchDarklyFeatureFlagProviderTest {
 
     @Mock
     private LDClientInterface ldClient;

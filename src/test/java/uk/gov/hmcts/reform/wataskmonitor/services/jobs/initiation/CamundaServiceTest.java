@@ -4,12 +4,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
@@ -23,10 +24,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-class CamundaServiceTest extends UnitBaseTest {
+@ExtendWith(MockitoExtension.class)
+class CamundaServiceTest {
+
+    private static final String SOME_SERVICE_TOKEN = "some service token";
 
     @Mock
     private CamundaClient camundaClient;
@@ -56,7 +59,7 @@ class CamundaServiceTest extends UnitBaseTest {
             queryCaptor.capture()
         )).thenReturn(tasks);
 
-        List<CamundaTask> result = camundaService.getUnconfiguredTasks(SOME_SERVICE_TOKEN);
+        List<CamundaTask> result = camundaService.getInitiationCandidates(SOME_SERVICE_TOKEN);
 
         JSONObject query = new JSONObject(queryCaptor.getValue());
         assertThat(result).isEqualTo(tasks);
@@ -66,9 +69,27 @@ class CamundaServiceTest extends UnitBaseTest {
     }
 
     @Test
+    void should_get_all_unconfigured_tasks_without_a_time_limit() throws JSONException {
+        List<CamundaTask> tasks = InitiationHelpers.getMockedTasks();
+        when(camundaClient.getTasks(
+            eq(SOME_SERVICE_TOKEN),
+            eq("0"),
+            eq("100"),
+            queryCaptor.capture()
+        )).thenReturn(tasks);
+
+        List<CamundaTask> result = camundaService.getUnconfiguredTasks(SOME_SERVICE_TOKEN);
+
+        JSONObject query = new JSONObject(queryCaptor.getValue());
+        assertThat(result).isEqualTo(tasks);
+        assertThat(query.has("createdBefore")).isFalse();
+        assertThat(query.has("createdAfter")).isFalse();
+        assertThat(query.getString("taskDefinitionKey")).isEqualTo("processTask");
+    }
+
+    @Test
     void should_get_stale_unconfigured_tasks_using_failure_query() throws JSONException {
         List<CamundaTask> tasks = InitiationHelpers.getMockedTasks();
-        when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
         when(camundaClient.getTasks(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
@@ -82,16 +103,6 @@ class CamundaServiceTest extends UnitBaseTest {
         assertThat(result).isEqualTo(tasks);
         assertThat(query.has("createdBefore")).isTrue();
         assertThat(query.has("createdAfter")).isFalse();
-    }
-
-    @Test
-    void should_not_get_stale_tasks_when_time_limit_is_disabled() {
-        when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(false);
-
-        List<CamundaTask> result = camundaService.getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN);
-
-        assertThat(result).isEmpty();
-        verifyNoInteractions(camundaClient);
     }
 
     @Test

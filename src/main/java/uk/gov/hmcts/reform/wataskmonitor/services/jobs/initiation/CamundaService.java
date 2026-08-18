@@ -14,7 +14,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED;
 
 @Service
@@ -35,14 +34,15 @@ public class CamundaService {
 
     public List<CamundaTask> getUnconfiguredTasks(String serviceToken) {
         log.info("Retrieving tasks with '{}' = '{}' from Camunda.", "cftTaskState", "unconfigured");
+        return getTasks(serviceToken, buildUnconfiguredTasksSearchQuery());
+    }
+
+    public List<CamundaTask> getInitiationCandidates(String serviceToken) {
+        log.info("Retrieving unconfigured task initiation candidates from Camunda.");
         return getTasks(serviceToken, buildInitiationSearchQuery());
     }
 
     public List<CamundaTask> getStaleUnconfiguredTasks(String serviceToken) {
-        if (!initiationJobConfig.isCamundaTimeLimitFlag()) {
-            log.info("Camunda time limit flag is set to false.");
-            return emptyList();
-        }
         return getTasks(serviceToken, buildInitiationFailuresSearchQuery());
     }
 
@@ -79,6 +79,15 @@ public class CamundaService {
         }
 
         log.info("Initiation build query: {}", LoggingUtility.logPrettyPrint(query));
+        return query;
+    }
+
+    private String buildUnconfiguredTasksSearchQuery() {
+        String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED)
+            .replace("\"createdBefore\": \"*\",", "")
+            .replace("\"createdAfter\": \"*\",", "");
+
+        log.info("Unconfigured tasks build query: {}", LoggingUtility.logPrettyPrint(query));
         return query;
     }
 

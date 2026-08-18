@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.failure.initiation;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.config.LaunchDarklyFeatureFlagProvider;
 import uk.gov.hmcts.reform.wataskmonitor.config.features.FeatureFlag;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
@@ -24,10 +25,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_INITIATION_FAILURES;
 
-class TaskInitiationFailuresJobTest extends UnitBaseTest {
+@ExtendWith(MockitoExtension.class)
+class TaskInitiationFailuresJobTest {
+
+    private static final String SOME_SERVICE_TOKEN = "some service token";
 
     @Mock
-    private TaskInitiationFailuresJobService taskInitiationFailuresJobService;
+    private TaskInitiationFailuresLogService taskInitiationFailuresLogService;
     @Mock
     private CamundaService camundaService;
     @Mock
@@ -88,7 +92,7 @@ class TaskInitiationFailuresJobTest extends UnitBaseTest {
             TASK_INITIATION_FAILURES.name()
         );
         verify(camundaService, never()).getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN);
-        verify(taskInitiationFailuresJobService, never()).reportInitiationFailures(tasks, SOME_SERVICE_TOKEN);
+        verify(taskInitiationFailuresLogService, never()).reportInitiationFailures(tasks, SOME_SERVICE_TOKEN);
     }
 
     @Test
@@ -102,7 +106,7 @@ class TaskInitiationFailuresJobTest extends UnitBaseTest {
 
         when(camundaService.getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN))
             .thenReturn(tasks);
-        when(taskInitiationFailuresJobService.reportInitiationFailures(tasks, SOME_SERVICE_TOKEN))
+        when(taskInitiationFailuresLogService.reportInitiationFailures(tasks, SOME_SERVICE_TOKEN))
             .thenReturn(jobReport);
         when(launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE))
             .thenReturn(false);
@@ -110,7 +114,7 @@ class TaskInitiationFailuresJobTest extends UnitBaseTest {
         taskInitiationFailuresJob.run(SOME_SERVICE_TOKEN);
 
         verify(camundaService).getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN);
-        verify(taskInitiationFailuresJobService).reportInitiationFailures(tasks, SOME_SERVICE_TOKEN);
+        verify(taskInitiationFailuresLogService).reportInitiationFailures(tasks, SOME_SERVICE_TOKEN);
         verify(camundaService, never()).getUnconfiguredTasks(SOME_SERVICE_TOKEN);
         verify(initiationService, never()).initiateTasks(
             tasks,

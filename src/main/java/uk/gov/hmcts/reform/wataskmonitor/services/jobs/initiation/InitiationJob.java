@@ -48,7 +48,7 @@ public class InitiationJob implements JobService {
         }
 
         log.info("Starting task {} job.", INITIATION);
-        List<CamundaTask> tasks = camundaService.getUnconfiguredTasks(serviceToken);
+        List<CamundaTask> tasks = camundaService.getInitiationCandidates(serviceToken);
         GenericJobReport report = initiationService.initiateTasks(tasks, serviceToken, JOB_TYPE);
         log.info("{} job finished successfully: {}", INITIATION, logPrettyPrint(report));
     }

@@ -3,8 +3,9 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
@@ -24,9 +25,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-class InitiationServiceTest extends UnitBaseTest {
+@ExtendWith(MockitoExtension.class)
+class InitiationServiceTest {
 
     private static final String JOB_TYPE = "Task Initiation";
+    private static final String SOME_SERVICE_TOKEN = "some service token";
 
     @Mock
     private CamundaService camundaService;

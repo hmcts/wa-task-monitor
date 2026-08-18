@@ -17,11 +17,11 @@ import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_
 
 @Service
 @Slf4j
-public class TaskInitiationFailuresJobService {
+public class TaskInitiationFailuresLogService {
 
     private final CamundaService camundaService;
 
-    public TaskInitiationFailuresJobService(CamundaService camundaService) {
+    public TaskInitiationFailuresLogService(CamundaService camundaService) {
         this.camundaService = camundaService;
     }
 
