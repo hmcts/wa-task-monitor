@@ -36,10 +36,12 @@ public class InitiationTaskAttributesMapper {
         String type = getType(camundaTask, variables);
 
         Map<String, Object> attributes = new ConcurrentHashMap<>();
-        String name = getVariableValue(variables.get(TASK_NAME.value()), String.class, null);
         attributes.put(TASK_TYPE.value(), type);
-        attributes.put(TASK_NAME.value(), name);
 
+        String name = getVariableValue(variables.get(TASK_NAME.value()), String.class, null);
+        if (name != null) {
+            attributes.put(TASK_NAME.value(), name);
+        }
 
         setAttributesFromCamundaTask(camundaTask, attributes);
 
