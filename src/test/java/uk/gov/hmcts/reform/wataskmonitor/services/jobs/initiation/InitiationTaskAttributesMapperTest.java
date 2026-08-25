@@ -240,6 +240,32 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
         assertThat(actual).isEqualTo(expected);
     }
 
+    @Test
+    void should_use_task_name_from_variables_when_camunda_task_name_is_null() {
+        Map<String, CamundaVariable> camundaVariables = createMockCamundaVariables();
+        ZonedDateTime createdDate = ZonedDateTime.now();
+        ZonedDateTime dueDate = createdDate.plusDays(1);
+
+        CamundaTask camundaTask = new CamundaTask(
+            "someCamundaTaskId",
+            null,
+            "someProcessInstanceId",
+            null,
+            createdDate,
+            dueDate,
+            null,
+            "someCamundaTaskOwner",
+            "someCamundaTaskFormKey"
+        );
+
+        Map<String, Object> actual = initiationTaskAttributesMapper.mapTaskAttributes(camundaTask, camundaVariables);
+
+        assertEquals(
+            camundaVariables.get(CamundaVariableDefinition.TASK_NAME.value()).getValue(),
+            actual.get(CamundaVariableDefinition.TASK_NAME.value())
+        );
+    }
+
 
     private Map<String, Object> getExpectedTaskAttributes(ZonedDateTime createdDate,
                                                           ZonedDateTime dueDate,
