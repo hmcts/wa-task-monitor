@@ -38,7 +38,7 @@ public class InitiationTaskAttributesMapper {
         Map<String, Object> attributes = new ConcurrentHashMap<>();
         attributes.put(TASK_TYPE.value(), type);
 
-        setAttributesFromCamundaTask(camundaTask, attributes);
+        setAttributesFromCamundaTask(camundaTask, attributes, variables);
 
         variables.entrySet().stream()
             .filter(variable -> !variable.getKey().equals(DUE_DATE.value()))
@@ -50,7 +50,8 @@ public class InitiationTaskAttributesMapper {
         return attributes;
     }
 
-    private void setAttributesFromCamundaTask(CamundaTask camundaTask, Map<String, Object> attributes) {
+    private void setAttributesFromCamundaTask(CamundaTask camundaTask, Map<String, Object> attributes,
+                                              Map<String, CamundaVariable> variables) {
         attributes.put(DUE_DATE.value(), CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getDue()));
         attributes.put(CREATED.value(), CAMUNDA_DATA_TIME_FORMATTER.format(camundaTask.getCreated()));
         if (camundaTask.getAssignee() != null) {
@@ -59,7 +60,9 @@ public class InitiationTaskAttributesMapper {
         if (camundaTask.getDescription() != null) {
             attributes.put(DESCRIPTION.value(), camundaTask.getDescription());
         }
-        attributes.put(TASK_NAME.value(), camundaTask.getName());
+        attributes.put(TASK_NAME.value(),
+                       camundaTask.getName() != null ? camundaTask.getName() :
+                           getVariableValue(variables.get(TASK_NAME.value()), String.class, null));
     }
 
     private String getType(CamundaTask camundaTask, Map<String, CamundaVariable> variables) {
