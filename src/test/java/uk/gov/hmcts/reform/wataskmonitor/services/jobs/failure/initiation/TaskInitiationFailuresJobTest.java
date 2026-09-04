@@ -1,25 +1,43 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.failure.initiation;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.wataskmonitor.config.LaunchDarklyFeatureFlagProvider;
+import uk.gov.hmcts.reform.wataskmonitor.config.features.FeatureFlag;
+import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.CamundaService;
+import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.InitiationService;
+
+import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName.TASK_INITIATION_FAILURES;
 
-class TaskInitiationFailuresJobTest extends UnitBaseTest {
+@ExtendWith(MockitoExtension.class)
+class TaskInitiationFailuresJobTest {
+
+    private static final String SOME_SERVICE_TOKEN = "some service token";
 
     @Mock
-    private TaskInitiationFailuresJobService taskInitiationFailuresJobService;
+    private TaskInitiationFailuresLogService taskInitiationFailuresLogService;
+    @Mock
+    private CamundaService camundaService;
+    @Mock
+    private InitiationService initiationService;
+    @Mock
+    private LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider;
 
     @InjectMocks
     private TaskInitiationFailuresJob taskInitiationFailuresJob;
@@ -37,7 +55,12 @@ class TaskInitiationFailuresJobTest extends UnitBaseTest {
     }
 
     @Test
-    void run() {
+    void should_initiate_failed_tasks_when_feature_flag_is_enabled() {
+        List<CamundaTask> tasks = List.of(new CamundaTask(
+            "some taskId",
+            "some name",
+            "some processInstanceId"
+        ));
 
         GenericJobReport jobReport = new GenericJobReport(
             1,
@@ -49,11 +72,54 @@ class TaskInitiationFailuresJobTest extends UnitBaseTest {
                 .build())
         );
 
-        when(taskInitiationFailuresJobService.getInitiationFailures(SOME_SERVICE_TOKEN))
+        when(camundaService.getUnconfiguredTasks(SOME_SERVICE_TOKEN))
+            .thenReturn(tasks);
+        when(initiationService.initiateTasks(
+            tasks,
+            SOME_SERVICE_TOKEN,
+            TASK_INITIATION_FAILURES.name()
+        ))
             .thenReturn(jobReport);
+        when(launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE))
+            .thenReturn(true);
 
         taskInitiationFailuresJob.run(SOME_SERVICE_TOKEN);
 
-        verify(taskInitiationFailuresJobService).getInitiationFailures(SOME_SERVICE_TOKEN);
+        verify(camundaService).getUnconfiguredTasks(SOME_SERVICE_TOKEN);
+        verify(initiationService).initiateTasks(
+            tasks,
+            SOME_SERVICE_TOKEN,
+            TASK_INITIATION_FAILURES.name()
+        );
+        verify(camundaService, never()).getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN);
+        verify(taskInitiationFailuresLogService, never()).reportInitiationFailures(tasks, SOME_SERVICE_TOKEN);
+    }
+
+    @Test
+    void should_report_initiation_failures_when_feature_flag_is_disabled() {
+        List<CamundaTask> tasks = List.of(new CamundaTask(
+            "some taskId",
+            "some name",
+            "some processInstanceId"
+        ));
+        GenericJobReport jobReport = new GenericJobReport(0, List.of());
+
+        when(camundaService.getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN))
+            .thenReturn(tasks);
+        when(taskInitiationFailuresLogService.reportInitiationFailures(tasks, SOME_SERVICE_TOKEN))
+            .thenReturn(jobReport);
+        when(launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE))
+            .thenReturn(false);
+
+        taskInitiationFailuresJob.run(SOME_SERVICE_TOKEN);
+
+        verify(camundaService).getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN);
+        verify(taskInitiationFailuresLogService).reportInitiationFailures(tasks, SOME_SERVICE_TOKEN);
+        verify(camundaService, never()).getUnconfiguredTasks(SOME_SERVICE_TOKEN);
+        verify(initiationService, never()).initiateTasks(
+            tasks,
+            SOME_SERVICE_TOKEN,
+            TASK_INITIATION_FAILURES.name()
+        );
     }
 }

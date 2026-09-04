@@ -21,7 +21,6 @@ import static net.serenitybdd.rest.SerenityRest.given;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assume.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
@@ -40,8 +39,6 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         caseworkerCredentials = authorizationProvider.getNewTribunalCaseworker("wa-ft-test-r2-");
         caseIds = new ArrayList<>();
 
-        //to avoid initiation job run on non-local environment
-        assumeTrue(isInitiationTriggerFlagEnabled());
     }
 
     @After
