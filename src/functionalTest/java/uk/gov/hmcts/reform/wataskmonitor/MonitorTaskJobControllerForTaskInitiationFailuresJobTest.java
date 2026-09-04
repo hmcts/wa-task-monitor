@@ -45,7 +45,7 @@ public class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends Sp
     }
 
     @Test
-    public void task_initiation_failures_job_should_initiate_unconfigured_task() {
+    public void should_initiate_unconfigured_task_when_task_initiation_failures_job_runs() {
         TestVariables taskVariables = common.setupTaskAndRetrieveIds();
         common.setupOrganisationalRoleAssignment(caseworkerCredentials.getHeaders());
 
