@@ -47,6 +47,7 @@ class MonitorTaskJobControllerForInitiationJobTest extends SpringBootIntegration
     private TaskManagementClient taskManagementClient;
     @MockitoBean
     private InitiationJobConfig initiationJobConfig;
+
     @BeforeEach
     void setUp() {
         mockExternalDependencies();
