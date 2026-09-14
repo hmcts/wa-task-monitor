@@ -3,13 +3,12 @@ package uk.gov.hmcts.reform.wataskmonitor.controllers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
-import uk.gov.hmcts.reform.wataskmonitor.config.LaunchDarklyFeatureFlagProvider;
-import uk.gov.hmcts.reform.wataskmonitor.config.features.FeatureFlag;
 import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
@@ -34,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
+@TestPropertySource(properties = "configuration.initiateTasksOnCreate=false")
 class MonitorTaskJobControllerForInitiationJobTest extends SpringBootIntegrationBaseTest {
 
     public static final String SERVICE_TOKEN = "some service token";
@@ -47,9 +47,6 @@ class MonitorTaskJobControllerForInitiationJobTest extends SpringBootIntegration
     private TaskManagementClient taskManagementClient;
     @MockitoBean
     private InitiationJobConfig initiationJobConfig;
-    @MockitoBean
-    private LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider;
-
     @BeforeEach
     void setUp() {
         mockExternalDependencies();
@@ -122,8 +119,6 @@ class MonitorTaskJobControllerForInitiationJobTest extends SpringBootIntegration
 
     private void mockExternalDependencies() {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
-        when(launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE))
-            .thenReturn(false);
         when(initiationJobConfig.getCamundaMaxResults()).thenReturn("100");
         ZonedDateTime createdDate = ZonedDateTime.now();
         ZonedDateTime dueDate = createdDate.plusDays(1);

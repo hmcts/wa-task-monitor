@@ -84,8 +84,15 @@ public class CamundaService {
 
     private String buildUnconfiguredTasksSearchQuery() {
         String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED)
-            .replace("\"createdBefore\": \"*\",", "")
             .replace("\"createdAfter\": \"*\",", "");
+
+        ZonedDateTime createdTime = ZonedDateTime.now()
+            .minusMinutes(initiationJobConfig.getFailureRetryDelayMinutes());
+        String createdBefore = createdTime.format(formatter);
+        query = query.replace(
+            "\"createdBefore\": \"*\",",
+            "\"createdBefore\": \"" + createdBefore + "\","
+        );
 
         log.info("Unconfigured tasks build query: {}", LoggingUtility.logPrettyPrint(query));
         return query;

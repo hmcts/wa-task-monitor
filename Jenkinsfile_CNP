@@ -25,7 +25,6 @@ def secrets = [
     secret('cft-task-POSTGRES-PORT-FLEXIBLE', 'POSTGRES_PORT'),
     secret('cft-task-POSTGRES-DATABASE-FLEXIBLE', 'POSTGRES_NAME'),
     secret('cft-task-POSTGRES-HOST-FLEXIBLE', 'POSTGRES_HOST'),
-    secret('ld-secret', 'LAUNCH_DARKLY_SDK_KEY'),
   ],
   's2s-${env}': [
     secret('microservicekey-wa-task-monitor', 'S2S_SECRET_TASK_MONITOR'),

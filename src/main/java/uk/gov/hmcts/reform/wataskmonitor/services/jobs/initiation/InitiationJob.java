@@ -2,9 +2,8 @@ package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.wataskmonitor.config.LaunchDarklyFeatureFlagProvider;
-import uk.gov.hmcts.reform.wataskmonitor.config.features.FeatureFlag;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
@@ -22,15 +21,16 @@ public class InitiationJob implements JobService {
 
     private final CamundaService camundaService;
     private final InitiationService initiationService;
-    private final LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider;
+    private final boolean initiateTasksOnCreate;
 
     @Autowired
     public InitiationJob(CamundaService camundaService,
                          InitiationService initiationService,
-                         LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider) {
+                         @Value("${configuration.initiateTasksOnCreate:false}")
+                         boolean initiateTasksOnCreate) {
         this.camundaService = camundaService;
         this.initiationService = initiationService;
-        this.launchDarklyFeatureFlagProvider = launchDarklyFeatureFlagProvider;
+        this.initiateTasksOnCreate = initiateTasksOnCreate;
     }
 
     @Override
@@ -40,10 +40,8 @@ public class InitiationJob implements JobService {
 
     @Override
     public void run(String serviceToken) {
-        if (launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE)) {
-            log.info("{} job skipped because {} feature flag is enabled.",
-                     INITIATION,
-                     FeatureFlag.WA_INITIATE_TASKS_ON_CREATE.getKey());
+        if (initiateTasksOnCreate) {
+            log.info("{} job skipped because immediate task initiation is enabled.", INITIATION);
             return;
         }
 

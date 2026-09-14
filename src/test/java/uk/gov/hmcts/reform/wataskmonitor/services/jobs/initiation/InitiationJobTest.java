@@ -4,11 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.InjectMocks;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.wataskmonitor.config.LaunchDarklyFeatureFlagProvider;
-import uk.gov.hmcts.reform.wataskmonitor.config.features.FeatureFlag;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
@@ -32,10 +30,12 @@ class InitiationJobTest {
     private CamundaService camundaService;
     @Mock
     private InitiationService initiationService;
-    @Mock
-    private LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider;
-    @InjectMocks
     private InitiationJob initiationJob;
+
+    @BeforeEach
+    void setUp() {
+        initiationJob = new InitiationJob(camundaService, initiationService, false);
+    }
 
     @ParameterizedTest(name = "jobName: {0} expected: {1}")
     @CsvSource({
@@ -48,15 +48,13 @@ class InitiationJobTest {
     }
 
     @Test
-    void run_when_launch_darkly_flag_is_disabled() {
+    void should_run_when_immediate_task_initiation_is_disabled() {
         CamundaTask camundaTask = new CamundaTask(
             "some taskId",
             "some name",
             "someProcessInstanceId"
         );
         List<CamundaTask> taskList = singletonList(camundaTask);
-        when(launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE))
-            .thenReturn(false);
         when(camundaService.getInitiationCandidates(SOME_SERVICE_TOKEN))
             .thenReturn(taskList);
         GenericJobReport jobReport = new GenericJobReport(
@@ -78,9 +76,8 @@ class InitiationJobTest {
     }
 
     @Test
-    void should_skip_when_launch_darkly_flag_is_enabled() {
-        when(launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE))
-            .thenReturn(true);
+    void should_skip_when_immediate_task_initiation_is_enabled() {
+        initiationJob = new InitiationJob(camundaService, initiationService, true);
 
         initiationJob.run(SOME_SERVICE_TOKEN);
 

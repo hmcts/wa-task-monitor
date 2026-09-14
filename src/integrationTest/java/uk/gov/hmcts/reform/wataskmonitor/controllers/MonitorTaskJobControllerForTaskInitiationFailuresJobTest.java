@@ -4,13 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.wataskmonitor.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
-import uk.gov.hmcts.reform.wataskmonitor.config.LaunchDarklyFeatureFlagProvider;
-import uk.gov.hmcts.reform.wataskmonitor.config.features.FeatureFlag;
 import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
@@ -37,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.InitiateTaskOperation.INITIATION;
 
+@TestPropertySource(properties = "configuration.initiateTasksOnCreate=true")
 class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBootIntegrationBaseTest {
 
     private static final String SERVICE_TOKEN = "some service token";
@@ -50,9 +50,6 @@ class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBoo
     private TaskManagementClient taskManagementClient;
     @MockitoBean
     private InitiationJobConfig initiationJobConfig;
-    @MockitoBean
-    private LaunchDarklyFeatureFlagProvider launchDarklyFeatureFlagProvider;
-
     @BeforeEach
     void setUp() {
         mockExternalDependencies();
@@ -96,11 +93,10 @@ class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBoo
 
     private void mockExternalDependencies() {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
-        when(launchDarklyFeatureFlagProvider.getBooleanValue(FeatureFlag.WA_INITIATE_TASKS_ON_CREATE))
-            .thenReturn(true);
         when(initiationJobConfig.getCamundaMaxResults()).thenReturn("100");
         when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
         when(initiationJobConfig.getCamundaTimeLimit()).thenReturn(120L);
+        when(initiationJobConfig.getFailureRetryDelayMinutes()).thenReturn(2L);
 
         when(camundaClient.getTasks(
             eq(SERVICE_TOKEN),

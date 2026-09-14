@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.helpers.InitiationHelpers;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.CamundaService.CAMUNDA_DATE_REQUEST_PATTERN;
 
 @ExtendWith(MockitoExtension.class)
 class CamundaServiceTest {
@@ -45,6 +48,7 @@ class CamundaServiceTest {
         camundaService = new CamundaService(camundaClient, initiationJobConfig);
         lenient().when(initiationJobConfig.getCamundaMaxResults()).thenReturn("100");
         lenient().when(initiationJobConfig.getCamundaTimeLimit()).thenReturn(120L);
+        lenient().when(initiationJobConfig.getFailureRetryDelayMinutes()).thenReturn(2L);
     }
 
     @ParameterizedTest
@@ -69,8 +73,9 @@ class CamundaServiceTest {
     }
 
     @Test
-    void should_get_all_unconfigured_tasks_without_a_time_limit() throws JSONException {
+    void should_get_unconfigured_tasks_older_than_the_failure_retry_delay() throws JSONException {
         List<CamundaTask> tasks = InitiationHelpers.getMockedTasks();
+        ZonedDateTime earliestExpectedCutoff = ZonedDateTime.now().minusMinutes(2).minusSeconds(1);
         when(camundaClient.getTasks(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
@@ -81,8 +86,13 @@ class CamundaServiceTest {
         List<CamundaTask> result = camundaService.getUnconfiguredTasks(SOME_SERVICE_TOKEN);
 
         JSONObject query = new JSONObject(queryCaptor.getValue());
+        ZonedDateTime latestExpectedCutoff = ZonedDateTime.now().minusMinutes(2).plusSeconds(1);
+        ZonedDateTime createdBefore = ZonedDateTime.parse(
+            query.getString("createdBefore"),
+            DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN)
+        );
         assertThat(result).isEqualTo(tasks);
-        assertThat(query.has("createdBefore")).isFalse();
+        assertThat(createdBefore).isBetween(earliestExpectedCutoff, latestExpectedCutoff);
         assertThat(query.has("createdAfter")).isFalse();
         assertThat(query.getString("taskDefinitionKey")).isEqualTo("processTask");
     }

@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SER
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
-@Ignore("Enable when wa-initiate-tasks-on-create is enabled")
+@Ignore("Enable when WA_INITIATE_TASKS_ON_CREATE_ENABLED is enabled")
 public class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBootFunctionalBaseTest {
 
     private List<String> caseIds;

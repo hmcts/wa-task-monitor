@@ -90,10 +90,8 @@ feign:
         readTimeout: 30000
         loggerLevel: basic
 
-launchDarkly:
-  sdkKey: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
-  connectionTimeout: ${LAUNCH_DARKLY_CONNECTION_TIMEOUT:5000}
-  socketTimeout: ${LAUNCH_DARKLY_SOCKET_TIMEOUT:5000}
+configuration:
+  initiateTasksOnCreate: ${WA_INITIATE_TASKS_ON_CREATE_ENABLED:false}
 
 job:
   configuration:
@@ -106,6 +104,7 @@ job:
     camunda-time-limit-flag: ${INITIATION_TIME_LIMIT_FLAG:true}
     #number of minutes
     camunda-time-limit: ${INITIATION_TIME_LIMIT:120}
+    failure-retry-delay-minutes: ${INITIATION_FAILURE_RETRY_DELAY_MINUTES:2}
   termination:
     camunda-max-results: ${TERMINATION_CAMUNDA_MAX_RESULTS:100}
     camunda-time-limit-flag: ${TERMINATION_TIME_LIMIT_FLAG:true}
