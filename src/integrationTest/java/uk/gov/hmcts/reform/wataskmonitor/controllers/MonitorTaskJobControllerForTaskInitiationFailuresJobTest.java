@@ -2,7 +2,10 @@ package uk.gov.hmcts.reform.wataskmonitor.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -28,6 +31,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -37,6 +41,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobContro
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.InitiateTaskOperation.INITIATION;
 
 @TestPropertySource(properties = "configuration.initiateTasksOnCreate=true")
+@ExtendWith(OutputCaptureExtension.class)
 class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBootIntegrationBaseTest {
 
     private static final String SERVICE_TOKEN = "some service token";
@@ -58,15 +63,7 @@ class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBoo
 
     @Test
     void shouldSucceedAndInitiateFailedTasks() throws Exception {
-        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(
-            new JobDetails(JobName.TASK_INITIATION_FAILURES)
-        );
-
-        mockMvc.perform(post("/monitor/tasks/jobs")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(TestUtility.asJsonString(monitorTaskJobReq)))
-            .andExpect(status().isOk())
-            .andExpect(content().string(equalTo(expectedResponse.apply(JobName.TASK_INITIATION_FAILURES.name()))));
+        runTaskInitiationFailuresJob();
 
         verify(authTokenGenerator).generate();
         verify(camundaClient).getTasks(
@@ -90,6 +87,33 @@ class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBoo
         assertThat(initiateTaskRequest.getTaskAttributes())
             .containsEntry("caseId", "00000")
             .containsEntry("taskType", "someTaskType");
+    }
+
+    @Test
+    void shouldLogFailureWhenTaskInitiationFails(CapturedOutput output) throws Exception {
+        doThrow(new RuntimeException("Task initiation failed"))
+            .when(taskManagementClient)
+            .initiateTask(any(), any(), any());
+
+        runTaskInitiationFailuresJob();
+
+        verify(taskManagementClient).initiateTask(eq(SERVICE_TOKEN), eq(CAMUNDA_TASK_ID), any());
+        assertThat(output.getOut())
+            .contains("TASK_INITIATION_FAILURES There are some uninitiated tasks:")
+            .contains("taskId: " + CAMUNDA_TASK_ID)
+            .contains("caseId: 00000");
+    }
+
+    private void runTaskInitiationFailuresJob() throws Exception {
+        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(
+            new JobDetails(JobName.TASK_INITIATION_FAILURES)
+        );
+
+        mockMvc.perform(post("/monitor/tasks/jobs")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(TestUtility.asJsonString(monitorTaskJobReq)))
+            .andExpect(status().isOk())
+            .andExpect(content().string(equalTo(expectedResponse.apply(JobName.TASK_INITIATION_FAILURES.name()))));
     }
 
     private void mockExternalDependencies() {
@@ -133,6 +157,8 @@ class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBoo
         variables.put("caseName", new CamundaVariable("someCaseName", "String"));
         variables.put("caseTypeId", new CamundaVariable("someCaseType", "String"));
         variables.put("taskState", new CamundaVariable("unconfigured", "String"));
+        variables.put("cftTaskState", new CamundaVariable("unconfigured", "String"));
+        variables.put("name", new CamundaVariable("someCamundaTaskName", "String"));
         variables.put("location", new CamundaVariable("someStaffLocationId", "String"));
         variables.put("locationName", new CamundaVariable("someStaffLocationName", "String"));
         variables.put("securityClassification", new CamundaVariable("SC", "String"));

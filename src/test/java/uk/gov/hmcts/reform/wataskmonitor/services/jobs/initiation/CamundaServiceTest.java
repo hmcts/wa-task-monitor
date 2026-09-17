@@ -73,9 +73,41 @@ class CamundaServiceTest {
     }
 
     @Test
+    void should_apply_configured_time_limit_to_initiation_candidates() throws JSONException {
+        long configuredTimeLimitMinutes = 45L;
+        final ZonedDateTime earliestExpectedCutoff = ZonedDateTime.now()
+            .minusMinutes(configuredTimeLimitMinutes)
+            .minusSeconds(1);
+        when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
+        when(initiationJobConfig.getCamundaTimeLimit()).thenReturn(configuredTimeLimitMinutes);
+        when(camundaClient.getTasks(
+            eq(SOME_SERVICE_TOKEN),
+            eq("0"),
+            eq("100"),
+            queryCaptor.capture()
+        )).thenReturn(InitiationHelpers.getMockedTasks());
+
+        camundaService.getInitiationCandidates(SOME_SERVICE_TOKEN);
+
+        JSONObject query = new JSONObject(queryCaptor.getValue());
+        ZonedDateTime latestExpectedCutoff = ZonedDateTime.now()
+            .minusMinutes(configuredTimeLimitMinutes)
+            .plusSeconds(1);
+        ZonedDateTime createdAfter = ZonedDateTime.parse(
+            query.getString("createdAfter"),
+            DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN)
+        );
+        assertThat(createdAfter).isBetween(earliestExpectedCutoff, latestExpectedCutoff);
+    }
+
+    @Test
     void should_get_unconfigured_tasks_older_than_the_failure_retry_delay() throws JSONException {
+        long configuredDelayMinutes = 7L;
         List<CamundaTask> tasks = InitiationHelpers.getMockedTasks();
-        ZonedDateTime earliestExpectedCutoff = ZonedDateTime.now().minusMinutes(2).minusSeconds(1);
+        final ZonedDateTime earliestExpectedCutoff = ZonedDateTime.now()
+            .minusMinutes(configuredDelayMinutes)
+            .minusSeconds(1);
+        when(initiationJobConfig.getFailureRetryDelayMinutes()).thenReturn(configuredDelayMinutes);
         when(camundaClient.getTasks(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
@@ -86,7 +118,9 @@ class CamundaServiceTest {
         List<CamundaTask> result = camundaService.getUnconfiguredTasks(SOME_SERVICE_TOKEN);
 
         JSONObject query = new JSONObject(queryCaptor.getValue());
-        ZonedDateTime latestExpectedCutoff = ZonedDateTime.now().minusMinutes(2).plusSeconds(1);
+        ZonedDateTime latestExpectedCutoff = ZonedDateTime.now()
+            .minusMinutes(configuredDelayMinutes)
+            .plusSeconds(1);
         ZonedDateTime createdBefore = ZonedDateTime.parse(
             query.getString("createdBefore"),
             DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN)

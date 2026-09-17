@@ -18,4 +18,5 @@ public class SpringBootIntegrationBaseTest {
 
     @Autowired
     protected MockMvc mockMvc;
+
 }

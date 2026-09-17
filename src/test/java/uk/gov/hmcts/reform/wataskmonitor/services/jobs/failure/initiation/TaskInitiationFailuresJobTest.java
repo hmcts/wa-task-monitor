@@ -104,6 +104,54 @@ class TaskInitiationFailuresJobTest {
     }
 
     @Test
+    void should_report_tasks_that_the_sweeper_could_not_initiate() {
+        taskInitiationFailuresJob = new TaskInitiationFailuresJob(
+            taskInitiationFailuresLogService,
+            camundaService,
+            initiationService,
+            true
+        );
+        CamundaTask initiatedTask = new CamundaTask(
+            "initiated taskId",
+            "some name",
+            "some processInstanceId"
+        );
+        CamundaTask failedTask = new CamundaTask(
+            "failed taskId",
+            "some name",
+            "some processInstanceId"
+        );
+        List<CamundaTask> tasks = List.of(initiatedTask, failedTask);
+        GenericJobReport jobReport = new GenericJobReport(
+            2,
+            List.of(
+                GenericJobOutcome.builder()
+                    .taskId(initiatedTask.getId())
+                    .successful(true)
+                    .build(),
+                GenericJobOutcome.builder()
+                    .taskId(failedTask.getId())
+                    .successful(false)
+                    .build()
+            )
+        );
+
+        when(camundaService.getUnconfiguredTasks(SOME_SERVICE_TOKEN)).thenReturn(tasks);
+        when(initiationService.initiateTasks(
+            tasks,
+            SOME_SERVICE_TOKEN,
+            TASK_INITIATION_FAILURES.name()
+        )).thenReturn(jobReport);
+
+        taskInitiationFailuresJob.run(SOME_SERVICE_TOKEN);
+
+        verify(taskInitiationFailuresLogService).reportInitiationFailures(
+            List.of(failedTask),
+            SOME_SERVICE_TOKEN
+        );
+    }
+
+    @Test
     void should_report_initiation_failures_when_feature_flag_is_disabled() {
         List<CamundaTask> tasks = List.of(new CamundaTask(
             "some taskId",
