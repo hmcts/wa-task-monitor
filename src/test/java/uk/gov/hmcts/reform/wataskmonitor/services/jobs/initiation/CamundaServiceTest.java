@@ -100,13 +100,9 @@ class CamundaServiceTest {
     }
 
     @Test
-    void should_get_stale_unconfigured_tasks_using_configured_time_limit() throws JSONException {
-        long configuredTimeLimitMinutes = 45L;
+    void should_get_stale_unconfigured_tasks_using_initiation_query() throws JSONException {
         List<CamundaTask> tasks = InitiationHelpers.getMockedTasks();
-        final ZonedDateTime earliestExpectedCutoff = ZonedDateTime.now()
-            .minusMinutes(configuredTimeLimitMinutes)
-            .minusSeconds(1);
-        when(initiationJobConfig.getCamundaTimeLimit()).thenReturn(configuredTimeLimitMinutes);
+        when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
         when(camundaClient.getTasks(
             eq(SOME_SERVICE_TOKEN),
             eq("0"),
@@ -117,17 +113,9 @@ class CamundaServiceTest {
         List<CamundaTask> result = camundaService.getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN);
 
         JSONObject query = new JSONObject(queryCaptor.getValue());
-        ZonedDateTime latestExpectedCutoff = ZonedDateTime.now()
-            .minusMinutes(configuredTimeLimitMinutes)
-            .plusSeconds(1);
-        ZonedDateTime createdBefore = ZonedDateTime.parse(
-            query.getString("createdBefore"),
-            DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN)
-        );
         assertThat(result).isEqualTo(tasks);
-        assertThat(createdBefore).isBetween(earliestExpectedCutoff, latestExpectedCutoff);
-        assertThat(query.has("createdAfter")).isFalse();
-        assertThat(query.getString("taskDefinitionKey")).isEqualTo("processTask");
+        assertThat(query.has("createdAfter")).isTrue();
+        assertThat(query.has("createdBefore")).isFalse();
     }
 
     @Test

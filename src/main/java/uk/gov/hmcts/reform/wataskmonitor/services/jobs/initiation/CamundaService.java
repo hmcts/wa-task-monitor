@@ -38,7 +38,7 @@ public class CamundaService {
     }
 
     public List<CamundaTask> getStaleUnconfiguredTasks(String serviceToken) {
-        return getTasks(serviceToken, buildInitiationFailuresSearchQuery());
+        return getTasks(serviceToken, buildInitiationSearchQuery());
     }
 
     public Map<String, CamundaVariable> getTaskVariables(String serviceToken, String taskId) {
@@ -77,19 +77,4 @@ public class CamundaService {
         return query;
     }
 
-    private String buildInitiationFailuresSearchQuery() {
-        String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED)
-            .replace("\"createdAfter\": \"*\",", "");
-
-        ZonedDateTime createdTime = ZonedDateTime.now()
-            .minusMinutes(initiationJobConfig.getCamundaTimeLimit());
-        String createdBefore = createdTime.format(formatter);
-        query = query.replace(
-            "\"createdBefore\": \"*\",",
-            "\"createdBefore\": \"" + createdBefore + "\","
-        );
-
-        log.info("Initiation failures build query: {}", LoggingUtility.logPrettyPrint(query));
-        return query;
-    }
 }
