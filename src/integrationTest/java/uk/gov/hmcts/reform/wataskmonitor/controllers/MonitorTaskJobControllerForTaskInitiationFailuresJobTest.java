@@ -121,7 +121,6 @@ class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBoo
         when(initiationJobConfig.getCamundaMaxResults()).thenReturn("100");
         when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
         when(initiationJobConfig.getCamundaTimeLimit()).thenReturn(120L);
-        when(initiationJobConfig.getFailureRetryDelayMinutes()).thenReturn(2L);
 
         when(camundaClient.getTasks(
             eq(SERVICE_TOKEN),
