@@ -32,11 +32,6 @@ public class CamundaService {
         this.initiationJobConfig = initiationJobConfig;
     }
 
-    public List<CamundaTask> getUnconfiguredTasks(String serviceToken) {
-        log.info("Retrieving tasks with '{}' = '{}' from Camunda.", "cftTaskState", "unconfigured");
-        return getTasks(serviceToken, buildUnconfiguredTasksSearchQuery());
-    }
-
     public List<CamundaTask> getInitiationCandidates(String serviceToken) {
         log.info("Retrieving unconfigured task initiation candidates from Camunda.");
         return getTasks(serviceToken, buildInitiationSearchQuery());
@@ -79,22 +74,6 @@ public class CamundaService {
         }
 
         log.info("Initiation build query: {}", LoggingUtility.logPrettyPrint(query));
-        return query;
-    }
-
-    private String buildUnconfiguredTasksSearchQuery() {
-        String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED)
-            .replace("\"createdAfter\": \"*\",", "");
-
-        ZonedDateTime createdTime = ZonedDateTime.now()
-            .minusMinutes(initiationJobConfig.getFailureRetryDelayMinutes());
-        String createdBefore = createdTime.format(formatter);
-        query = query.replace(
-            "\"createdBefore\": \"*\",",
-            "\"createdBefore\": \"" + createdBefore + "\","
-        );
-
-        log.info("Unconfigured tasks build query: {}", LoggingUtility.logPrettyPrint(query));
         return query;
     }
 

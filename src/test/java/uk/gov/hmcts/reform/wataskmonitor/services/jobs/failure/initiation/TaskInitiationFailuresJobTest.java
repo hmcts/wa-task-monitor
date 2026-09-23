@@ -83,7 +83,7 @@ class TaskInitiationFailuresJobTest {
                 .build())
         );
 
-        when(camundaService.getUnconfiguredTasks(SOME_SERVICE_TOKEN))
+        when(camundaService.getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN))
             .thenReturn(tasks);
         when(initiationService.initiateTasks(
             tasks,
@@ -93,13 +93,12 @@ class TaskInitiationFailuresJobTest {
             .thenReturn(jobReport);
         taskInitiationFailuresJob.run(SOME_SERVICE_TOKEN);
 
-        verify(camundaService).getUnconfiguredTasks(SOME_SERVICE_TOKEN);
+        verify(camundaService).getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN);
         verify(initiationService).initiateTasks(
             tasks,
             SOME_SERVICE_TOKEN,
             TASK_INITIATION_FAILURES.name()
         );
-        verify(camundaService, never()).getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN);
         verify(taskInitiationFailuresLogService, never()).reportInitiationFailures(tasks, SOME_SERVICE_TOKEN);
     }
 
@@ -136,7 +135,7 @@ class TaskInitiationFailuresJobTest {
             )
         );
 
-        when(camundaService.getUnconfiguredTasks(SOME_SERVICE_TOKEN)).thenReturn(tasks);
+        when(camundaService.getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN)).thenReturn(tasks);
         when(initiationService.initiateTasks(
             tasks,
             SOME_SERVICE_TOKEN,
@@ -168,7 +167,6 @@ class TaskInitiationFailuresJobTest {
 
         verify(camundaService).getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN);
         verify(taskInitiationFailuresLogService).reportInitiationFailures(tasks, SOME_SERVICE_TOKEN);
-        verify(camundaService, never()).getUnconfiguredTasks(SOME_SERVICE_TOKEN);
         verify(initiationService, never()).initiateTasks(
             tasks,
             SOME_SERVICE_TOKEN,

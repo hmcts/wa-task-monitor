@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor;
 
+import io.restassured.path.json.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -164,15 +165,14 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         Map<String, CamundaVariable> delayedTaskCamundaVariables =
             common.getTaskVariablesFromCamunda(caseworkerCredentials.getHeaders(), delayedTaskVariables.getTaskId());
 
-        Map<String, CamundaVariable> delayedTaskCftResponse =
+        JsonPath delayedTaskCftResponse =
             common.getTaskFromTaskManagementApi(caseworkerCredentials.getHeaders(), delayedTaskVariables.getTaskId());
 
-        Map<String, CamundaVariable> defaultTaskCftResponse =
+        JsonPath defaultTaskCftResponse =
             common.getTaskFromTaskManagementApi(caseworkerCredentials.getHeaders(), defaultTaskVariables.getTaskId());
 
-        String actualDefaultTaskCftTaskState = ((HashMap) (((HashMap) defaultTaskCftResponse)
-            .get("task"))).get("task_state").toString();
-        String actualDelayedTaskCftTaskState = String.valueOf(delayedTaskCftResponse.get("status"));
+        String actualDefaultTaskCftTaskState = defaultTaskCftResponse.getString("task.task_state");
+        String actualDelayedTaskCftTaskState = delayedTaskCftResponse.getString("status");
 
         assertEquals("unassigned", actualDefaultTaskCftTaskState);
         assertEquals(String.valueOf(HttpStatus.NOT_FOUND.value()), actualDelayedTaskCftTaskState);
