@@ -37,10 +37,6 @@ public class CamundaService {
         return getTasks(serviceToken, buildInitiationSearchQuery());
     }
 
-    public List<CamundaTask> getStaleUnconfiguredTasks(String serviceToken) {
-        return getTasks(serviceToken, buildInitiationSearchQuery());
-    }
-
     public Map<String, CamundaVariable> getTaskVariables(String serviceToken, String taskId) {
         return camundaClient.getVariables(serviceToken, taskId);
     }

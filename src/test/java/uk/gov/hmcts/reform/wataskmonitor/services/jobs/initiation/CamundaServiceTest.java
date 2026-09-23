@@ -100,25 +100,6 @@ class CamundaServiceTest {
     }
 
     @Test
-    void should_get_stale_unconfigured_tasks_using_initiation_query() throws JSONException {
-        List<CamundaTask> tasks = InitiationHelpers.getMockedTasks();
-        when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
-        when(camundaClient.getTasks(
-            eq(SOME_SERVICE_TOKEN),
-            eq("0"),
-            eq("100"),
-            queryCaptor.capture()
-        )).thenReturn(tasks);
-
-        List<CamundaTask> result = camundaService.getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN);
-
-        JSONObject query = new JSONObject(queryCaptor.getValue());
-        assertThat(result).isEqualTo(tasks);
-        assertThat(query.has("createdAfter")).isTrue();
-        assertThat(query.has("createdBefore")).isFalse();
-    }
-
-    @Test
     void should_get_task_variables() {
         Map<String, CamundaVariable> variables = InitiationHelpers.createMockCamundaVariables();
         when(camundaClient.getVariables(SOME_SERVICE_TOKEN, "task-id")).thenReturn(variables);
