@@ -90,6 +90,8 @@ feign:
         readTimeout: 30000
         loggerLevel: basic
 
+configuration:
+  initiateTasksOnCreate: ${WA_INITIATE_TASKS_ON_CREATE_ENABLED:false}
 
 job:
   configuration:

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import io.restassured.http.Headers;
+import io.restassured.path.json.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -222,7 +223,7 @@ public class Common {
 
     }
 
-    public Map<String, CamundaVariable> getTaskFromTaskManagementApi(Headers authenticationHeaders, String value) {
+    public JsonPath getTaskFromTaskManagementApi(Headers authenticationHeaders, String value) {
         String taskActionControllerEndPoint = "task/{task-id}";
         return taskManagementApiActions.get(
                 taskActionControllerEndPoint,
@@ -231,8 +232,7 @@ public class Common {
             ).then()
             .extract()
             .body()
-            .jsonPath()
-            .getMap("");
+            .jsonPath();
 
     }
 
