@@ -4,6 +4,17 @@ Last reviewed on: **15/04/2025**
 
 [![Build Status](https://travis-ci.org/hmcts/wa-task-monitor.svg?branch=master)](https://travis-ci.org/hmcts/wa-task-monitor)
 
+## Contents
+
+- [Purpose](#purpose)
+- [Prerequisites](#prerequisites)
+- [Building and deploying the application](#building-and-deploying-the-application)
+- [Running the application](#running-the-application)
+- [Running contract or Pact tests](#running-contract-or-pact-tests)
+- [Using Docker](#using-docker)
+- [Alternative script to run application](#alternative-script-to-run-application)
+- [License](#license)
+
 ## Purpose
 
 The **wa-task-monitor** application interacts with the Camunda REST API to identify and process tasks that meet specific conditions, such as:
@@ -62,12 +73,9 @@ To build the project execute the following command:
 
 #### Run Functional tests
 
-Make sure, wa-workflow-api,
-wa_task_management_api services should be running
+Make sure `wa-workflow-api` and `wa_task_management_api` services are running, then execute:
 
-```bash
-./gradlew functional
-````
+    ./gradlew functional
 
 ### Running contract or pact tests:
 
@@ -77,15 +85,36 @@ You can run contract or pact tests as follows:
 ./gradlew contract
 ```
 
-To publish Pact tests locally:
+For example, to run the CCD consumer Pact tests for `wa_task_monitor` and `ccdDataStoreAPI_Cases` can be run with:
+
+```bash
+./gradlew contract --tests 'uk.gov.hmcts.reform.wataskmonitor.consumer.ccd.*'
+```
+
+To publish those tests to a local Pact Broker on `localhost:9292`, use the existing broker and branch variables:
 
 - Start the Pact Broker using Docker Compose:
+
 ```bash
 docker-compose -f docker-pactbroker-compose.yml up
 ```
-- Publish the tests:
+
+- Run and publish the consumer Pacts using the `Dev` branch/tag:
+
 ```bash
-./gradlew pactPublish
+PACT_BROKER_FULL_URL=http://localhost:9292 \
+PACT_BRANCH_NAME=Dev \
+./gradlew runAndPublishConsumerPactTests \
+  --tests 'uk.gov.hmcts.reform.wataskmonitor.consumer.ccd.*'
+```
+
+The generated Pact files are written to `pacts/` and published as:
+
+```
+Consumer: wa_task_monitor
+Provider: ccdDataStoreAPI_Cases
+Broker:   http://localhost:9292
+Branch:   Dev
 ```
 
 #### Using docker
@@ -159,4 +188,3 @@ There is no need to remove postgres and java or similar core images.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
-

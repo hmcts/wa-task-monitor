@@ -8,7 +8,6 @@ import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
 public final class PactDslBuilderForCaseDetailsList {
 
     public static final String REGEX_DATE = "^((19|2[0-9])[0-9]{2})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$";
-    private static final String ALPHABETIC_REGEX = "[/^[A-Za-z_]+$/]+";
 
     private PactDslBuilderForCaseDetailsList() {
         //No-op
@@ -21,10 +20,10 @@ public final class PactDslBuilderForCaseDetailsList {
                 .nullValue("token")
                 .object("case_details", cd -> {
                     cd.numberType("id", 2000);
-                    cd.stringMatcher("jurisdiction", ALPHABETIC_REGEX, "IA");
-                    cd.stringMatcher("case_type_id", ALPHABETIC_REGEX, "Asylum");
-                    cd.stringValue("state", "appealStarted");
-                    cd.stringValue("security_classification", "PUBLIC");
+                    cd.stringType("jurisdiction", "IA");
+                    cd.stringType("case_type_id", "Asylum");
+                    cd.stringType("state", "appealStarted");
+                    cd.stringType("security_classification", "PUBLIC");
                     cd.object("case_data", PactDslBuilderForCaseDetailsList::getCaseDataPactDsl);
                 })).build();
     }
@@ -35,11 +34,11 @@ public final class PactDslBuilderForCaseDetailsList {
                 .stringType("token", "token")
                 .nullValue("token")
                 .object("case_details", cd -> {
-                    cd.stringMatcher("jurisdiction", ALPHABETIC_REGEX, "IA");
-                    cd.stringMatcher("case_type_id", ALPHABETIC_REGEX, "Asylum");
+                    cd.stringType("jurisdiction", "IA");
+                    cd.stringType("case_type_id", "Asylum");
                     cd.object("case_data", data -> {
-                        data.stringMatcher("isOutOfCountryEnabled", "Yes|No|YES|NO", "No");
-                        data.stringMatcher("appealOutOfCountry", "Yes|No|YES|NO", "No");
+                        data.stringType("isOutOfCountryEnabled", "No");
+                        data.stringType("appealOutOfCountry", "No");
                     });
                 }))
             .build();
@@ -49,10 +48,10 @@ public final class PactDslBuilderForCaseDetailsList {
         return newJsonBody(
             o -> o.numberType("id", caseId)
                 .stringType("jurisdiction", "IA")
-                .stringValue("case_type_id", "Asylum")
-                .stringValue("state", "appealStarted")
-                .stringValue("security_classification", "PUBLIC")
-                .stringValue("callback_response_status", "CALLBACK_COMPLETED")
+                .stringType("case_type_id", "Asylum")
+                .stringType("state", "appealStarted")
+                .stringType("security_classification", "PUBLIC")
+                .stringType("callback_response_status", "CALLBACK_COMPLETED")
                 .object("case_data", PactDslBuilderForCaseDetailsList::getCaseDataPactDsl)).build();
     }
 
@@ -68,16 +67,16 @@ public final class PactDslBuilderForCaseDetailsList {
     private static void getCaseDataPactDsl(final LambdaDslObject dataMap) {
         dataMap
             .stringType("homeOfficeReferenceNumber", "000123456")
-            .stringMatcher("submissionOutOfTime", "Yes|No|YES|NO", "Yes")
+            .stringType("submissionOutOfTime", "Yes")
             .stringMatcher("homeOfficeDecisionDate", REGEX_DATE, "2019-08-01")
             .stringMatcher("appellantDateOfBirth", REGEX_DATE, "1990-12-07")
             .stringType("appellantTitle", "Mr")
             .stringType("appellantNameForDisplay", "Bob Smith")
             .stringType("appellantFamilyName", "Smith")
             .stringType("appellantGivenNames", "Bob")
-            .stringMatcher("uploadAdditionalEvidenceActionAvailable", "Yes|No|YES|NO", "No")
+            .stringType("uploadAdditionalEvidenceActionAvailable", "No")
             .stringType("appealType", "protection")
-            .stringMatcher("appealReferenceNumber", "DRAFT")
+            .stringType("appealReferenceNumber", "DRAFT")
             .stringType("applicationOutOfTimeExplanation", "test case")
             .stringType("legalRepCompanyName", "")
             .stringType("staffLocation", "Taylor House")
@@ -116,9 +115,9 @@ public final class PactDslBuilderForCaseDetailsList {
                     subs.stringType("id", "1")
                         .object("value", v ->
                             v.stringType("subscriber", "appellant")
-                                .stringMatcher("wantsEmail", "Yes|No|YES|NO", "Yes")
+                                .stringType("wantsEmail", "Yes")
                                 .stringType("email", "test@example.com")
-                                .stringMatcher("wantsSms", "Yes|No|YES|NO", "Yes")
+                                .stringType("wantsSms", "Yes")
                                 .stringType("mobileNumber", "0111111111")
                         )//subscriptions object
             );// minArray
