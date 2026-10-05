@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.wataskmonitor.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.hmcts.reform.wataskmonitor.exceptions.ObjectMapperUtilityFailure;
 
 public final class ObjectMapperUtility {
@@ -11,10 +11,10 @@ public final class ObjectMapperUtility {
     }
 
     public static <T> T stringToObject(String string, Class<T> valueType) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        JsonMapper objectMapper = JsonMapper.builder().configureForJackson2().build();
         try {
             return objectMapper.readValue(string, valueType);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new ObjectMapperUtilityFailure(
                 String.format("Error deserializing object[%s] from string[%s]", valueType.toString(), string),
                 e

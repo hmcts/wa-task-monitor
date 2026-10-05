@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.wataskmonitor.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ResourceUtils;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -83,7 +83,8 @@ public class GivensBuilder {
                 OffsetDateTime.now().toString()
             );
 
-            data = new ObjectMapper().readValue(caseDataString, Map.class);
+            data = JsonMapper.builder().configureForJackson2().build()
+                .readValue(caseDataString, Map.class);
         } catch (IOException e) {
             e.printStackTrace();
         }

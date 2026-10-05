@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
@@ -32,7 +32,9 @@ class InitiationTaskAttributesMapperTest extends UnitBaseTest {
 
     @BeforeEach
     void setUp() {
-        initiationTaskAttributesMapper = new InitiationTaskAttributesMapper(new ObjectMapper());
+        initiationTaskAttributesMapper = new InitiationTaskAttributesMapper(
+            JsonMapper.builder().configureForJackson2().build()
+        );
     }
 
     @Test
