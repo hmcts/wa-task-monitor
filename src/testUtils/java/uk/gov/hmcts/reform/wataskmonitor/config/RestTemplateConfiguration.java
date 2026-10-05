@@ -2,30 +2,24 @@ package uk.gov.hmcts.reform.wataskmonitor.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
 public class RestTemplateConfiguration {
 
     @Bean
-    public RestOperations restOperations(
-        MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter
-    ) {
-        return restTemplate(mappingJackson2HttpMessageConverter);
+    public RestOperations restOperations(JsonMapper jsonMapper) {
+        return restTemplate(jsonMapper);
     }
 
     @Bean
-    public RestTemplate restTemplate(
-        MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter
-    ) {
+    public RestTemplate restTemplate(JsonMapper jsonMapper) {
         RestTemplate restTemplate = new RestTemplate();
-        //Remove default
-        restTemplate.getMessageConverters().removeIf(MappingJackson2HttpMessageConverter.class::isInstance);
-        //Add autowired message converters as defined in JacksonConfiguration.java
-        restTemplate.getMessageConverters().add(mappingJackson2HttpMessageConverter);
-
+        restTemplate.getMessageConverters().removeIf(JacksonJsonHttpMessageConverter.class::isInstance);
+        restTemplate.getMessageConverters().add(new JacksonJsonHttpMessageConverter(jsonMapper));
         return restTemplate;
     }
 

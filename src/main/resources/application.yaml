@@ -17,7 +17,8 @@ springdoc:
 spring:
   config:
     import: "optional:configtree:/mnt/secrets/wa/"
-  jackson.serialization.INDENT_OUTPUT: true
+  jackson:
+    use-jackson2-defaults: true
   application:
     name: WA Task monitor
   main:
