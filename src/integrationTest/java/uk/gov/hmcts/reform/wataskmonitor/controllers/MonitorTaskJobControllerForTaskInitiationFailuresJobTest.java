@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor.controllers;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
 import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
 import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.InitiateTaskOperation.INITIATION;
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.CamundaService.CAMUNDA_DATE_REQUEST_PATTERN;
 
 @TestPropertySource(properties = "configuration.initiateTasksOnCreate=true")
 @ExtendWith(OutputCaptureExtension.class)
@@ -63,15 +66,29 @@ class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBoo
 
     @Test
     void shouldSucceedAndInitiateFailedTasks() throws Exception {
+        final ZonedDateTime earliestExpectedCutoff = ZonedDateTime.now().minusMinutes(2).minusSeconds(1);
         runTaskInitiationFailuresJob();
 
         verify(authTokenGenerator).generate();
+        ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
         verify(camundaClient).getTasks(
             eq(SERVICE_TOKEN),
             eq("0"),
             eq("100"),
-            any()
+            queryCaptor.capture()
         );
+        JSONObject query = new JSONObject(queryCaptor.getValue());
+        ZonedDateTime createdBefore = ZonedDateTime.parse(
+            query.getString("createdBefore"),
+            DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN)
+        );
+        assertThat(createdBefore).isBetween(
+            earliestExpectedCutoff, ZonedDateTime.now().minusMinutes(2).plusSeconds(1)
+        );
+        ZonedDateTime createdAfter = ZonedDateTime.parse(
+            query.getString("createdAfter"), DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN)
+        );
+        assertThat(createdAfter).isEqualTo(createdBefore.minusMinutes(118));
         verify(camundaClient).getVariables(SERVICE_TOKEN, CAMUNDA_TASK_ID);
 
         ArgumentCaptor<InitiateTaskRequest> initiateTaskRequestCaptor =
@@ -121,6 +138,7 @@ class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBoo
         when(initiationJobConfig.getCamundaMaxResults()).thenReturn("100");
         when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
         when(initiationJobConfig.getCamundaTimeLimit()).thenReturn(120L);
+        when(initiationJobConfig.getFailureRetryDelayMinutes()).thenReturn(2L);
 
         when(camundaClient.getTasks(
             eq(SERVICE_TOKEN),

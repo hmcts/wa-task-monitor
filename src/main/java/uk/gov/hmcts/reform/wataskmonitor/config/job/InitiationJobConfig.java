@@ -16,5 +16,6 @@ public class InitiationJobConfig {
     private String camundaMaxResults;
     private boolean camundaTimeLimitFlag;
     private Long camundaTimeLimit;
+    private Long failureRetryDelayMinutes;
 
 }

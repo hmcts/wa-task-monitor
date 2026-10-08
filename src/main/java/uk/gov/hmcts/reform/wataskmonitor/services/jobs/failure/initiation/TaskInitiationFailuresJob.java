@@ -47,9 +47,9 @@ public class TaskInitiationFailuresJob implements JobService {
     @Override
     public void run(String serviceToken) {
         log.info("Starting task {} job.", TASK_INITIATION_FAILURES);
-        List<CamundaTask> tasks = camundaService.getInitiationCandidates(serviceToken);
         GenericJobReport report;
         if (initiateTasksOnCreate) {
+            List<CamundaTask> tasks = camundaService.getStaleUnconfiguredTasks(serviceToken);
             report = initiationService.initiateTasks(
                 tasks,
                 serviceToken,
@@ -57,6 +57,7 @@ public class TaskInitiationFailuresJob implements JobService {
             );
             reportFailedInitiations(tasks, report, serviceToken);
         } else {
+            List<CamundaTask> tasks = camundaService.getInitiationCandidates(serviceToken);
             report = taskInitiationFailuresLogService.reportInitiationFailures(tasks, serviceToken);
         }
         log.info("{} job completed successfully: {}", TASK_INITIATION_FAILURES, logPrettyPrint(report));

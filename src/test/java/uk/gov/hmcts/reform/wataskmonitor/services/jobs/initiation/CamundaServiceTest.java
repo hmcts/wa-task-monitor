@@ -112,4 +112,44 @@ class CamundaServiceTest {
         assertThat(result).isEqualTo(variables);
         verify(camundaClient).getVariables(SOME_SERVICE_TOKEN, "task-id");
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void should_get_stale_tasks_using_created_before(boolean timeLimitEnabled) throws JSONException {
+        long configuredRetryDelayMinutes = 5L;
+        final ZonedDateTime earliestExpectedCutoff = ZonedDateTime.now()
+            .minusMinutes(configuredRetryDelayMinutes).minusSeconds(1);
+        List<CamundaTask> tasks = InitiationHelpers.getMockedTasks();
+        when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(timeLimitEnabled);
+        when(initiationJobConfig.getFailureRetryDelayMinutes()).thenReturn(configuredRetryDelayMinutes);
+        when(camundaClient.getTasks(
+            eq(SOME_SERVICE_TOKEN), eq("0"), eq("100"), queryCaptor.capture()
+        )).thenReturn(tasks);
+
+        assertThat(camundaService.getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN)).isEqualTo(tasks);
+
+        JSONObject query = new JSONObject(queryCaptor.getValue());
+        assertThat(query.has("createdAfter")).isEqualTo(timeLimitEnabled);
+        assertThat(query.has("createdBefore")).isTrue();
+        assertThat(query.getString("taskDefinitionKey")).isEqualTo("processTask");
+        assertThat(query.getString("processDefinitionKey")).isEqualTo("wa-task-initiation-ia-asylum");
+        JSONObject variable = query.getJSONArray("orQueries").getJSONObject(0)
+            .getJSONArray("taskVariables").getJSONObject(0);
+        assertThat(variable.getString("name")).isEqualTo("cftTaskState");
+        assertThat(variable.getString("operator")).isEqualTo("eq");
+        assertThat(variable.getString("value")).isEqualTo("unconfigured");
+        ZonedDateTime createdBefore = ZonedDateTime.parse(
+            query.getString("createdBefore"), DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN)
+        );
+        assertThat(createdBefore).isBetween(
+            earliestExpectedCutoff,
+            ZonedDateTime.now().minusMinutes(configuredRetryDelayMinutes).plusSeconds(1)
+        );
+        if (timeLimitEnabled) {
+            ZonedDateTime createdAfter = ZonedDateTime.parse(
+                query.getString("createdAfter"), DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN)
+            );
+            assertThat(createdAfter).isEqualTo(createdBefore.minusMinutes(120L - configuredRetryDelayMinutes));
+        }
+    }
 }

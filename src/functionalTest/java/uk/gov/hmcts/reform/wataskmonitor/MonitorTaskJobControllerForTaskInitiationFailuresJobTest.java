@@ -12,10 +12,12 @@ import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJ
 import uk.gov.hmcts.reform.wataskmonitor.entities.TestAuthenticationCredentials;
 import uk.gov.hmcts.reform.wataskmonitor.entities.TestVariables;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import static net.serenitybdd.rest.SerenityRest.given;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -29,6 +31,9 @@ public class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends Sp
 
     @Value("${configuration.initiateTasksOnCreate:false}")
     private boolean initiateTasksOnCreate;
+
+    @Value("${job.initiation.failure-retry-delay-minutes:2}")
+    private long failureRetryDelayMinutes;
 
     private List<String> caseIds;
     private TestAuthenticationCredentials caseworkerCredentials;
@@ -63,23 +68,31 @@ public class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends Sp
 
         caseIds.add(taskVariables.getCaseId());
 
-        given()
-            .contentType(APPLICATION_JSON_VALUE)
-            .header(SERVICE_AUTHORIZATION, serviceToken)
-            .body(TestUtility.asJsonString(
-                new MonitorTaskJobRequest(new JobDetails(JobName.TASK_INITIATION_FAILURES))
-            ))
-            .when()
-            .post("/monitor/tasks/jobs")
-            .then()
-            .statusCode(HttpStatus.OK.value())
-            .body(is(expectedResponse.apply(JobName.TASK_INITIATION_FAILURES.name())));
+        Duration pickupDelay = Duration.ofMinutes(failureRetryDelayMinutes).plusSeconds(1);
+        await("Failure sweeper initiates task " + taskVariables.getTaskId())
+            .pollInSameThread()
+            .pollDelay(pickupDelay)
+            .pollInterval(Duration.ofSeconds(5))
+            .atMost(pickupDelay.plusMinutes(1))
+            .untilAsserted(() -> {
+                given()
+                    .contentType(APPLICATION_JSON_VALUE)
+                    .header(SERVICE_AUTHORIZATION, serviceToken)
+                    .body(TestUtility.asJsonString(
+                        new MonitorTaskJobRequest(new JobDetails(JobName.TASK_INITIATION_FAILURES))
+                    ))
+                    .when()
+                    .post("/monitor/tasks/jobs")
+                    .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .body(is(expectedResponse.apply(JobName.TASK_INITIATION_FAILURES.name())));
 
-        JsonPath taskManagementResponse =
-            common.getTaskFromTaskManagementApi(caseworkerCredentials.getHeaders(), taskVariables.getTaskId());
-
-        assertEquals(taskVariables.getTaskId(), taskManagementResponse.getString("task.id"));
-        assertEquals(taskVariables.getCaseId(), taskManagementResponse.getString("task.case_id"));
-        assertEquals("unassigned", taskManagementResponse.getString("task.task_state"));
+                JsonPath taskManagementResponse = common.getTaskFromTaskManagementApi(
+                    caseworkerCredentials.getHeaders(), taskVariables.getTaskId()
+                );
+                assertEquals(taskVariables.getTaskId(), taskManagementResponse.getString("task.id"));
+                assertEquals(taskVariables.getCaseId(), taskManagementResponse.getString("task.case_id"));
+                assertEquals("unassigned", taskManagementResponse.getString("task.task_state"));
+            });
     }
 }

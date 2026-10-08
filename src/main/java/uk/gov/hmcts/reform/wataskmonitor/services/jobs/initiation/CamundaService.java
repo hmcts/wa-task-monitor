@@ -41,6 +41,32 @@ public class CamundaService {
         return camundaClient.getVariables(serviceToken, taskId);
     }
 
+    public List<CamundaTask> getStaleUnconfiguredTasks(String serviceToken) {
+        log.info("Retrieving stale unconfigured tasks from Camunda.");
+        return getTasks(serviceToken, buildStaleUnconfiguredTasksSearchQuery());
+    }
+
+    private String buildStaleUnconfiguredTasksSearchQuery() {
+        ZonedDateTime now = ZonedDateTime.now();
+        String createdBefore = now.minusMinutes(initiationJobConfig.getFailureRetryDelayMinutes())
+            .format(formatter);
+        String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED)
+            .replace("\"createdBefore\": \"*\",", "\"createdBefore\": \"" + createdBefore + "\",");
+
+        if (initiationJobConfig.isCamundaTimeLimitFlag()) {
+            String createdAfter = now.minusMinutes(initiationJobConfig.getCamundaTimeLimit()).format(formatter);
+            query = query.replace(
+                "\"createdAfter\": \"*\",",
+                "\"createdAfter\": \"" + createdAfter + "\","
+            );
+        } else {
+            query = query.replace("\"createdAfter\": \"*\",", "");
+        }
+
+        log.info("Stale unconfigured tasks build query: {}", LoggingUtility.logPrettyPrint(query));
+        return query;
+    }
+
     private List<CamundaTask> getTasks(String serviceToken, String searchQuery) {
         log.info("initiationJobConfig: {}", initiationJobConfig);
         List<CamundaTask> tasks = camundaClient.getTasks(
