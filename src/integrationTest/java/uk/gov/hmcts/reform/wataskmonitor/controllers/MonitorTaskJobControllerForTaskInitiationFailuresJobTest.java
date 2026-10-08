@@ -1,0 +1,196 @@
+package uk.gov.hmcts.reform.wataskmonitor.controllers;
+
+import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.wataskmonitor.TestUtility;
+import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
+import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
+import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.InitiateTaskRequest;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
+import static uk.gov.hmcts.reform.wataskmonitor.domain.taskmanagement.request.enums.InitiateTaskOperation.INITIATION;
+import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.CamundaService.CAMUNDA_DATE_REQUEST_PATTERN;
+
+@TestPropertySource(properties = "configuration.initiateTasksOnCreate=true")
+@ExtendWith(OutputCaptureExtension.class)
+class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBootIntegrationBaseTest {
+
+    private static final String SERVICE_TOKEN = "some service token";
+    private static final String CAMUNDA_TASK_ID = "some camunda task id";
+
+    @MockitoBean
+    private CamundaClient camundaClient;
+    @MockitoBean
+    private AuthTokenGenerator authTokenGenerator;
+    @MockitoBean
+    private TaskManagementClient taskManagementClient;
+    @MockitoBean
+    private InitiationJobConfig initiationJobConfig;
+
+    @BeforeEach
+    void setUp() {
+        mockExternalDependencies();
+    }
+
+    @Test
+    void shouldSucceedAndInitiateFailedTasks() throws Exception {
+        final ZonedDateTime earliestExpectedCutoff = ZonedDateTime.now().minusMinutes(2).minusSeconds(1);
+        runTaskInitiationFailuresJob();
+
+        verify(authTokenGenerator).generate();
+        ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
+        verify(camundaClient).getTasks(
+            eq(SERVICE_TOKEN),
+            eq("0"),
+            eq("100"),
+            queryCaptor.capture()
+        );
+        JSONObject query = new JSONObject(queryCaptor.getValue());
+        ZonedDateTime createdBefore = ZonedDateTime.parse(
+            query.getString("createdBefore"),
+            DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN)
+        );
+        assertThat(createdBefore).isBetween(
+            earliestExpectedCutoff, ZonedDateTime.now().minusMinutes(2).plusSeconds(1)
+        );
+        ZonedDateTime createdAfter = ZonedDateTime.parse(
+            query.getString("createdAfter"), DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN)
+        );
+        assertThat(createdAfter).isEqualTo(createdBefore.minusMinutes(118));
+        verify(camundaClient).getVariables(SERVICE_TOKEN, CAMUNDA_TASK_ID);
+
+        ArgumentCaptor<InitiateTaskRequest> initiateTaskRequestCaptor =
+            ArgumentCaptor.forClass(InitiateTaskRequest.class);
+        verify(taskManagementClient).initiateTask(
+            eq(SERVICE_TOKEN),
+            eq(CAMUNDA_TASK_ID),
+            initiateTaskRequestCaptor.capture()
+        );
+
+        InitiateTaskRequest initiateTaskRequest = initiateTaskRequestCaptor.getValue();
+        assertThat(initiateTaskRequest.getOperation()).isEqualTo(INITIATION);
+        assertThat(initiateTaskRequest.getTaskAttributes())
+            .containsEntry("caseId", "00000")
+            .containsEntry("taskType", "someTaskType");
+    }
+
+    @Test
+    void shouldLogFailureWhenTaskInitiationFails(CapturedOutput output) throws Exception {
+        doThrow(new RuntimeException("Task initiation failed"))
+            .when(taskManagementClient)
+            .initiateTask(any(), any(), any());
+
+        runTaskInitiationFailuresJob();
+
+        verify(taskManagementClient).initiateTask(eq(SERVICE_TOKEN), eq(CAMUNDA_TASK_ID), any());
+        assertThat(output.getOut())
+            .contains("TASK_INITIATION_FAILURES There are some uninitiated tasks:")
+            .contains("taskId: " + CAMUNDA_TASK_ID)
+            .contains("caseId: 00000");
+    }
+
+    private void runTaskInitiationFailuresJob() throws Exception {
+        MonitorTaskJobRequest monitorTaskJobReq = new MonitorTaskJobRequest(
+            new JobDetails(JobName.TASK_INITIATION_FAILURES)
+        );
+
+        mockMvc.perform(post("/monitor/tasks/jobs")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(TestUtility.asJsonString(monitorTaskJobReq)))
+            .andExpect(status().isOk())
+            .andExpect(content().string(equalTo(expectedResponse.apply(JobName.TASK_INITIATION_FAILURES.name()))));
+    }
+
+    private void mockExternalDependencies() {
+        when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
+        when(initiationJobConfig.getCamundaMaxResults()).thenReturn("100");
+        when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
+        when(initiationJobConfig.getCamundaTimeLimit()).thenReturn(120L);
+        when(initiationJobConfig.getFailureRetryDelayMinutes()).thenReturn(2L);
+
+        when(camundaClient.getTasks(
+            eq(SERVICE_TOKEN),
+            eq("0"),
+            eq("100"),
+            any()
+        )).thenReturn(List.of(createMockedCamundaTask()));
+
+        when(camundaClient.getVariables(SERVICE_TOKEN, CAMUNDA_TASK_ID))
+            .thenReturn(createMockCamundaVariables());
+
+        doNothing().when(taskManagementClient).initiateTask(any(), any(), any());
+    }
+
+    private CamundaTask createMockedCamundaTask() {
+        ZonedDateTime createdDate = ZonedDateTime.now();
+        return new CamundaTask(
+            CAMUNDA_TASK_ID,
+            "someCamundaTaskName",
+            "someProcessInstanceId",
+            "someAssignee",
+            createdDate,
+            createdDate.plusDays(1),
+            "someCamundaTaskDescription",
+            "someCamundaTaskOwner",
+            "someCamundaTaskFormKey"
+        );
+    }
+
+    private Map<String, CamundaVariable> createMockCamundaVariables() {
+        Map<String, CamundaVariable> variables = new HashMap<>();
+        variables.put("caseId", new CamundaVariable("00000", "String"));
+        variables.put("caseName", new CamundaVariable("someCaseName", "String"));
+        variables.put("caseTypeId", new CamundaVariable("someCaseType", "String"));
+        variables.put("taskState", new CamundaVariable("unconfigured", "String"));
+        variables.put("cftTaskState", new CamundaVariable("unconfigured", "String"));
+        variables.put("name", new CamundaVariable("someCamundaTaskName", "String"));
+        variables.put("location", new CamundaVariable("someStaffLocationId", "String"));
+        variables.put("locationName", new CamundaVariable("someStaffLocationName", "String"));
+        variables.put("securityClassification", new CamundaVariable("SC", "String"));
+        variables.put("title", new CamundaVariable("someTitle", "String"));
+        variables.put("executionType", new CamundaVariable("someExecutionType", "String"));
+        variables.put("taskSystem", new CamundaVariable("someTaskSystem", "String"));
+        variables.put("jurisdiction", new CamundaVariable("someJurisdiction", "String"));
+        variables.put("region", new CamundaVariable("someRegion", "String"));
+        variables.put("appealType", new CamundaVariable("someAppealType", "String"));
+        variables.put("caseManagementCategory", new CamundaVariable("someCaseCategory", "String"));
+        variables.put("autoAssigned", new CamundaVariable("false", "Boolean"));
+        variables.put("assignee", new CamundaVariable("uid", "String"));
+        variables.put("hasWarnings", new CamundaVariable("true", "Boolean"));
+        variables.put("warningList", new CamundaVariable("SomeWarningListValue", "String"));
+        variables.put("taskType", new CamundaVariable("someTaskType", "String"));
+        return variables;
+    }
+}
