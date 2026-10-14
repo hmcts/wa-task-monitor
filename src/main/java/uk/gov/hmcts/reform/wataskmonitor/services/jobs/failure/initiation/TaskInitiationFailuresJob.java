@@ -57,7 +57,7 @@ public class TaskInitiationFailuresJob implements JobService {
             );
             reportFailedInitiations(tasks, report, serviceToken);
         } else {
-            List<CamundaTask> tasks = camundaService.getInitiationCandidates(serviceToken);
+            List<CamundaTask> tasks = camundaService.getInitiationFailuresForReporting(serviceToken);
             report = taskInitiationFailuresLogService.reportInitiationFailures(tasks, serviceToken);
         }
         log.info("{} job completed successfully: {}", TASK_INITIATION_FAILURES, logPrettyPrint(report));

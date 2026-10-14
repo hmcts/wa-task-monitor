@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,16 @@ public class CamundaService {
     public List<CamundaTask> getInitiationCandidates(String serviceToken) {
         log.info("Retrieving unconfigured task initiation candidates from Camunda.");
         return getTasks(serviceToken, buildInitiationSearchQuery());
+    }
+
+    public List<CamundaTask> getInitiationFailuresForReporting(String serviceToken) {
+        if (!initiationJobConfig.isCamundaTimeLimitFlag()) {
+            log.info("Initiation failure reporting skipped because the Camunda time limit is disabled.");
+            return Collections.emptyList();
+        }
+
+        log.info("Retrieving overdue unconfigured tasks for initiation failure reporting.");
+        return getTasks(serviceToken, buildInitiationFailureReportQuery());
     }
 
     public Map<String, CamundaVariable> getTaskVariables(String serviceToken, String taskId) {
@@ -96,6 +107,18 @@ public class CamundaService {
         }
 
         log.info("Initiation build query: {}", LoggingUtility.logPrettyPrint(query));
+        return query;
+    }
+
+    private String buildInitiationFailureReportQuery() {
+        String createdBefore = ZonedDateTime.now()
+            .minusMinutes(initiationJobConfig.getCamundaTimeLimit())
+            .format(formatter);
+        String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED)
+            .replace("\"createdAfter\": \"*\",", "")
+            .replace("\"createdBefore\": \"*\",", "\"createdBefore\": \"" + createdBefore + "\",");
+
+        log.info("Initiation failure report query: {}", LoggingUtility.logPrettyPrint(query));
         return query;
     }
 

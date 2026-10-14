@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.CamundaService.CAMUNDA_DATE_REQUEST_PATTERN;
 
@@ -97,6 +98,39 @@ class CamundaServiceTest {
             DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN)
         );
         assertThat(createdAfter).isBetween(earliestExpectedCutoff, latestExpectedCutoff);
+    }
+
+    @Test
+    void should_report_only_tasks_older_than_the_configured_time_limit() throws JSONException {
+        long configuredTimeLimitMinutes = 45L;
+        ZonedDateTime earliestExpectedCutoff = ZonedDateTime.now()
+            .minusMinutes(configuredTimeLimitMinutes).minusSeconds(1);
+        List<CamundaTask> tasks = InitiationHelpers.getMockedTasks();
+        when(initiationJobConfig.isCamundaTimeLimitFlag()).thenReturn(true);
+        when(initiationJobConfig.getCamundaTimeLimit()).thenReturn(configuredTimeLimitMinutes);
+        when(camundaClient.getTasks(
+            eq(SOME_SERVICE_TOKEN), eq("0"), eq("100"), queryCaptor.capture()
+        )).thenReturn(tasks);
+
+        assertThat(camundaService.getInitiationFailuresForReporting(SOME_SERVICE_TOKEN)).isEqualTo(tasks);
+
+        JSONObject query = new JSONObject(queryCaptor.getValue());
+        assertThat(query.has("createdAfter")).isFalse();
+        assertThat(query.getString("taskDefinitionKey")).isEqualTo("processTask");
+        assertThat(query.getString("processDefinitionKey")).isEqualTo("wa-task-initiation-ia-asylum");
+        ZonedDateTime createdBefore = ZonedDateTime.parse(
+            query.getString("createdBefore"), DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN)
+        );
+        assertThat(createdBefore).isBetween(
+            earliestExpectedCutoff,
+            ZonedDateTime.now().minusMinutes(configuredTimeLimitMinutes).plusSeconds(1)
+        );
+    }
+
+    @Test
+    void should_skip_initiation_failure_reporting_when_time_limit_is_disabled() {
+        assertThat(camundaService.getInitiationFailuresForReporting(SOME_SERVICE_TOKEN)).isEmpty();
+        verifyNoInteractions(camundaClient);
     }
 
     @Test
