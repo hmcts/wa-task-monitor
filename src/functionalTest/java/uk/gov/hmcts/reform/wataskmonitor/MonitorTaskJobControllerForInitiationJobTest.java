@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.wataskmonitor;
 
+import io.restassured.path.json.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -21,7 +22,6 @@ import static net.serenitybdd.rest.SerenityRest.given;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assume.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
@@ -40,8 +40,6 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         caseworkerCredentials = authorizationProvider.getNewTribunalCaseworker("wa-ft-test-r2-");
         caseIds = new ArrayList<>();
 
-        //to avoid initiation job run on non-local environment
-        assumeTrue(isInitiationTriggerFlagEnabled());
     }
 
     @After
@@ -167,15 +165,14 @@ public class MonitorTaskJobControllerForInitiationJobTest extends SpringBootFunc
         Map<String, CamundaVariable> delayedTaskCamundaVariables =
             common.getTaskVariablesFromCamunda(caseworkerCredentials.getHeaders(), delayedTaskVariables.getTaskId());
 
-        Map<String, CamundaVariable> delayedTaskCftResponse =
+        JsonPath delayedTaskCftResponse =
             common.getTaskFromTaskManagementApi(caseworkerCredentials.getHeaders(), delayedTaskVariables.getTaskId());
 
-        Map<String, CamundaVariable> defaultTaskCftResponse =
+        JsonPath defaultTaskCftResponse =
             common.getTaskFromTaskManagementApi(caseworkerCredentials.getHeaders(), defaultTaskVariables.getTaskId());
 
-        String actualDefaultTaskCftTaskState = ((HashMap) (((HashMap) defaultTaskCftResponse)
-            .get("task"))).get("task_state").toString();
-        String actualDelayedTaskCftTaskState = String.valueOf(delayedTaskCftResponse.get("status"));
+        String actualDefaultTaskCftTaskState = defaultTaskCftResponse.getString("task.task_state");
+        String actualDelayedTaskCftTaskState = delayedTaskCftResponse.getString("status");
 
         assertEquals("unassigned", actualDefaultTaskCftTaskState);
         assertEquals(String.valueOf(HttpStatus.NOT_FOUND.value()), actualDelayedTaskCftTaskState);

@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobOutcome;
 import uk.gov.hmcts.reform.wataskmonitor.domain.jobs.GenericJobReport;
@@ -15,15 +16,26 @@ import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class InitiationJobTest extends UnitBaseTest {
+@ExtendWith(MockitoExtension.class)
+class InitiationJobTest {
+
+    private static final String SOME_SERVICE_TOKEN = "some service token";
 
     @Mock
-    private InitiationJobService initiationJobService;
-    @InjectMocks
+    private CamundaService camundaService;
+    @Mock
+    private InitiationService initiationService;
     private InitiationJob initiationJob;
+
+    @BeforeEach
+    void setUp() {
+        initiationJob = new InitiationJob(camundaService, initiationService, false);
+    }
 
     @ParameterizedTest(name = "jobName: {0} expected: {1}")
     @CsvSource({
@@ -36,14 +48,14 @@ class InitiationJobTest extends UnitBaseTest {
     }
 
     @Test
-    void run() {
+    void should_run_when_immediate_task_initiation_is_disabled() {
         CamundaTask camundaTask = new CamundaTask(
             "some taskId",
             "some name",
             "someProcessInstanceId"
         );
         List<CamundaTask> taskList = singletonList(camundaTask);
-        when(initiationJobService.getUnConfiguredTasks(SOME_SERVICE_TOKEN))
+        when(camundaService.getInitiationCandidates(SOME_SERVICE_TOKEN))
             .thenReturn(taskList);
         GenericJobReport jobReport = new GenericJobReport(
             1,
@@ -54,12 +66,22 @@ class InitiationJobTest extends UnitBaseTest {
                               .jobType("Task Initiation")
                               .build())
         );
-        when(initiationJobService.initiateTasks(taskList, SOME_SERVICE_TOKEN))
+        when(initiationService.initiateTasks(taskList, SOME_SERVICE_TOKEN, "Task Initiation"))
             .thenReturn(jobReport);
 
         initiationJob.run(SOME_SERVICE_TOKEN);
 
-        verify(initiationJobService).getUnConfiguredTasks(SOME_SERVICE_TOKEN);
-        verify(initiationJobService).initiateTasks(taskList, SOME_SERVICE_TOKEN);
+        verify(camundaService).getInitiationCandidates(SOME_SERVICE_TOKEN);
+        verify(initiationService).initiateTasks(taskList, SOME_SERVICE_TOKEN, "Task Initiation");
+    }
+
+    @Test
+    void should_skip_when_immediate_task_initiation_is_enabled() {
+        initiationJob = new InitiationJob(camundaService, initiationService, true);
+
+        initiationJob.run(SOME_SERVICE_TOKEN);
+
+        verify(camundaService, never()).getInitiationCandidates(SOME_SERVICE_TOKEN);
+        verify(initiationService, never()).initiateTasks(any(), any(), any());
     }
 }
