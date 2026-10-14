@@ -1,52 +1,35 @@
 package uk.gov.hmcts.reform.wataskmonitor.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.form.spring.SpringFormEncoder;
-import org.springframework.beans.factory.ObjectFactory;
+import feign.jackson3.Jackson3Decoder;
+import feign.jackson3.Jackson3Encoder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
-import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
-import org.springframework.cloud.openfeign.support.SpringDecoder;
-import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import tools.jackson.databind.json.JsonMapper;
 
-@Configuration
-@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+/**
+ * Referenced only via {@code @FeignClient(configuration = ...)}.
+ * Not a Spring {@code @Configuration}, so these codecs stay on the IDAM client.
+ * The token call is form-encoded; the JSON delegate is Jackson 3.
+ */
 public class SnakeCaseFeignConfiguration {
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
     @Autowired
-    public SnakeCaseFeignConfiguration(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
-    @Bean
-    @Primary
-    public Encoder feignFormEncoder(
-        ObjectFactory<HttpMessageConverters> messageConverters
-    ) {
-        return new SpringFormEncoder(new SpringEncoder(messageConverters));
+    public SnakeCaseFeignConfiguration(JsonMapper jsonMapper) {
+        this.jsonMapper = jsonMapper;
     }
 
     @Bean
     public Decoder feignDecoder() {
-        HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter(objectMapper);
-        ObjectFactory<HttpMessageConverters> objectFactory = () -> new HttpMessageConverters(jacksonConverter);
-        return new ResponseEntityDecoder(new SpringDecoder(objectFactory));
+        return new Jackson3Decoder(jsonMapper);
     }
 
     @Bean
     public Encoder feignEncoder() {
-        HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter(objectMapper);
-        ObjectFactory<HttpMessageConverters> objectFactory = () -> new HttpMessageConverters(jacksonConverter);
-        return new SpringEncoder(objectFactory);
+        return new SpringFormEncoder(new Jackson3Encoder(jsonMapper));
     }
 }
-

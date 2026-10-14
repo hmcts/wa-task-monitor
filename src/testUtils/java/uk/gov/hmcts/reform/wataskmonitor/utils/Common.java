@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.wataskmonitor.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import io.restassured.http.Headers;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +7,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ResourceUtils;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.config.GivensBuilder;
 import uk.gov.hmcts.reform.wataskmonitor.config.RestApiActions;
@@ -71,7 +71,7 @@ public class Common {
     private final IdamService idamService;
     private final RoleAssignmentServiceApi roleAssignmentServiceApi;
     private final CamundaClient camundaClient;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final JsonMapper objectMapper = JsonMapper.builder().configureForJackson2().build();
 
     public Common(GivensBuilder given,
                   RestApiActions camundaApiActions,
@@ -524,7 +524,7 @@ public class Common {
 
         try {
             json = objectMapper.writeValueAsString(attributes);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             e.printStackTrace();
         }
 
@@ -536,7 +536,7 @@ public class Common {
 
         try {
             json = objectMapper.writeValueAsString(attributes);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             e.printStackTrace();
         }
 

@@ -1,18 +1,18 @@
 package uk.gov.hmcts.reform.wataskmonitor.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.hmcts.reform.wataskmonitor.exceptions.LoggingUtilityFailure;
 
 public final class LoggingUtility {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final JsonMapper MAPPER = JsonMapper.builder().configureForJackson2().build();
 
     public static String logPrettyPrint(String str) {
         try {
             Object json = MAPPER.readValue(str, Object.class);
             return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(json);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new LoggingUtilityFailure("Error logging pretty print: " + str, e);
         }
     }
@@ -20,7 +20,7 @@ public final class LoggingUtility {
     public static String logPrettyPrint(Object obj) {
         try {
             return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new LoggingUtilityFailure("Error logging pretty print: " + obj, e);
         }
     }

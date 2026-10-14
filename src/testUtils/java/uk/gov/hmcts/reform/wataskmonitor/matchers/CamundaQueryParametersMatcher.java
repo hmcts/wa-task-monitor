@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.wataskmonitor.matchers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.internal.lang3.StringUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.mockito.ArgumentMatcher;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,7 +22,7 @@ public class CamundaQueryParametersMatcher implements ArgumentMatcher<String> {
     @SneakyThrows
     @Override
     public boolean matches(String actualCamundaQueryParameters) {
-        ObjectMapper mapper = new ObjectMapper();
+        JsonMapper mapper = JsonMapper.builder().configureForJackson2().build();
 
         JsonNode expected = mapper.readTree(expectedCamundaQueryParameters);
         log.debug(expected.toPrettyString());

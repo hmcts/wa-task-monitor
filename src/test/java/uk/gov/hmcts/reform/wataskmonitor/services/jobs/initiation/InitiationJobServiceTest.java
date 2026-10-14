@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,6 +12,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.hmcts.reform.wataskmonitor.UnitBaseTest;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
@@ -55,7 +55,7 @@ class InitiationJobServiceTest extends UnitBaseTest {
     @BeforeEach
     void setUp() {
         initiationTaskAttributesMapper =
-            new InitiationTaskAttributesMapper(new ObjectMapper());
+            new InitiationTaskAttributesMapper(JsonMapper.builder().configureForJackson2().build());
         initiationJobService = new InitiationJobService(
             camundaClient,
             taskManagementClient,
