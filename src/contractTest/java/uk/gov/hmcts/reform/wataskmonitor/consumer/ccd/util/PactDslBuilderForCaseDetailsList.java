@@ -17,7 +17,6 @@ public final class PactDslBuilderForCaseDetailsList {
         return newJsonBody(o ->
             o.stringType("event_id", eventId)
                 .stringType("token", "token")
-                .nullValue("token")
                 .object("case_details", cd -> {
                     cd.numberType("id", 2000);
                     cd.stringType("jurisdiction", "IA");
@@ -32,7 +31,6 @@ public final class PactDslBuilderForCaseDetailsList {
         return newJsonBody(
             o -> o.stringType("event_id", eventId)
                 .stringType("token", "token")
-                .nullValue("token")
                 .object("case_details", cd -> {
                     cd.stringType("jurisdiction", "IA");
                     cd.stringType("case_type_id", "Asylum");
