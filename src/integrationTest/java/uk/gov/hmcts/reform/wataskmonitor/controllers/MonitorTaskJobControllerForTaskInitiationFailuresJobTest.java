@@ -27,8 +27,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -115,10 +117,11 @@ class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBoo
         runTaskInitiationFailuresJob();
 
         verify(taskManagementClient).initiateTask(eq(SERVICE_TOKEN), eq(CAMUNDA_TASK_ID), any());
-        assertThat(output.getOut())
-            .contains("TASK_INITIATION_FAILURES There are some uninitiated tasks:")
-            .contains("taskId: " + CAMUNDA_TASK_ID)
-            .contains("caseId: 00000");
+        await().atMost(10, TimeUnit.SECONDS)
+            .untilAsserted(() -> assertThat(output.getOut())
+                .contains("TASK_INITIATION_FAILURES There are some uninitiated tasks:")
+                .contains("taskId: " + CAMUNDA_TASK_ID)
+                .contains("caseId: 00000"));
     }
 
     private void runTaskInitiationFailuresJob() throws Exception {
