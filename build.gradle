@@ -293,7 +293,6 @@ def versions = [
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.18.2',
   pactVersion         : '4.6.11'
-  tomcat              : '11.0.27'
 ]
 
 ext.libraries = [
@@ -306,8 +305,7 @@ ext.libraries = [
   ]
 ]
 
-// Boot 4.1.1 manages Tomcat 11.0.24. 11.0.26 includes the 2026-09-15 fixes.
-ext['tomcat.version'] = '11.0.26'
+ext['tomcat.version'] = '11.0.27'
 
 dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
