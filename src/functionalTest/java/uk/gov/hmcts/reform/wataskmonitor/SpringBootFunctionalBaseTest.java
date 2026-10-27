@@ -73,8 +73,6 @@ public class SpringBootFunctionalBaseTest {
     private String testUrl;
     @Value("${targets.wa-task-management-api.url}")
     private String taskManagementUrl;
-    @Value("${enable_initiation_trigger_flag}")
-    private boolean enableInitiationTriggerFlag;
     @Autowired
     private CamundaClient camundaClient;
     @Autowired
@@ -117,11 +115,6 @@ public class SpringBootFunctionalBaseTest {
                 .post("/monitor/tasks/jobs")
                 .then()
                 .statusCode(HttpStatus.UNAUTHORIZED.value());
-    }
-
-    protected boolean isInitiationTriggerFlagEnabled() {
-        log.info("enableInitiationTriggerFlag : '{}'", enableInitiationTriggerFlag);
-        return enableInitiationTriggerFlag;
     }
 
     protected void initiateTask(Headers authenticationHeaders, TestVariables testVariables,

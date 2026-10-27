@@ -18,6 +18,9 @@ idam:
 document_management:
   url: ${DM_STORE_URL:http://local-dm-store}
 
+configuration:
+  initiateTasksOnCreate: ${WA_INITIATE_TASKS_ON_CREATE_ENABLED:false}
+
 core_case_data:
   api:
     url: ${CCD_URL:http://ccd-data-store-api}
@@ -33,5 +36,3 @@ spring:
           oidc:
             client-id: ${WA_IDAM_CLIENT_ID:wa}
             client-secret: ${WA_IDAM_CLIENT_SECRET:something}
-
-enable_initiation_trigger_flag: ${ENABLE_INITIATION_TRIGGER_FLAG:false}

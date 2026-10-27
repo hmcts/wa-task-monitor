@@ -150,7 +150,7 @@ project.ext {
 
 checkstyle {
   maxWarnings = 0
-  toolVersion = '13.9.0'
+  toolVersion = '13.11.0'
   getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
 }
 
@@ -293,6 +293,7 @@ def versions = [
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.18.2',
   pactVersion         : '4.6.11'
+  tomcat              : '11.0.27'
 ]
 
 ext.libraries = [
@@ -323,7 +324,7 @@ dependencies {
   implementation group: 'io.github.openfeign', name: 'feign-core', version: '13.13'
 
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: versions.springDoc
-  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.13'
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.14'
 
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '9.0'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
