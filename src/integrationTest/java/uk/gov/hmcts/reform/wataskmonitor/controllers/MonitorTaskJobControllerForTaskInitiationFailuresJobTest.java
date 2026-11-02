@@ -7,10 +7,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.taskmonitor.util.AwaitilityIntegrationTestConfig;
 import uk.gov.hmcts.reform.wataskmonitor.TestUtility;
 import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
 import uk.gov.hmcts.reform.wataskmonitor.clients.TaskManagementClient;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -45,6 +48,7 @@ import static uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.Camunda
 
 @TestPropertySource(properties = "configuration.initiateTasksOnCreate=true")
 @ExtendWith(OutputCaptureExtension.class)
+@Import(AwaitilityIntegrationTestConfig.class)
 class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBootIntegrationBaseTest {
 
     private static final String SERVICE_TOKEN = "some service token";
@@ -115,10 +119,11 @@ class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBoo
         runTaskInitiationFailuresJob();
 
         verify(taskManagementClient).initiateTask(eq(SERVICE_TOKEN), eq(CAMUNDA_TASK_ID), any());
-        assertThat(output.getOut())
-            .contains("TASK_INITIATION_FAILURES There are some uninitiated tasks:")
-            .contains("taskId: " + CAMUNDA_TASK_ID)
-            .contains("caseId: 00000");
+        await()
+            .untilAsserted(() -> assertThat(output.getOut())
+                .contains("TASK_INITIATION_FAILURES There are some uninitiated tasks:")
+                .contains("taskId: " + CAMUNDA_TASK_ID)
+                .contains("caseId: 00000"));
     }
 
     private void runTaskInitiationFailuresJob() throws Exception {

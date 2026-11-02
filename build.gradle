@@ -150,7 +150,7 @@ project.ext {
 
 checkstyle {
   maxWarnings = 0
-  toolVersion = '13.9.0'
+  toolVersion = '13.11.0'
   getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
 }
 
@@ -256,7 +256,7 @@ dependencyManagement {
     dependency group: 'org.glassfish', name: 'jakarta.el', version: '4.0.2'
 
     //CVE-2022-31692, CVE-2022-31690
-    dependencySet( group: 'org.springframework.security', version: '7.1.0'){
+    dependencySet( group: 'org.springframework.security', version: '7.1.2'){
       entry 'spring-boot-starter-security'
       entry 'spring-security-core'
       entry 'spring-security-acl'
@@ -302,12 +302,12 @@ def versions = [
   junit               : '6.1.2',
   junitPlatform       : '6.1.2',
   reformLogging       : '8.0.0',
-  springDoc           : '2.9.0',
+  springDoc           : '2.9.1',
   serenity            : '4.2.16',
   springFrameworkCloud: '2.2.10.RELEASE',
   pitest              : '1.18.2',
   pactVersion         : '4.6.11',
-  tomcat              : '11.0.24'
+  tomcat              : '11.0.27'
 ]
 
 ext.libraries = [
@@ -332,8 +332,8 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
-  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.22.2'
-  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.22.2'
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.22.4'
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.22.4'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.22'
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.3'
@@ -343,7 +343,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-rsa', version: '1.1.5'
 
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: versions.springDoc
-  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.13'
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.14'
 
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '9.0'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
@@ -381,7 +381,7 @@ dependencies {
   testImplementation group: 'com.obsidiandynamics.pojotester', name: 'core', version: '0.9.0'
   testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.10', classifier: 'all'
 
-  testImplementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
+  testImplementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.1.0'
 
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.9'
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
