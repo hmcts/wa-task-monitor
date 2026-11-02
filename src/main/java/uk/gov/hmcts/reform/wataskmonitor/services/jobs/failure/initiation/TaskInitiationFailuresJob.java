@@ -12,7 +12,10 @@ import uk.gov.hmcts.reform.wataskmonitor.services.JobService;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.CamundaService;
 import uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation.InitiationService;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -47,36 +50,36 @@ public class TaskInitiationFailuresJob implements JobService {
     @Override
     public void run(String serviceToken) {
         log.info("Starting task {} job.", TASK_INITIATION_FAILURES);
-        GenericJobReport report;
+        List<CamundaTask> failedTasks = new ArrayList<>();
         if (initiateTasksOnCreate) {
             List<CamundaTask> tasks = camundaService.getStaleUnconfiguredTasks(serviceToken);
-            report = initiationService.initiateTasks(
+            GenericJobReport initiationReport = initiationService.initiateTasks(
                 tasks,
                 serviceToken,
                 TASK_INITIATION_FAILURES.name()
             );
-            reportFailedInitiations(tasks, report, serviceToken);
-        } else {
-            List<CamundaTask> tasks = camundaService.getInitiationFailuresForReporting(serviceToken);
-            report = taskInitiationFailuresLogService.reportInitiationFailures(tasks, serviceToken);
+            failedTasks.addAll(reportFailedInitiations(tasks, initiationReport));
         }
+
+        failedTasks.addAll(camundaService.getInitiationFailuresForReporting(serviceToken));
+        Map<String, CamundaTask> uniqueFailedTasks = new LinkedHashMap<>();
+        failedTasks.forEach(task -> uniqueFailedTasks.putIfAbsent(task.getId(), task));
+        GenericJobReport report = taskInitiationFailuresLogService.reportInitiationFailures(
+            List.copyOf(uniqueFailedTasks.values()),
+            serviceToken
+        );
         log.info("{} job completed successfully: {}", TASK_INITIATION_FAILURES, logPrettyPrint(report));
     }
 
-    private void reportFailedInitiations(List<CamundaTask> tasks,
-                                         GenericJobReport initiationReport,
-                                         String serviceToken) {
+    private List<CamundaTask> reportFailedInitiations(List<CamundaTask> tasks,
+                                                      GenericJobReport initiationReport) {
         Set<String> failedTaskIds = initiationReport.getOutcomeList().stream()
             .filter(outcome -> !outcome.isSuccessful())
             .map(GenericJobOutcome::getTaskId)
             .collect(toSet());
 
-        List<CamundaTask> failedTasks = tasks.stream()
+        return tasks.stream()
             .filter(task -> failedTaskIds.contains(task.getId()))
             .toList();
-
-        if (!failedTasks.isEmpty()) {
-            taskInitiationFailuresLogService.reportInitiationFailures(failedTasks, serviceToken);
-        }
     }
 }
