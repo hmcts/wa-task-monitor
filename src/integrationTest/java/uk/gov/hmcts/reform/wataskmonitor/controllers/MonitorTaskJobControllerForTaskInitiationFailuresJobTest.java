@@ -37,6 +37,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -75,13 +76,16 @@ class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBoo
 
         verify(authTokenGenerator).generate();
         ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
-        verify(camundaClient).getTasks(
+        // Verify that getTasks is called twice i.e for getStaleUnconfiguredTasks and getInitiationFailuresForReporting
+        verify(camundaClient, times(2)).getTasks(
             eq(SERVICE_TOKEN),
             eq("0"),
             eq("100"),
             queryCaptor.capture()
         );
-        JSONObject query = new JSONObject(queryCaptor.getValue());
+        JSONObject firstQuery = new JSONObject(queryCaptor.getAllValues().get(0));
+        JSONObject secondQuery = new JSONObject(queryCaptor.getAllValues().get(1));
+        JSONObject query = firstQuery.has("createdAfter") ? firstQuery : secondQuery;
         ZonedDateTime createdBefore = ZonedDateTime.parse(
             query.getString("createdBefore"),
             DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN)
@@ -150,7 +154,10 @@ class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBoo
             eq("0"),
             eq("100"),
             any()
-        )).thenReturn(List.of(createMockedCamundaTask()));
+        )).thenAnswer(invocation -> {
+            JSONObject query = new JSONObject(invocation.getArgument(3, String.class));
+            return query.has("createdAfter") ? List.of(createMockedCamundaTask()) : List.of();
+        });
 
         when(camundaClient.getVariables(SERVICE_TOKEN, CAMUNDA_TASK_ID))
             .thenReturn(createMockCamundaVariables());
