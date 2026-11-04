@@ -1,0 +1,125 @@
+package uk.gov.hmcts.reform.wataskmonitor.services.jobs.initiation;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.wataskmonitor.clients.CamundaClient;
+import uk.gov.hmcts.reform.wataskmonitor.config.job.InitiationJobConfig;
+import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaTask;
+import uk.gov.hmcts.reform.wataskmonitor.domain.camunda.CamundaVariable;
+import uk.gov.hmcts.reform.wataskmonitor.utils.LoggingUtility;
+import uk.gov.hmcts.reform.wataskmonitor.utils.ResourceUtility;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static uk.gov.hmcts.reform.wataskmonitor.services.ResourceEnum.CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED;
+
+@Service
+@Slf4j
+public class CamundaService {
+
+    public static final String CAMUNDA_DATE_REQUEST_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(CAMUNDA_DATE_REQUEST_PATTERN);
+
+    private final CamundaClient camundaClient;
+    private final InitiationJobConfig initiationJobConfig;
+
+    public CamundaService(CamundaClient camundaClient,
+                          InitiationJobConfig initiationJobConfig) {
+        this.camundaClient = camundaClient;
+        this.initiationJobConfig = initiationJobConfig;
+    }
+
+    public List<CamundaTask> getInitiationCandidates(String serviceToken) {
+        log.info("Retrieving unconfigured task initiation candidates from Camunda.");
+        return getTasks(serviceToken, buildInitiationSearchQuery());
+    }
+
+    public List<CamundaTask> getInitiationFailuresForReporting(String serviceToken) {
+        if (!initiationJobConfig.isCamundaTimeLimitFlag()) {
+            log.info("Initiation failure reporting skipped because the Camunda time limit is disabled.");
+            return Collections.emptyList();
+        }
+
+        log.info("Retrieving overdue unconfigured tasks for initiation failure reporting.");
+        return getTasks(serviceToken, buildInitiationFailureReportQuery());
+    }
+
+    public Map<String, CamundaVariable> getTaskVariables(String serviceToken, String taskId) {
+        return camundaClient.getVariables(serviceToken, taskId);
+    }
+
+    public List<CamundaTask> getStaleUnconfiguredTasks(String serviceToken) {
+        log.info("Retrieving stale unconfigured tasks from Camunda.");
+        return getTasks(serviceToken, buildStaleUnconfiguredTasksSearchQuery());
+    }
+
+    private String buildStaleUnconfiguredTasksSearchQuery() {
+        ZonedDateTime now = ZonedDateTime.now();
+        String createdBefore = now.minusMinutes(initiationJobConfig.getFailureRetryDelayMinutes())
+            .format(formatter);
+        String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED)
+            .replace("\"createdBefore\": \"*\",", "\"createdBefore\": \"" + createdBefore + "\",");
+
+        if (initiationJobConfig.isCamundaTimeLimitFlag()) {
+            String createdAfter = now.minusMinutes(initiationJobConfig.getCamundaTimeLimit()).format(formatter);
+            query = query.replace(
+                "\"createdAfter\": \"*\",",
+                "\"createdAfter\": \"" + createdAfter + "\","
+            );
+        } else {
+            query = query.replace("\"createdAfter\": \"*\",", "");
+        }
+
+        log.info("Stale unconfigured tasks build query: {}", LoggingUtility.logPrettyPrint(query));
+        return query;
+    }
+
+    private List<CamundaTask> getTasks(String serviceToken, String searchQuery) {
+        log.info("initiationJobConfig: {}", initiationJobConfig);
+        List<CamundaTask> tasks = camundaClient.getTasks(
+            serviceToken,
+            "0",
+            initiationJobConfig.getCamundaMaxResults(),
+            searchQuery
+        );
+        log.info("{} task(s) retrieved successfully.", tasks.size());
+        return tasks;
+    }
+
+    private String buildInitiationSearchQuery() {
+        String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED)
+            .replace("\"createdBefore\": \"*\",", "");
+
+        if (initiationJobConfig.isCamundaTimeLimitFlag()) {
+            ZonedDateTime createdTime = ZonedDateTime.now()
+                .minusMinutes(initiationJobConfig.getCamundaTimeLimit());
+            String createdAfter = createdTime.format(formatter);
+            query = query.replace(
+                "\"createdAfter\": \"*\",",
+                "\"createdAfter\": \"" + createdAfter + "\","
+            );
+        } else {
+            query = query.replace("\"createdAfter\": \"*\",", "");
+        }
+
+        log.info("Initiation build query: {}", LoggingUtility.logPrettyPrint(query));
+        return query;
+    }
+
+    private String buildInitiationFailureReportQuery() {
+        String createdBefore = ZonedDateTime.now()
+            .minusMinutes(initiationJobConfig.getCamundaTimeLimit())
+            .format(formatter);
+        String query = ResourceUtility.getResource(CAMUNDA_TASKS_CFT_TASK_STATE_UNCONFIGURED)
+            .replace("\"createdAfter\": \"*\",", "")
+            .replace("\"createdBefore\": \"*\",", "\"createdBefore\": \"" + createdBefore + "\",");
+
+        log.info("Initiation failure report query: {}", LoggingUtility.logPrettyPrint(query));
+        return query;
+    }
+
+}

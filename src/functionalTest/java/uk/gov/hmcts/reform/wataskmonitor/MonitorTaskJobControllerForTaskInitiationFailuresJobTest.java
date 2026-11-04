@@ -1,0 +1,98 @@
+package uk.gov.hmcts.reform.wataskmonitor;
+
+import io.restassured.path.json.JsonPath;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.JobName;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.JobDetails;
+import uk.gov.hmcts.reform.wataskmonitor.domain.taskmonitor.request.MonitorTaskJobRequest;
+import uk.gov.hmcts.reform.wataskmonitor.entities.TestAuthenticationCredentials;
+import uk.gov.hmcts.reform.wataskmonitor.entities.TestVariables;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
+import static net.serenitybdd.rest.SerenityRest.given;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.wataskmonitor.config.SecurityConfiguration.SERVICE_AUTHORIZATION;
+import static uk.gov.hmcts.reform.wataskmonitor.controllers.MonitorTaskJobControllerUtility.expectedResponse;
+
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert", "PMD.LawOfDemeter"})
+public class MonitorTaskJobControllerForTaskInitiationFailuresJobTest extends SpringBootFunctionalBaseTest {
+
+    @Value("${configuration.initiateTasksOnCreate:false}")
+    private boolean initiateTasksOnCreate;
+
+    @Value("${job.initiation.failure-retry-delay-minutes:2}")
+    private long failureRetryDelayMinutes;
+
+    private List<String> caseIds;
+    private TestAuthenticationCredentials caseworkerCredentials;
+
+    @Before
+    public void setUp() {
+        assumeTrue(
+            "configuration.initiateTasksOnCreate must be enabled",
+            initiateTasksOnCreate
+        );
+        caseworkerCredentials = authorizationProvider.getNewTribunalCaseworker("wa-ft-test-r2-");
+        caseIds = new ArrayList<>();
+    }
+
+    @After
+    public void cleanUp() {
+        if (caseworkerCredentials != null) {
+            common.clearAllRoleAssignments(caseworkerCredentials.getHeaders());
+            authorizationProvider.deleteAccount(caseworkerCredentials.getAccount().getUsername());
+            common.cleanUpTask(caseworkerCredentials.getHeaders(), caseIds);
+        }
+    }
+
+    @Test
+    public void should_initiate_unconfigured_task_when_task_initiation_failures_job_runs() {
+        TestVariables taskVariables = common.setupTaskAndRetrieveIds();
+        common.setupOrganisationalRoleAssignment(caseworkerCredentials.getHeaders());
+
+        assertNotNull(taskVariables);
+        assertNotNull(taskVariables.getTaskId());
+        assertNotNull(taskVariables.getCaseId());
+
+        caseIds.add(taskVariables.getCaseId());
+
+        Duration pickupDelay = Duration.ofMinutes(failureRetryDelayMinutes).plusSeconds(1);
+        await("Failure sweeper initiates task " + taskVariables.getTaskId())
+            .pollInSameThread()
+            .pollDelay(pickupDelay)
+            .pollInterval(Duration.ofSeconds(5))
+            .atMost(pickupDelay.plusMinutes(1))
+            .untilAsserted(() -> {
+                given()
+                    .contentType(APPLICATION_JSON_VALUE)
+                    .header(SERVICE_AUTHORIZATION, serviceToken)
+                    .body(TestUtility.asJsonString(
+                        new MonitorTaskJobRequest(new JobDetails(JobName.TASK_INITIATION_FAILURES))
+                    ))
+                    .when()
+                    .post("/monitor/tasks/jobs")
+                    .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .body(is(expectedResponse.apply(JobName.TASK_INITIATION_FAILURES.name())));
+
+                JsonPath taskManagementResponse = common.getTaskFromTaskManagementApi(
+                    caseworkerCredentials.getHeaders(), taskVariables.getTaskId()
+                );
+                assertEquals(taskVariables.getTaskId(), taskManagementResponse.getString("task.id"));
+                assertEquals(taskVariables.getCaseId(), taskManagementResponse.getString("task.case_id"));
+                assertEquals("unassigned", taskManagementResponse.getString("task.task_state"));
+            });
+    }
+}
