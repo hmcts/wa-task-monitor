@@ -94,17 +94,17 @@ class TaskInitiationFailuresJobTest {
         taskInitiationFailuresJob.run(SOME_SERVICE_TOKEN);
 
         verify(camundaService).getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN);
-        verify(camundaService, never()).getInitiationFailuresForReporting(SOME_SERVICE_TOKEN);
+        verify(camundaService).getInitiationFailuresForReporting(SOME_SERVICE_TOKEN);
         verify(initiationService).initiateTasks(
             tasks,
             SOME_SERVICE_TOKEN,
             TASK_INITIATION_FAILURES.name()
         );
-        verify(taskInitiationFailuresLogService, never()).reportInitiationFailures(tasks, SOME_SERVICE_TOKEN);
+        verify(taskInitiationFailuresLogService).reportInitiationFailures(List.of(), SOME_SERVICE_TOKEN);
     }
 
     @Test
-    void should_report_tasks_that_the_sweeper_could_not_initiate() {
+    void should_report_current_and_historic_failures() {
         taskInitiationFailuresJob = new TaskInitiationFailuresJob(
             taskInitiationFailuresLogService,
             camundaService,
@@ -118,6 +118,11 @@ class TaskInitiationFailuresJobTest {
         );
         CamundaTask failedTask = new CamundaTask(
             "failed taskId",
+            "some name",
+            "some processInstanceId"
+        );
+        CamundaTask historicFailedTask = new CamundaTask(
+            "historic failed taskId",
             "some name",
             "some processInstanceId"
         );
@@ -142,6 +147,47 @@ class TaskInitiationFailuresJobTest {
             SOME_SERVICE_TOKEN,
             TASK_INITIATION_FAILURES.name()
         )).thenReturn(jobReport);
+        when(camundaService.getInitiationFailuresForReporting(SOME_SERVICE_TOKEN))
+            .thenReturn(List.of(historicFailedTask));
+
+        taskInitiationFailuresJob.run(SOME_SERVICE_TOKEN);
+
+        verify(taskInitiationFailuresLogService).reportInitiationFailures(
+            List.of(failedTask, historicFailedTask),
+            SOME_SERVICE_TOKEN
+        );
+    }
+
+    @Test
+    void should_not_report_duplicate_task_returned_as_current_and_historic_failure() {
+        taskInitiationFailuresJob = new TaskInitiationFailuresJob(
+            taskInitiationFailuresLogService,
+            camundaService,
+            initiationService,
+            true
+        );
+        CamundaTask failedTask = new CamundaTask(
+            "failed taskId",
+            "some name",
+            "some processInstanceId"
+        );
+        List<CamundaTask> tasks = List.of(failedTask);
+        GenericJobReport jobReport = new GenericJobReport(
+            1,
+            List.of(GenericJobOutcome.builder()
+                .taskId(failedTask.getId())
+                .successful(false)
+                .build())
+        );
+
+        when(camundaService.getStaleUnconfiguredTasks(SOME_SERVICE_TOKEN)).thenReturn(tasks);
+        when(initiationService.initiateTasks(
+            tasks,
+            SOME_SERVICE_TOKEN,
+            TASK_INITIATION_FAILURES.name()
+        )).thenReturn(jobReport);
+        when(camundaService.getInitiationFailuresForReporting(SOME_SERVICE_TOKEN))
+            .thenReturn(List.of(failedTask));
 
         taskInitiationFailuresJob.run(SOME_SERVICE_TOKEN);
 
