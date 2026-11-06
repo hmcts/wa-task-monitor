@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.wataskmonitor.domain.caseeventhandler;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import tools.jackson.databind.JsonNode;
 
 import java.util.Map;
 
@@ -18,8 +19,9 @@ public class AdditionalData {
     private final Map<String, JsonNode> definition;
 
     @JsonCreator
-    public AdditionalData(@JsonProperty("Data") Map<String, Object> data,
-                          @JsonProperty("Definition") Map<String, JsonNode> definition) {
+    public AdditionalData(@JsonProperty("Data") @JsonAlias("data") Map<String, Object> data,
+                          @JsonProperty("Definition") @JsonAlias("definition")
+                          Map<String, JsonNode> definition) {
         this.data = data;
         this.definition = definition;
     }

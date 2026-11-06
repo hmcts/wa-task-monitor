@@ -15,6 +15,7 @@ public class MonitorTaskJobRequest {
         this.jobDetails = jobDetails;
     }
 
+    @JsonProperty("job_details")
     public JobDetails getJobDetails() {
         return jobDetails;
     }

@@ -9,6 +9,7 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
+import io.restassured.mapper.ObjectMapperType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
@@ -32,15 +33,19 @@ public class RestApiActions {
         return RestAssured.given()
             .spec(specification)
             .config(RestAssured.config()
-                        .objectMapperConfig(new ObjectMapperConfig().jackson2ObjectMapperFactory(
-                            (type, s) -> {
-                                ObjectMapper objectMapper = new ObjectMapper();
-                                objectMapper.setPropertyNamingStrategy(propertyNamingStrategy);
-                                objectMapper.registerModule(new Jdk8Module());
-                                objectMapper.registerModule(new JavaTimeModule());
-                                return objectMapper;
-                            }
-                        ))
+                        // Rest Assured 6 prefers Jackson 3 when both generations are on the classpath.
+                        // Keep Jackson 2 here so the naming strategy on this factory is actually used.
+                        .objectMapperConfig(new ObjectMapperConfig(ObjectMapperType.JACKSON_2)
+                                                .jackson2ObjectMapperFactory(
+                                                    (type, s) -> {
+                                                        ObjectMapper objectMapper = new ObjectMapper();
+                                                        objectMapper.setPropertyNamingStrategy(
+                                                            propertyNamingStrategy);
+                                                        objectMapper.registerModule(new Jdk8Module());
+                                                        objectMapper.registerModule(new JavaTimeModule());
+                                                        return objectMapper;
+                                                    }
+                                                ))
             ).relaxedHTTPSValidation();
     }
 

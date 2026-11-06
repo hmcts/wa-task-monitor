@@ -1,48 +1,66 @@
 package uk.gov.hmcts.reform.wataskmonitor.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import feign.RequestTemplate;
+import feign.Util;
 import feign.codec.Decoder;
+import feign.codec.EncodeException;
 import feign.codec.Encoder;
-import org.springframework.beans.factory.ObjectFactory;
+import feign.jackson3.Jackson3Decoder;
+import feign.jackson3.Jackson3Encoder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
-import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
-import org.springframework.cloud.openfeign.support.SpringDecoder;
-import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.json.JsonMapper;
 
-@Configuration
-@SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+import java.lang.reflect.Type;
+
+/**
+ * Referenced only via {@code @FeignClient(configuration = ...)}.
+ * Not a Spring {@code @Configuration}, so camelCase stays on the role-assignment client.
+ * Raw {@link String}/{@code byte[]} bodies are passed through so template JSON is not
+ * re-quoted by {@link Jackson3Encoder} (RoleAssignmentServiceApi posts a pre-built String).
+ */
 public class CamelCaseFeignConfiguration {
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper camelCaseMapper;
 
     @Autowired
-    public CamelCaseFeignConfiguration(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public CamelCaseFeignConfiguration(JsonMapper jsonMapper) {
+        this.camelCaseMapper = jsonMapper.rebuild()
+            .propertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE)
+            .build();
     }
 
     @Bean
     public Decoder feignDecoder() {
-        HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter(camelCasedObjectMapper());
-        ObjectFactory<HttpMessageConverters> objectFactory = () -> new HttpMessageConverters(jacksonConverter);
-        return new ResponseEntityDecoder(new SpringDecoder(objectFactory));
+        return new Jackson3Decoder(camelCaseMapper);
     }
 
     @Bean
     public Encoder feignEncoder() {
-        HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter(camelCasedObjectMapper());
-        ObjectFactory<HttpMessageConverters> objectFactory = () -> new HttpMessageConverters(jacksonConverter);
-        return new SpringEncoder(objectFactory);
-    }
-
-    public ObjectMapper camelCasedObjectMapper() {
-        //Override naming strategy for this class only
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
-        return objectMapper;
+        Encoder jackson3 = new Jackson3Encoder(camelCaseMapper);
+        return new Encoder() {
+            @Override
+            public void encode(Object object, Type bodyType, RequestTemplate template) throws EncodeException {
+                if (bodyType == String.class) {
+                    template.body(String.valueOf(object));
+                    return;
+                }
+                if (bodyType == byte[].class) {
+                    template.body((byte[]) object, null);
+                    return;
+                }
+                if (object instanceof String) {
+                    byte[] bodyData = ((String) object).getBytes(Util.UTF_8);
+                    template.body(bodyData, Util.UTF_8);
+                    return;
+                }
+                if (object instanceof byte[]) {
+                    template.body((byte[]) object, null);
+                    return;
+                }
+                jackson3.encode(object, bodyType, template);
+            }
+        };
     }
 }

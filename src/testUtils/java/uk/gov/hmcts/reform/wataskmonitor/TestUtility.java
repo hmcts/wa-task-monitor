@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.wataskmonitor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.json.JsonMapper;
 
 public final class TestUtility {
 
@@ -12,10 +12,12 @@ public final class TestUtility {
 
     public static String asJsonString(Object object) {
         try {
-            return new ObjectMapper()
-                .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+            return JsonMapper.builder()
+                .configureForJackson2()
+                .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+                .build()
                 .writeValueAsString(object);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
